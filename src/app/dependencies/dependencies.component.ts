@@ -19,16 +19,20 @@ export class DependenciesComponent implements OnInit{
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
     constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location){}
     ngOnInit(): void {
-      let state = this.location.getState() as { dependencies: any[] };
-      this.dependencies = state.dependencies;
-      console.log(this.dependencies);
-      this.lightMode = this.vulnService.getLightMode();
+      // let state = this.location.getState() as { dependencies: any[] };
+      // this.dependencies = state.dependencies;
+      // console.log(this.dependencies);
+      this.vulnService.getLightMode().subscribe((mode: boolean) => {
+        this.lightMode = mode;
+      });
+       this.vulnService.dependencies$.subscribe((data:any[]) => {
+          this.dependencies = data;
+         })
     }
     viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
           this.vulnService.setLightMode(this.lightMode);
-          this.router.navigate(['/vulnerabilityList'], {
-            state: {vulnerabilityData}
-          })
+          this.router.navigate(['/vulnerabilityList']);
+          this.vulnService.setVulnerabilityData(vulnerabilityData);
     }
 }

@@ -18,7 +18,7 @@ import { Location } from '@angular/common';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss']
 })
-export class DashboardComponent implements OnDestroy {  
+export class DashboardComponent implements OnDestroy, AfterViewInit {  
   isLoading = true;
   isAnimate = false;
   shouldAnimate = false;
@@ -32,11 +32,14 @@ export class DashboardComponent implements OnDestroy {
   animationStyle:string = "none";
   fetchedDependencies:number = 0;
   totalDependencies:number = 0;
+  @ViewChild(RouterOutlet) outlet: RouterOutlet | undefined;
   @ViewChild('loaderRef', {static:false}) loaderRef!:ElementRef;
 constructor(private http: HttpClient, private router: Router, private vulnService: VulnerabilityService, private ngZone:NgZone, private cd: ChangeDetectorRef,
   private location: Location
 ){
-  this.lightMode = vulnService.getLightMode();
+  this.vulnService.getLightMode().subscribe((mode => {
+    this.lightMode = mode;
+  }))
   this.isLoading = false;
   if(vulnService.hasData()){
     this.searchVariant = vulnService.getSearchVariant();
@@ -85,10 +88,10 @@ searchVulnerabilities() {
         this.vulnService.setSearchVariant(this.searchVariant);
         this.vulnService.setLightMode(this.lightMode);
         this.router.navigate(['/vulnerabilityList'], {
-          state:{vulnerabilityData: this.vulnerabilityData}
+          state:{searchVariant: this.searchVariant}
         });
         this.isAnimate = false;
-        this.vulnService.setVulnerabilities(this.vulnerabilityData);
+        this.vulnService.setVulnerabilityData(this.vulnerabilityData);
        },
        error:(error)=> {
           console.log(this.searchUrl)
@@ -133,9 +136,8 @@ startScan(): void {
   } else {
     console.log("No dependencies found in localStorage.");
   }
-  this.router.navigate(['/dependencies'],{
-    state:{dependencies:this.dependencies}
-  })
+  this.router.navigate(['/dependencies']);
+  this.vulnService.setDependencies(this.dependencies);
   // this.eventSource.onmessage = (event) => {
   //   console.log(event.data)
   //   this.ngZone.run(() => {
@@ -194,5 +196,16 @@ fetchFinalResults() {
 
 updateProgress(fetched: number, total: number) {
   this.progress = total > 0 ? Math.round((fetched / total) * 100) : 0;
+}
+ngAfterViewInit(): void {
+  // this.vulnService.lightMode$.subscribe(mode => {
+  //   const currentComponent = this.outlet!.component;
+  //   if (currentComponent && 'onLightModeChange' in currentComponent) {
+  //     (currentComponent as { onLightModeChange: (mode: boolean) => void }).onLightModeChange(mode);
+  //   }
+  // });
+}
+changeTheme(event:any): void {
+  this.vulnService.setLightMode(event.target.checked);
 }
 }
