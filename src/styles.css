@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+.custom-auto-black{
+    background-color: black;
+}
+.custom-app-grey{
+    background-color: rgb(228, 227, 227);
+} 
+.app-vul-scrollbar::-webkit-scrollbar {
+    width: 10px;
+}
+  
+.app-vul-scrollbar::-webkit-scrollbar-track {
+    background: #d1d1d1; 
+}
+   
+.app-vul-scrollbar::-webkit-scrollbar-thumb {
+    background: #7a7a7a; 
+}
+
+.app-vul-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #464646; 
+}
+
+.text-black {
+    color: black;
+}
+/* Component SCSS or global styles */
+.custom-card {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .custom-table {
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+  
+    .mat-header-cell {
+      font-weight: 600;
+      background-color: var(--header-bg);
+      color: var(--header-color);
+    }
+  
+    .mat-cell {
+      background-color: var(--row-bg);
+      color: var(--text-color);
+    }
+  
+    .mat-row:nth-child(even) .mat-cell {
+      background-color: var(--row-alt-bg);
+    }
+  }
+  

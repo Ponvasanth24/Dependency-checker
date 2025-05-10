@@ -1,0 +1,4 @@
+table th:nth-child(1),td:nth-child(1) {
+    padding: 10px;
+    border-left: 5px solid red;
+}

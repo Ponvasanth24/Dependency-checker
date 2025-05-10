@@ -1,0 +1,19 @@
+<table [ngClass]="{'table-dark': !lightMode, 'table-white': lightMode}"
+class="table border border-2 border-secondary table-responsive-lg table-borderless table-striped mt-2">
+    <thead>
+        <tr>
+            <th>Dependency Name</th> 
+            <th>Vendor</th>
+            <th>Product</th>
+            <th>Version</th>
+         </tr>
+    </thead>
+     <tbody>
+        <tr *ngFor="let dependency of dependencies">
+            <td><a [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}"class="text-white" (click)="viewDependency(dependency.vulnerabilities)">{{dependency.dependencyName}}</a></td>
+            <td>{{dependency.cpeEnumeration?.vendor}}</td>
+            <td>{{dependency.cpeEnumeration?.product}}</td>
+            <td>{{dependency.cpeEnumeration?.version}}</td>
+        </tr>
+     </tbody>
+</table>

@@ -1,0 +1,58 @@
+.row div {
+    padding: 0;
+}
+.custom-db-col{
+    width: 49%;
+}
+.custom-db-gab{
+    gap: 10px;
+}
+.custom-col-db-black{
+    background-color: rgba(20, 20, 20, 0.904);
+}
+
+#dependency-search{
+    outline: none;
+    caret-color: white;
+    background-image: url("../../assets/images/search_24dp_CCCCCC_FILL0_wght400_GRAD0_opsz24.png");
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+}
+
+.search-button:hover {
+    background-color: white !important;
+    color: black !important;
+}
+.dep-inp-ht{
+    height: 40px;
+}
+.chart-config{
+    height: 80% !important;
+}
+.h-fit{
+    height: fit-content;
+}
+.severity-low {
+    background-color: green;
+}
+.severity-medium{
+    background-color: orange;
+}
+.severity-high{
+    background-color: red;
+}
+.severity-critical{
+    background-color: white;
+}
+.search-type-checkbox {
+    accent-color: orange;
+}
+#search-type input[type="radio"]{
+    width: 18px;
+    height: 18px;
+}
+@media (max-width: 768px) {
+    .custom-db-col {
+      width: 100% !important;
+    }
+}
