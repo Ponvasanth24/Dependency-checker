@@ -3,7 +3,7 @@
     background-color: black;
 }
 .custom-app-grey{
-    background-color: rgb(228, 227, 227);
+    background-color: rgb(228, 227, 227) !important;
 } 
 .app-vul-scrollbar::-webkit-scrollbar {
     width: 10px;
@@ -51,4 +51,9 @@
       background-color: var(--row-alt-bg);
     }
   }
-  
+.custom-col-db-black{
+    background-color: rgba(20, 20, 20, 0.904);
+}
+.custom-col-db-white{
+    background-color: rgb(236, 235, 235);
+}

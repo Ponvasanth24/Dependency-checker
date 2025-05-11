@@ -9,11 +9,35 @@ class="table border border-2 border-secondary table-responsive-lg table-borderle
          </tr>
     </thead>
      <tbody>
-        <tr *ngFor="let dependency of dependencies">
-            <td><a [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}"class="text-white" (click)="viewDependency(dependency.vulnerabilities)">{{dependency.dependencyName}}</a></td>
+        <tr *ngFor="let dependency of pagedDependencies">
+            <td><a [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}"class="text-white cursor-pointer" (click)="viewDependency(dependency.vulnerabilities)">{{dependency.dependencyName}}</a></td>
             <td>{{dependency.cpeEnumeration?.vendor}}</td>
             <td>{{dependency.cpeEnumeration?.product}}</td>
             <td>{{dependency.cpeEnumeration?.version}}</td>
         </tr>
      </tbody>
 </table>
+
+<div class="row justify-content-center height-fit-content">
+<div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
+  <mat-label class="text-nowrap" [ngClass]="{'bg-dark': !lightMode, 'bg-white': lightMode, 'border-white': !lightMode, 'border-dark': lightMode,'text-white': !lightMode, 'text-dark': lightMode}">Page Size</mat-label>
+  <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
+    <mat-option [ngClass]="{'bg-dark': !lightMode, 'bg-white': lightMode, 'text-white': !lightMode, 'text-dark': lightMode}" *ngFor="let size of pageSizes" [value]="size">
+      {{ size }}
+    </mat-option>
+  </mat-select>
+<span [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}" class="text-white">{{start}} - {{end}} out of {{dependencies.length}} dependencies</span>
+
+<button (click)="previousPage()" [ngClass]="{'bg-white': !lightMode, 'custom-app-grey': lightMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm"> 
+<mat-icon class="material-symbols-outlined">
+arrow_back_ios
+</mat-icon>  
+</button>
+<button (click)="nextPage()" [ngClass]="{'bg-white': !lightMode, 'custom-app-grey': lightMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm">
+<mat-icon class="material-symbols-outlined">
+arrow_forward_ios
+</mat-icon>
+</button>
+</div>
+</div>
+

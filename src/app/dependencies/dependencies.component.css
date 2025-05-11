@@ -1,4 +1,20 @@
 table th:nth-child(1),td:nth-child(1) {
     padding: 10px;
-    border-left: 5px solid red;
+    border-left: 7px solid red;
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+.height-fit-content {
+    height: fit-content;
+}
+.width-fit-content {
+    width: fit-content;
+}
+.page-size-width {
+    width: 50px;
+}
+.page-custom-btn {
+    width: 42px;
+    height: 40px;
 }

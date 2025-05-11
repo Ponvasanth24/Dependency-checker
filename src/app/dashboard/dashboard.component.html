@@ -19,7 +19,7 @@
       <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
         <div class="w-100 pb-1 d-flex justify-content-end">
         <div class="form-check form-switch">
-          <input class="form-check-input" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
+          <input class="form-check-input" [(ngModel)]="lightMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
           <label class="form-check-label" [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}" for="flexSwitchCheckDefault">Light Mode</label>
         </div>
       </div>

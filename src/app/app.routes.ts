@@ -14,16 +14,15 @@ export const routes: Routes = [
         {
           path: 'vulnerabilityList',
           loadComponent: () => import('./vulnerabilitylist/vulnerabilitylist.component').then(m => m.VulnerabilitylistComponent)
-        },
-        {
-          path: 'vulnerability',
-          loadComponent: () => import('./vulnerability/vulnerability.component').then(m => m.VulnerabilityComponent)
-        },
+        }
         // {
         //   path: '',
         //   redirectTo: 'dependencies',
         //   pathMatch: 'full'
         // }
       ]
-    }
+    },{
+          path: 'vulnerability',
+          loadComponent: () => import('./vulnerability/vulnerability.component').then(m => m.VulnerabilityComponent)
+        }
   ];
