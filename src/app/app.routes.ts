@@ -13,7 +13,8 @@ export const routes: Routes = [
         },
         {
           path: 'vulnerabilityList',
-          loadComponent: () => import('./vulnerabilitylist/vulnerabilitylist.component').then(m => m.VulnerabilitylistComponent)
+          loadComponent: () => import('./vulnerabilitylist/vulnerabilitylist.component').then(m => m.VulnerabilitylistComponent),
+          runGuardsAndResolvers: 'always'
         }
         // {
         //   path: '',

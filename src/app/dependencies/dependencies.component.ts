@@ -29,6 +29,7 @@ export class DependenciesComponent implements OnInit{
     pagedDependencies: any[] = [];
     pageIndex:number = 0;
     pageSize:number = 10;
+    initialIndex:number = 0;
     currentPageSize:number = this.pageSize;
     totalPages:number = 0;
     pageSizes:Array<number> = [];
@@ -46,8 +47,8 @@ export class DependenciesComponent implements OnInit{
       });
        this.vulnService.dependencies$.subscribe((data:any[]) => {
           this.dependencies = data;
-      });
-      this.updatePagedData();   
+          this.updatePagedData(this. initialIndex);
+      });   
     }
    viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
@@ -57,7 +58,7 @@ export class DependenciesComponent implements OnInit{
    }
    nextPage(): void {
     console.log("called")
-    if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages) {
+    if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
       console.log("called inside")
     this.pageIndex++;
     this.start = this.pageIndex * this.pageSize;
@@ -77,10 +78,10 @@ export class DependenciesComponent implements OnInit{
     }
    }
   
-   updatePagedData(): void {
+   updatePagedData(initialIndex: number): void {
     let pages = Math.ceil(this.dependencies.length / this.pageSize);
     this.totalPages = pages;
-    this.start = this.pageIndex * this.pageSize;
+    this.start = initialIndex * this.pageSize;
     this.end = this.start + this.pageSize;
     this.pageSizes = this.dependencies.length >= 100 ? [10, 25, 50, 100] : this.dependencies.length <= 100 && this.dependencies.length >= 50 ? [10, 25, 50] : 
     this.dependencies.length <= 50 && this.dependencies.length >= 25 ? [10, 25] : this.dependencies.length <= 25 && this.dependencies.length >= 10 ? [10] : [5];
@@ -88,6 +89,6 @@ export class DependenciesComponent implements OnInit{
    }
    onPageSizeChange(event: MatSelectChange): void {
    this.pageSize = event.value;
-   this.updatePagedData();
+   this.updatePagedData(this.initialIndex);
    }
 }

@@ -10,11 +10,15 @@ import { VulnerabilitylistComponent } from '../vulnerabilitylist/vulnerabilityli
 import { DependenciesComponent } from '../dependencies/dependencies.component';
 import { RouterOutlet } from '@angular/router';
 import { Location } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-dashboard',
   standalone:true,
-  imports: [MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent, RouterOutlet],
+  imports: [MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent, RouterOutlet,
+    MatFormFieldModule, MatSelectModule
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss']
 })
@@ -23,7 +27,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   isAnimate = false;
   shouldAnimate = false;
   vulnerabilityData:any = [];
-  searchType: number = 0;
+  searchType: number = 1;
+  searchCve: number = 0;
   searchValue: string = "";
   searchUrl: string = "";
   searchVariant:boolean = false;
@@ -32,6 +37,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   animationStyle:string = "none";
   fetchedDependencies:number = 0;
   totalDependencies:number = 0;
+  searchTypes = [{id: 1, value: 'CVE Search'}, {id: 2, value: 'CPE Search'}];
   @ViewChild(RouterOutlet) outlet: RouterOutlet | undefined;
   @ViewChild('loaderRef', {static:false}) loaderRef!:ElementRef;
 constructor(private http: HttpClient, private router: Router, private vulnService: VulnerabilityService, private ngZone:NgZone, private cd: ChangeDetectorRef,
@@ -63,8 +69,8 @@ constructor(private http: HttpClient, private router: Router, private vulnServic
 
 setSearchUrl() {
   this.dependencies = []; 
-   if(this.searchValue !== "" && this.searchType !== 0){
-      switch(this.searchType) {
+   if(this.searchValue !== "" && this.searchCve !== 0){
+      switch(this.searchCve) {
            case 1: 
               this.searchUrl = environment.searchByKeyWordUrl;
               this.searchVulnerabilities();
@@ -139,48 +145,48 @@ dependencies = [];
 startScan(): void {
   this.messages = [];
   this.isScanning = true;
-  this.isLoading = true;
-  this.eventSource = new EventSource('http://localhost:8080/cvss/getVulnerabilities');
-  // const dependencies = localStorage.getItem("dependencies");
-  // if (dependencies) {
-  //   console.log(JSON.parse(dependencies));
-  //   this.dependencies = JSON.parse(dependencies);
-  //   this.vulnService.setLightMode(this.lightMode);
-  // } else {
-  //   console.log("No dependencies found in localStorage.");
-  // }
-  // this.router.navigate(['/dependencies']);
-  // this.vulnService.setDependencies(this.dependencies);
-  this.eventSource.onmessage = (event) => {
-    console.log(event.data)
-    this.ngZone.run(() => {
-      let data = {};
-      if(event.data !== 'Analysis completed'){
-        data = JSON.parse(event.data);
-      }
-      this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
-      this.totalDependencies = (data as any)?.totalDependencies || 0;
-      this.updateProgress(this.fetchedDependencies, this.totalDependencies);
-    });
+  // this.isLoading = true;
+  // this.eventSource = new EventSource('http://localhost:8080/cvss/getVulnerabilities');
+  const dependencies = localStorage.getItem("dependencies");
+  if (dependencies) {
+    console.log(JSON.parse(dependencies));
+    this.dependencies = JSON.parse(dependencies);
+    this.vulnService.setLightMode(this.lightMode);
+  } else {
+    console.log("No dependencies found in localStorage.");
+  }
+  this.router.navigate(['/dependencies']);
+  this.vulnService.setDependencies(this.dependencies);
+  // this.eventSource.onmessage = (event) => {
+  //   console.log(event.data)
+  //   this.ngZone.run(() => {
+  //     let data = {};
+  //     if(event.data !== 'Analysis completed'){
+  //       data = JSON.parse(event.data);
+  //     }
+  //     this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
+  //     this.totalDependencies = (data as any)?.totalDependencies || 0;
+  //     this.updateProgress(this.fetchedDependencies, this.totalDependencies);
+  //   });
 
-    if (event.data === 'Analysis completed') {
-      console.log("completed")
-      this.isLoading = false;
-      this.eventSource?.close(); // Stop listening to SSE
-      this.fetchFinalResults(); 
+  //   if (event.data === 'Analysis completed') {
+  //     console.log("completed")
+  //     this.isLoading = false;
+  //     this.eventSource?.close(); // Stop listening to SSE
+  //     this.fetchFinalResults(); 
       
-    }
-  };
+  //   }
+  // };
 
-  this.eventSource.onerror = (error) => {
-    console.error('SSE error:', error);
-    this.isScanning = false;
-    this.eventSource?.close();
-  };
+  // this.eventSource.onerror = (error) => {
+  //   console.error('SSE error:', error);
+  //   this.isScanning = false;
+  //   this.eventSource?.close();
+  // };
 
-  this.eventSource.onopen = () => {
-    this.messages.push();
-  };
+  // this.eventSource.onopen = () => {
+  //   this.messages.push();
+  // };
 }
 
 ngOnDestroy(): void {
@@ -203,7 +209,6 @@ fetchFinalResults() {
       this.router.navigate(['/dependencies']);
       // localStorage.setItem("dependencies",JSON.stringify(data))
       console.log('Final vulnerability data:', data);
-      // this.cd.detectChanges();
     })
     .catch(error => {
       console.error('Error fetching final results:', error);
