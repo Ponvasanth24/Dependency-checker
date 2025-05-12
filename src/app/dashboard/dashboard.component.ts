@@ -61,44 +61,57 @@ constructor(private http: HttpClient, private router: Router, private vulnServic
   }
 }
 
-searchVulnerabilities() {
-  this.isAnimate = true;
+setSearchUrl() {
   this.dependencies = []; 
    if(this.searchValue !== "" && this.searchType !== 0){
       switch(this.searchType) {
            case 1: 
               this.searchUrl = environment.searchByKeyWordUrl;
+              this.searchVulnerabilities();
               break;
            case 2:
-              this.searchUrl = environment.searchByCveid;
+              if(this.searchValue.startsWith('CVE-')){
+                this.searchUrl = environment.searchByCveid;
+                this.searchVulnerabilities();
+              }
+              else {
+                window.alert("Please enter a valid CVE ID");
+              }
               break;
            case 3:
-              this.searchUrl = environment.searchByCpeName;
+              if(this.searchValue.startsWith('cpe:')){
+                this.searchUrl = environment.searchByCpeName;
+                this.searchVulnerabilities();
+              }
+              else {
+                window.alert("Please enter a valid CPE Name");
+              }
               break;      
            default:
               return;    
       }  
    }
    
-   this.http.get<any>(this.searchUrl.concat(this.searchValue)).subscribe({
+    }
+searchVulnerabilities() {
+ this.isAnimate = true;
+ this.http.get<any>(this.searchUrl.concat(this.searchValue)).subscribe({
        next:(response)=> {
         console.log(response)
         this.vulnerabilityData = response;
         this.searchVariant = true;
         this.vulnService.setSearchVariant(this.searchVariant);
         this.vulnService.setLightMode(this.lightMode);
-        this.router.navigate(['/vulnerabilityList'], {
-          state:{searchVariant: this.searchVariant}
-        });
-        this.isAnimate = false;
         this.vulnService.setVulnerabilityData(this.vulnerabilityData);
+        this.isAnimate = false;
+        this.router.navigate(['/vulnerabilityList']);
        },
        error:(error)=> {
           console.log(this.searchUrl)
           console.log(error)  
        }
     });
-    }
+}    
 
 getFirstMetricKey(metrics: any): string {
   return Object.keys(metrics)[0];
@@ -126,47 +139,48 @@ dependencies = [];
 startScan(): void {
   this.messages = [];
   this.isScanning = true;
-  // this.isLoading = true;
-  // this.eventSource = new EventSource('http://localhost:8080/cvss/getVulnerabilities');
-  const dependencies = localStorage.getItem("dependencies");
-  if (dependencies) {
-    console.log(JSON.parse(dependencies));
-    this.dependencies = JSON.parse(dependencies);
-    this.vulnService.setLightMode(this.lightMode);
-  } else {
-    console.log("No dependencies found in localStorage.");
-  }
-  this.router.navigate(['/dependencies']);
-  this.vulnService.setDependencies(this.dependencies);
-  // this.eventSource.onmessage = (event) => {
-  //   console.log(event.data)
-  //   this.ngZone.run(() => {
-  //     let data = {};
-  //     if(event.data !== 'Analysis completed'){
-  //       data = JSON.parse(event.data);
-  //     }
-  //     this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
-  //     this.totalDependencies = (data as any)?.totalDependencies || 0;
-  //     this.updateProgress(this.fetchedDependencies, this.totalDependencies);
-  //   });
+  this.isLoading = true;
+  this.eventSource = new EventSource('http://localhost:8080/cvss/getVulnerabilities');
+  // const dependencies = localStorage.getItem("dependencies");
+  // if (dependencies) {
+  //   console.log(JSON.parse(dependencies));
+  //   this.dependencies = JSON.parse(dependencies);
+  //   this.vulnService.setLightMode(this.lightMode);
+  // } else {
+  //   console.log("No dependencies found in localStorage.");
+  // }
+  // this.router.navigate(['/dependencies']);
+  // this.vulnService.setDependencies(this.dependencies);
+  this.eventSource.onmessage = (event) => {
+    console.log(event.data)
+    this.ngZone.run(() => {
+      let data = {};
+      if(event.data !== 'Analysis completed'){
+        data = JSON.parse(event.data);
+      }
+      this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
+      this.totalDependencies = (data as any)?.totalDependencies || 0;
+      this.updateProgress(this.fetchedDependencies, this.totalDependencies);
+    });
 
-  //   if (event.data === 'Analysis completed') {
-  //     console.log("completed")
-  //     this.isLoading = false;
-  //     this.eventSource?.close(); // Stop listening to SSE
-  //     this.fetchFinalResults(); 
-  //   }
-  // };
+    if (event.data === 'Analysis completed') {
+      console.log("completed")
+      this.isLoading = false;
+      this.eventSource?.close(); // Stop listening to SSE
+      this.fetchFinalResults(); 
+      
+    }
+  };
 
-  // this.eventSource.onerror = (error) => {
-  //   console.error('SSE error:', error);
-  //   this.isScanning = false;
-  //   this.eventSource?.close();
-  // };
+  this.eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+    this.isScanning = false;
+    this.eventSource?.close();
+  };
 
-  // this.eventSource.onopen = () => {
-  //   this.messages.push();
-  // };
+  this.eventSource.onopen = () => {
+    this.messages.push();
+  };
 }
 
 ngOnDestroy(): void {
@@ -185,6 +199,8 @@ fetchFinalResults() {
     .then(data => {
       this.isLoading = false;
       this.dependencies = data;
+      this.vulnService.setDependencies(this.dependencies);
+      this.router.navigate(['/dependencies']);
       // localStorage.setItem("dependencies",JSON.stringify(data))
       console.log('Final vulnerability data:', data);
       // this.cd.detectChanges();

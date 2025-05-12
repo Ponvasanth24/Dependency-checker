@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectChange } from '@angular/material/select';
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-dependencies',
   standalone: true,
@@ -35,7 +36,7 @@ export class DependenciesComponent implements OnInit{
     end:number = 0;
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
-    constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location){}
+    constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef){}
   ngOnInit(): void {
       // let state = this.location.getState() as { dependencies: any[] };
       // this.dependencies = state.dependencies;
@@ -55,11 +56,15 @@ export class DependenciesComponent implements OnInit{
           this.vulnService.setVulnerabilityData(vulnerabilityData);
    }
    nextPage(): void {
+    console.log("called")
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages) {
+      console.log("called inside")
     this.pageIndex++;
     this.start = this.pageIndex * this.pageSize;
     this.end = this.start + this.pageSize;
     this.pagedDependencies = this.dependencies.slice(this.start, this.end);
+    console.log(this.pagedDependencies, this.start, this.end);
+    this.cd.detectChanges();
     }
    }
    previousPage(): void {
@@ -68,6 +73,7 @@ export class DependenciesComponent implements OnInit{
       this.start = this.pageIndex * this.pageSize;
       this.end = this.start + this.pageSize;
       this.pagedDependencies = this.dependencies.slice(this.start, this.end);
+      this.cd.detectChanges();
     }
    }
   

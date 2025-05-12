@@ -30,7 +30,7 @@
           id="dependency-search"
           placeholder="Dependency Search"
         />
-        <button [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode, 'custom-auto-black': !lightMode, 'custom-app-grey': lightMode}" [disabled]="searchType == 0" (click)="searchVulnerabilities()"
+        <button [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode, 'custom-auto-black': !lightMode, 'custom-app-grey': lightMode}" [disabled]="searchType == 0" (click)="setSearchUrl()"
           class="border-0 col-4 rounded-end-3 h-100 d-flex align-items-center"
         >
           <mat-icon [ngClass]="{'search-button': searchType !== 0, 'text-white': !lightMode, 'text-dark': lightMode, 'bg-dark': !lightMode, 'bg-white': lightMode}"
@@ -57,7 +57,7 @@
     <router-outlet></router-outlet>
     <div
       class="position-fixed h-100 d-flex justify-content-center align-items-center"
-      *ngIf="isLoading"
+      *ngIf="isLoading" [ngClass]="{'bg-dark': !lightMode, 'bg-white': lightMode}"
     >
       <div class="d-flex flex-column"> 
       <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
@@ -67,7 +67,7 @@
     
     <div
       class="position-fixed h-100 d-flex justify-content-center align-items-center"
-      *ngIf="isAnimate"
+      *ngIf="isAnimate" [ngClass]="{'bg-dark': !lightMode, 'bg-white': lightMode}"
     >
       <div id="progress-bar" class="loader" style="--n: 16; --f: 0.2">  
       </div>
