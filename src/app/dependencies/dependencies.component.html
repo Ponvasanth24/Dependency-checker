@@ -1,5 +1,6 @@
-<table [ngClass]="{'table-dark': !lightMode, 'table-white': lightMode}"
+<table *ngIf="pagedDependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table border border-2 border-secondary table-responsive-lg table-borderless table-striped mt-2">
+<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning">{{dependencies.length}}</span></caption>
     <thead>
         <tr>
             <th>Dependency Name</th> 
@@ -10,7 +11,7 @@ class="table border border-2 border-secondary table-responsive-lg table-borderle
     </thead>
      <tbody>
         <tr *ngFor="let dependency of pagedDependencies">
-            <td><a [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}"class="text-white cursor-pointer" (click)="viewDependency(dependency.vulnerabilities)">{{dependency.dependencyName}}</a></td>
+            <td><a [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}"class="text-white cursor-pointer" (click)="viewDependency(dependency.vulnerabilities)">{{dependency.dependencyName}}</a></td>
             <td>{{dependency.cpeEnumeration?.vendor}}</td>
             <td>{{dependency.cpeEnumeration?.product}}</td>
             <td>{{dependency.cpeEnumeration?.version}}</td>
@@ -18,23 +19,31 @@ class="table border border-2 border-secondary table-responsive-lg table-borderle
      </tbody>
 </table>
 
+<!--------------------------------No-vulnerability-data-start------------------------------------->
+<div #noDependency *ngIf="pagedDependencies.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center">
+  <div class="text-center">
+    <span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h3">No Dependency Data Found</span>
+  </div>
+</div>
+<!--------------------------------No-vulnerability-data-end--------------------------------------->
 
-<div class="row justify-content-center height-fit-content">
+
+<div *ngIf="pagedDependencies.length > 0" class="row justify-content-center height-fit-content">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
-  <mat-label class="text-nowrap" [ngClass]="{'bg-dark': !lightMode, 'bg-white': lightMode, 'border-white': !lightMode, 'border-dark': lightMode,'text-white': !lightMode, 'text-dark': lightMode}">Page Size</mat-label>
-  <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
-    <mat-option [ngClass]="{'bg-dark': !lightMode, 'bg-white': lightMode, 'text-white': !lightMode, 'text-dark': lightMode}" *ngFor="let size of pageSizes" [value]="size">
+  <mat-label class="text-nowrap custom-fw-1" [ngClass]="{'bg-dark': darkMode, 'bg-alice': darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
+  <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
+    <mat-option [ngClass]="{'bg-dark':darkMode, 'bg-white':!darkMode, 'text-white':darkMode, 'text-dark': !darkMode}" *ngFor="let size of pageSizes" [value]="size">
       {{ size }}
     </mat-option>
   </mat-select>
-<span [ngClass]="{'text-white': !lightMode, 'text-dark': lightMode}" class="text-white">{{start}} - {{end}} out of {{dependencies.length}} dependencies</span>
+<span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="custom-fw-1">{{start}} - {{end}} out of {{dependencies.length}} dependencies</span>
 
-<button (click)="previousPage()" [ngClass]="{'bg-white': !lightMode, 'custom-app-grey': lightMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm"> 
+<button (click)="previousPage()" [ngClass]="{'bg-white': darkMode, 'custom-app-grey': !darkMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm"> 
 <mat-icon class="material-symbols-outlined">
 arrow_back_ios
 </mat-icon>  
 </button>
-<button (click)="nextPage()" [ngClass]="{'bg-white': !lightMode, 'custom-app-grey': lightMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm">
+<button (click)="nextPage()" [ngClass]="{'bg-white': darkMode, 'custom-app-grey': !darkMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm">
 <mat-icon class="material-symbols-outlined">
 arrow_forward_ios
 </mat-icon>

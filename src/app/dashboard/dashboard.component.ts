@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environments';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,7 +22,7 @@ import { MatSelectModule } from '@angular/material/select';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss']
 })
-export class DashboardComponent implements OnDestroy, AfterViewInit {  
+export class DashboardComponent implements OnDestroy, AfterViewInit, OnInit {  
   isLoading = true;
   isAnimate = false;
   shouldAnimate = false;
@@ -32,22 +32,23 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
   searchValue: string = "";
   searchUrl: string = "";
   searchVariant:boolean = false;
-  lightMode:boolean = false;
+  darkMode:boolean = false;
   progress:number = 0;
   animationStyle:string = "none";
   fetchedDependencies:number = 0;
   totalDependencies:number = 0;
+  portNumber:number = 8080;
+  navigationUrl:string = "/vulnerabilityList";
   searchTypes = [{id: 1, value: 'CVE Search'}, {id: 2, value: 'CPE Search'}];
   @ViewChild(RouterOutlet) outlet: RouterOutlet | undefined;
-  @ViewChild('loaderRef', {static:false}) loaderRef!:ElementRef;
 constructor(private http: HttpClient, private router: Router, private vulnService: VulnerabilityService, private ngZone:NgZone, private cd: ChangeDetectorRef,
   private location: Location
 ){
-  this.vulnService.getLightMode().subscribe((mode => {
-    this.lightMode = mode;
+  this.vulnService.getDarkMode().subscribe((mode => {
+    this.darkMode = mode;
   }))
   this.isLoading = false;
-  if(vulnService.hasData()){
+  if(vulnService.hasData()) {
     this.searchVariant = vulnService.getSearchVariant();
     this.vulnerabilityData = vulnService.getVulnerabilities();
     this.isLoading = false;
@@ -66,6 +67,15 @@ constructor(private http: HttpClient, private router: Router, private vulnServic
     // }); 
   }
 }
+
+  ngOnInit(): void {
+    this.vulnService.darkMode$.subscribe((mode: boolean) => {
+      this.darkMode = mode;
+    });
+    this.vulnService.isLoading$.subscribe((loading: boolean) => {
+      this.isLoading = loading;
+    })
+  }
 
 setSearchUrl() {
   this.dependencies = []; 
@@ -96,6 +106,7 @@ setSearchUrl() {
            case 5:
               if(this.searchValue.startsWith('cpe:')){
                 this.searchUrl = environment.searchLikelyCpe;
+                this.navigationUrl = "/cpeSearchResults";
                 this.searchVulnerabilities();
               }
               else {
@@ -109,17 +120,23 @@ setSearchUrl() {
   }
 
 searchVulnerabilities() {
- this.isAnimate = true;
+ this.isLoading = true;
  this.http.get<any>(this.searchUrl.concat(this.searchValue)).subscribe({
        next:(response)=> {
         console.log(response)
         this.vulnerabilityData = response;
         this.searchVariant = true;
         this.vulnService.setSearchVariant(this.searchVariant);
-        this.vulnService.setLightMode(this.lightMode);
-        this.vulnService.setVulnerabilityData(this.vulnerabilityData);
-        this.isAnimate = false;
-        this.router.navigate(['/vulnerabilityList']);
+        this.vulnService.setDarkMode(this.darkMode);
+        if(this.searchField === 5) {
+          this.vulnService.setCpeData(this.vulnerabilityData);
+          this.isLoading = false;
+          this.router.navigate([this.navigationUrl]);
+        } else {
+          this.vulnService.setVulnerabilityData(this.vulnerabilityData);
+          this.isLoading = false;
+          this.router.navigate(['/vulnerabilityList']);
+        }
        },
        error:(error)=> {
           console.log(this.searchUrl)
@@ -154,13 +171,13 @@ dependencies = [];
 startScan(): void {
   this.messages = [];
   this.isScanning = true;
-  this.isLoading = true;
-  this.eventSource = new EventSource('http://localhost:8080/cvss/getVulnerabilities');
+  this.isAnimate = true;
+  this.eventSource = new EventSource(environment.baseLocaUrl.concat(this.portNumber.toString()).concat(environment.fetchVulnerability));
   // const dependencies = localStorage.getItem("dependencies");
   // if (dependencies) {
   //   console.log(JSON.parse(dependencies));
   //   this.dependencies = JSON.parse(dependencies);
-  //   this.vulnService.setLightMode(this.lightMode);
+  //   this.vulnService.setdarkMode(this.darkMode);
   // } else {
   //   console.log("No dependencies found in localStorage.");
   // }
@@ -180,7 +197,7 @@ startScan(): void {
 
     if (event.data === 'Analysis completed') {
       console.log("completed")
-      this.isLoading = false;
+      this.isAnimate = false;
       this.eventSource?.close(); // Stop listening to SSE
       this.fetchFinalResults(); 
       
@@ -190,7 +207,10 @@ startScan(): void {
   this.eventSource.onerror = (error) => {
     console.error('SSE error:', error);
     this.isScanning = false;
+    window.alert(`Please check if the server is running on port ${this.portNumber}`);
+    this.isAnimate = false;
     this.eventSource?.close();
+    this.cd.detectChanges();
   };
 
   this.eventSource.onopen = () => {
@@ -203,7 +223,7 @@ ngOnDestroy(): void {
 }
 
 fetchFinalResults() {
-  fetch('http://localhost:8080/cvss/vulnerabilities')
+  fetch(environment.baseLocaUrl.concat(this.portNumber.toString()).concat(environment.getVulnerabilities))
     .then(response => {
       if (!response.ok) {
         console.log(response)
@@ -212,8 +232,9 @@ fetchFinalResults() {
       return response.json();
     })
     .then(data => {
-      this.isLoading = false;
+      this.isAnimate = false;
       this.dependencies = data;
+      this.isScanning = false;
       this.vulnService.setDependencies(this.dependencies);
       this.router.navigate(['/dependencies']);
       // localStorage.setItem("dependencies",JSON.stringify(data))
@@ -228,14 +249,14 @@ updateProgress(fetched: number, total: number) {
   this.progress = total > 0 ? Math.round((fetched / total) * 100) : 0;
 }
 ngAfterViewInit(): void {
-  // this.vulnService.lightMode$.subscribe(mode => {
+  // this.vulnService.darkMode$.subscribe(mode => {
   //   const currentComponent = this.outlet!.component;
-  //   if (currentComponent && 'onLightModeChange' in currentComponent) {
-  //     (currentComponent as { onLightModeChange: (mode: boolean) => void }).onLightModeChange(mode);
+  //   if (currentComponent && 'ondarkModeChange' in currentComponent) {
+  //     (currentComponent as { ondarkModeChange: (mode: boolean) => void }).ondarkModeChange(mode);
   //   }
   // });
 }
 changeTheme(event:any): void {
-  this.vulnService.setLightMode(event.target.checked);
+  this.vulnService.setDarkMode(event.target.checked);
 }
 }

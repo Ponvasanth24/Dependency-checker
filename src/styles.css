@@ -1,4 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+* {
+     /* font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100; */
+
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
 .custom-auto-black{
     background-color: black;
 }
@@ -56,4 +67,16 @@
 }
 .custom-col-db-white{
     background-color: rgb(236, 235, 235);
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+.caption-side-top{
+    caption-side: top;
+}
+.custom-fw-1 {
+    font-weight: 500;
+}
+.bg-alice {
+    background-color: rgb(221, 235, 248);
 }

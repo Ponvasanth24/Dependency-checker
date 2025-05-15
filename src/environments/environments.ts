@@ -1,6 +1,9 @@
 export const environment = {
       production:false,
-      getVulnerability: "http://localhost:8080/cvss/getVulnerabilities",
+      baseLocaUrl: "http://localhost:",
+      // getVulnerability: "http://localhost:8080/cvss/getVulnerabilities",
+      fetchVulnerability: "/cvss/getVulnerabilities",
+      getVulnerabilities: "/cvss/vulnerabilities",
       searchByKeyWordUrl: "http://localhost:8080/cvss/search/keywords?keywords=",
       searchByCveid: "http://localhost:8080/cvss/search/cveId?cveId=",
       searchByCpeName: "http://localhost:8080/cvss/search/cpe?cpe=",

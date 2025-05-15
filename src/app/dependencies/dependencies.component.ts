@@ -1,11 +1,11 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -14,18 +14,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectChange } from '@angular/material/select';
 import { ChangeDetectorRef } from '@angular/core';
+import { Renderer2 } from '@angular/core';
 @Component({
   selector: 'app-dependencies',
-  standalone: true,
   imports: [CommonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
     MatSelectModule, FormsModule, MatIconModule, MatButtonModule
   ],
   templateUrl: './dependencies.component.html',
   styleUrl: './dependencies.component.css'
 })
-export class DependenciesComponent implements OnInit{
+export class DependenciesComponent implements OnInit, AfterViewInit{
     @Input() dependencies:any = [];
-    @Input() lightMode:boolean = false;
+    @Input() darkMode:boolean = false;
     pagedDependencies: any[] = [];
     pageIndex:number = 0;
     pageSize:number = 10;
@@ -36,30 +36,36 @@ export class DependenciesComponent implements OnInit{
     start:number = 0;
     end:number = 0;
     @ViewChild(MatPaginator) paginator!: MatPaginator;
+    @ViewChild('noDependency') noDependency!: ElementRef;
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
-    constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef){}
+    constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef,
+      private renderer: Renderer2
+    ){}
   ngOnInit(): void {
       // let state = this.location.getState() as { dependencies: any[] };
       // this.dependencies = state.dependencies;
       // console.log(this.dependencies);
-      this.vulnService.getLightMode().subscribe((mode: boolean) => {
-        this.lightMode = mode;
+      this.vulnService.getDarkMode().subscribe((mode: boolean) => {
+        this.darkMode = mode;
       });
        this.vulnService.dependencies$.subscribe((data:any[]) => {
           this.dependencies = data;
           this.updatePagedData(this. initialIndex);
       });   
     }
+    ngAfterViewInit(): void {
+       if(this.dependencies.length === 0) {
+          this.renderer.setStyle(this.noDependency.nativeElement, 'height', '600px');
+        }
+    }
    viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
-          this.vulnService.setLightMode(this.lightMode);
+          this.vulnService.setDarkMode(this.darkMode);
           this.router.navigate(['/vulnerabilityList']);
           this.vulnService.setVulnerabilityData(vulnerabilityData);
    }
    nextPage(): void {
-    console.log("called")
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
-      console.log("called inside")
     this.pageIndex++;
     this.start = this.pageIndex * this.pageSize;
     this.end = this.start + this.pageSize;
@@ -89,6 +95,7 @@ export class DependenciesComponent implements OnInit{
    }
    onPageSizeChange(event: MatSelectChange): void {
    this.pageSize = event.value;
+   this.pageIndex = 0;
    this.updatePagedData(this.initialIndex);
    }
 }

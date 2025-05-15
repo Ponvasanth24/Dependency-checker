@@ -13,14 +13,12 @@ export const routes: Routes = [
         },
         {
           path: 'vulnerabilityList',
-          loadComponent: () => import('./vulnerabilitylist/vulnerabilitylist.component').then(m => m.VulnerabilitylistComponent),
-          runGuardsAndResolvers: 'always'
+          loadComponent: () => import('./vulnerabilitylist/vulnerabilitylist.component').then(m => m.VulnerabilitylistComponent)
+        },
+        {
+          path: 'cpeSearchResults',
+          loadComponent: () => import('./cpesearch/cpesearch.component').then(m => m.CpesearchComponent)
         }
-        // {
-        //   path: '',
-        //   redirectTo: 'dependencies',
-        //   pathMatch: 'full'
-        // }
       ]
     },{
           path: 'vulnerability',

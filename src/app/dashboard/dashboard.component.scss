@@ -1,5 +1,6 @@
+@use 'sass:math';
 $r-pad: 6em;
-$b: $r-pad/3;
+$b: math.div($r-pad, 3);
 $w-rng: .125*$b;
 
 @property --p {

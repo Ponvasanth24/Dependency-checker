@@ -13,7 +13,7 @@
 
 #dependency-search{
     outline: none;
-    caret-color: white;
+    -caret-color-cblackolor: white;
     background-image: url("../../assets/images/search_24dp_CCCCCC_FILL0_wght400_GRAD0_opsz24.png");
     background-position: 10px 10px;
     background-repeat: no-repeat;
@@ -44,15 +44,52 @@
 .severity-critical{
     background-color: white;
 }
-.search-type-checkbox {
+.search-type-checkbox input[type="radio"] {
     accent-color: orange;
+    outline: none;
+    border: none;
 }
 #search-type input[type="radio"]{
     width: 18px;
     height: 18px;
 }
+input:-webkit-autofill {
+    caret-color: black;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+.show-lg {
+    display: block !important;
+       
+}
+.show-md {
+    display: none !important;
+}
+.custom-col-3 {
+    width: 33.33%;
+}
 @media (max-width: 768px) {
     .custom-db-col {
       width: 100% !important;
     }
+}
+@media (max-width:992px) {
+.show-lg {
+        display: none !important;
+       
+}
+.show-md {
+        display: block !important;
+}
+.custom-col-3 {
+    width: 24.99%;
+}
 }
