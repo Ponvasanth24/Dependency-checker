@@ -31,11 +31,24 @@
 .app-vul-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #464646; 
 }
+.app-vul-scrollbar::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+.app-vul-scrollbar::-webkit-scrollbar-track:horizontal {
+  background: #d1d1d1;
+}
+
+.app-vul-scrollbar::-webkit-scrollbar-thumb:horizontal {
+  background: #7a7a7a;
+}
+.app-vul-scrollbar::-webkit-scrollbar-thumb:horizontal:hover {
+  background: #464646;
+}
 
 .text-black {
     color: black;
 }
-/* Component SCSS or global styles */
 .custom-card {
     background-color: var(--bg-color);
     color: var(--text-color);

@@ -57,6 +57,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit {
        next:(response)=> {
         this.vulnService.setDarkMode(this.darkMode);
         this.vulnService.setVulnerabilityData(response);
+        this.vulnService.setTempVulnerability(false);
         this.router.navigate(['/vulnerabilityList']);
         this.vulnService.setLoading(false);
        },error: (error) => {

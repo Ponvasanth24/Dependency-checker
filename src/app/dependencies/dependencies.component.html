@@ -1,6 +1,7 @@
-<table *ngIf="pagedDependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
-class="table border border-2 border-secondary table-responsive-lg table-borderless table-striped mt-2">
-<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning">{{dependencies.length}}</span></caption>
+<table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
+class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
+<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning fw-bold">{{dependencies.length}}</span><span class="float-end">
+  <input class="dep-search-field" type="text" placeholder="Search" (keyup)="searchDependencies($event)"></span> </caption>
     <thead>
         <tr>
             <th>Dependency Name</th> 
@@ -20,7 +21,7 @@ class="table border border-2 border-secondary table-responsive-lg table-borderle
 </table>
 
 <!--------------------------------No-vulnerability-data-start------------------------------------->
-<div #noDependency *ngIf="pagedDependencies.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center">
+<div #noDependency *ngIf="dependencies.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
   <div class="text-center">
     <span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h3">No Dependency Data Found</span>
   </div>
@@ -28,7 +29,7 @@ class="table border border-2 border-secondary table-responsive-lg table-borderle
 <!--------------------------------No-vulnerability-data-end--------------------------------------->
 
 
-<div *ngIf="pagedDependencies.length > 0" class="row justify-content-center height-fit-content">
+<div *ngIf="dependencies.length > 0" class="row justify-content-center height-fit-content">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
   <mat-label class="text-nowrap custom-fw-1" [ngClass]="{'bg-dark': darkMode, 'bg-alice': darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
   <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">

@@ -44,11 +44,11 @@
 .severity-critical{
     background-color: white;
 }
-.search-type-checkbox input[type="radio"] {
+/* .search-type-checkbox input[type="radio"] {
     accent-color: orange;
     outline: none;
     border: none;
-}
+} */
 #search-type input[type="radio"]{
     width: 18px;
     height: 18px;
@@ -75,6 +75,9 @@ input[type=number] {
 }
 .custom-col-3 {
     width: 33.33%;
+}
+.isteer-logo {
+    height: 50px;
 }
 @media (max-width: 768px) {
     .custom-db-col {

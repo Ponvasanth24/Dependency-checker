@@ -21,7 +21,7 @@ export const routes: Routes = [
         }
       ]
     },{
-          path: 'vulnerability',
+          path: 'vulnerability/:id',
           loadComponent: () => import('./vulnerability/vulnerability.component').then(m => m.VulnerabilityComponent)
         }
   ];

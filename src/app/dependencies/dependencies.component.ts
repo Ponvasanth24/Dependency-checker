@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, input, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -61,6 +61,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit{
    viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
           this.vulnService.setDarkMode(this.darkMode);
+          this.vulnService.setTempVulnerability(false);
           this.router.navigate(['/vulnerabilityList']);
           this.vulnService.setVulnerabilityData(vulnerabilityData);
    }
@@ -98,4 +99,19 @@ export class DependenciesComponent implements OnInit, AfterViewInit{
    this.pageIndex = 0;
    this.updatePagedData(this.initialIndex);
    }
+   searchDependencies(event: Event) {
+    const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
+    console.log(inputValue);
+      if(inputValue === '') {
+        this.pageIndex = 0;
+        this.updatePagedData(this.initialIndex);
+      } else {
+      this.pagedDependencies = this.dependencies.filter((dep:any) => {
+          return dep?.dependencyName.toLowerCase().includes(inputValue.toLowerCase()) || dep?.cpeEnumeration?.vendor.toLowerCase().includes(inputValue.toLowerCase()) ||
+           dep?.cpeEnumeration?.product.toLowerCase().includes(inputValue.toLowerCase()) || dep?.cpeEnumeration?.version.toLowerCase().includes(inputValue.toLowerCase());
+      });
+    }
+     this.cd.detectChanges();
+   }
+   
 }

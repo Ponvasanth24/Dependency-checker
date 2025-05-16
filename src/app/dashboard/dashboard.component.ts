@@ -12,12 +12,13 @@ import { RouterOutlet } from '@angular/router';
 import { Location } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import {MatRadioModule} from '@angular/material/radio';
 
 @Component({
   selector: 'app-dashboard',
   standalone:true,
   imports: [MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent, RouterOutlet,
-    MatFormFieldModule, MatSelectModule
+    MatFormFieldModule, MatSelectModule, MatRadioModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss']
@@ -39,6 +40,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit, OnInit {
   totalDependencies:number = 0;
   portNumber:number = 8080;
   navigationUrl:string = "/vulnerabilityList";
+  regex = /^cpe:\d+\.\d+:[aho]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
   searchTypes = [{id: 1, value: 'CVE Search'}, {id: 2, value: 'CPE Search'}];
   @ViewChild(RouterOutlet) outlet: RouterOutlet | undefined;
 constructor(private http: HttpClient, private router: Router, private vulnService: VulnerabilityService, private ngZone:NgZone, private cd: ChangeDetectorRef,
@@ -82,6 +84,14 @@ setSearchUrl() {
    if(this.searchValue !== "" && this.searchField !== 0){
       switch(this.searchField) {
            case 1: 
+              if(this.searchValue.length > 0){
+                this.searchUrl = environment.searchByKeyWordUrl;
+                this.navigationUrl = "/vulnerabilityList";
+                this.searchVulnerabilities();
+              }
+              else {
+                window.alert("Please enter a valid keyword");
+              }
               this.searchUrl = environment.searchByKeyWordUrl;
               this.searchVulnerabilities();
               break;
@@ -94,8 +104,8 @@ setSearchUrl() {
                 window.alert("Please enter a valid CVE ID");
               }
               break;
-           case 3:
-              if(this.searchValue.startsWith('cpe:')){
+          case 3:
+              if(this.regex.test(this.searchValue)){
                 this.searchUrl = environment.searchByCpeName;
                 this.searchVulnerabilities();
               }
@@ -103,8 +113,18 @@ setSearchUrl() {
                 window.alert("Please enter a valid CPE Name");
               }
               break; 
+          case 4:
+              if(this.searchValue.length > 0) {
+                this.searchUrl = environment.searchLikelyKeyword;
+                this.navigationUrl = "/cpeSearchResults";
+                this.searchVulnerabilities();
+              }
+              else {
+                window.alert("Please enter a valid Keyword");
+              }
+              break;     
            case 5:
-              if(this.searchValue.startsWith('cpe:')){
+              if(this.regex.test(this.searchValue)){
                 this.searchUrl = environment.searchLikelyCpe;
                 this.navigationUrl = "/cpeSearchResults";
                 this.searchVulnerabilities();
@@ -123,12 +143,12 @@ searchVulnerabilities() {
  this.isLoading = true;
  this.http.get<any>(this.searchUrl.concat(this.searchValue)).subscribe({
        next:(response)=> {
-        console.log(response)
+        console.log(response, this.searchField)
         this.vulnerabilityData = response;
         this.searchVariant = true;
         this.vulnService.setSearchVariant(this.searchVariant);
         this.vulnService.setDarkMode(this.darkMode);
-        if(this.searchField === 5) {
+        if(this.searchField === 5 || this.searchField === 4) {
           this.vulnService.setCpeData(this.vulnerabilityData);
           this.isLoading = false;
           this.router.navigate([this.navigationUrl]);
@@ -139,8 +159,10 @@ searchVulnerabilities() {
         }
        },
        error:(error)=> {
-          console.log(this.searchUrl)
-          console.log(error)  
+          console.log(this.searchUrl);
+          console.log(error);  
+          window.alert("Unexpected error occured");
+          this.isLoading = false;
        }
     });
 }    
@@ -172,51 +194,65 @@ startScan(): void {
   this.messages = [];
   this.isScanning = true;
   this.isAnimate = true;
-  this.eventSource = new EventSource(environment.baseLocaUrl.concat(this.portNumber.toString()).concat(environment.fetchVulnerability));
-  // const dependencies = localStorage.getItem("dependencies");
-  // if (dependencies) {
-  //   console.log(JSON.parse(dependencies));
-  //   this.dependencies = JSON.parse(dependencies);
-  //   this.vulnService.setdarkMode(this.darkMode);
-  // } else {
-  //   console.log("No dependencies found in localStorage.");
-  // }
-  // this.router.navigate(['/dependencies']);
-  // this.vulnService.setDependencies(this.dependencies);
-  this.eventSource.onmessage = (event) => {
-    console.log(event.data)
-    this.ngZone.run(() => {
-      let data = {};
-      if(event.data !== 'Analysis completed'){
-        data = JSON.parse(event.data);
-      }
-      this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
-      this.totalDependencies = (data as any)?.totalDependencies || 0;
-      this.updateProgress(this.fetchedDependencies, this.totalDependencies);
-    });
 
-    if (event.data === 'Analysis completed') {
-      console.log("completed")
-      this.isAnimate = false;
-      this.eventSource?.close(); // Stop listening to SSE
-      this.fetchFinalResults(); 
-      
+  try {
+    const url = environment.baseLocaUrl
+      .concat(this.portNumber.toString())
+      .concat(environment.fetchVulnerability);
+    if (!url || !this.portNumber) {
+      throw new Error('Invalid URL or port number.');
     }
-  };
+    console.log(window.location.host)
+    this.eventSource = new EventSource(url);
+    this.eventSource.onmessage = (event) => {
+      try {
+        console.log(event.data);
+        this.ngZone.run(() => {
+          let data = {};
+          if (event.data !== 'Analysis completed') {
+            data = JSON.parse(event.data);
+          }
+          this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
+          this.totalDependencies = (data as any)?.totalDependencies || 0;
+          this.updateProgress(this.fetchedDependencies, this.totalDependencies);
+        });
 
-  this.eventSource.onerror = (error) => {
-    console.error('SSE error:', error);
+        if (event.data === 'Analysis completed') {
+          console.log("completed");
+          this.isAnimate = false;
+          this.eventSource?.close();
+          this.fetchFinalResults();
+        }
+
+      } catch (messageError) {
+        console.error('Error while processing message:', messageError);
+      }
+    };
+
+    this.eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      this.isScanning = false;
+      window.alert(`Please check if the server is running on port ${this.portNumber}`);
+      this.isAnimate = false;
+      this.eventSource?.close();
+      this.cd.detectChanges();
+    };
+    this.eventSource.onopen = () => {
+      this.messages.push("Connection established");
+    };
+
+  } catch (error: any) {
+    console.error('Error:', error);
     this.isScanning = false;
-    window.alert(`Please check if the server is running on port ${this.portNumber}`);
     this.isAnimate = false;
-    this.eventSource?.close();
+    window.alert(`Error occurred: ${error.message || 'Please check if the server is running.'}`);
+    if (this.eventSource) {
+      this.eventSource?.close();
+    }
     this.cd.detectChanges();
-  };
-
-  this.eventSource.onopen = () => {
-    this.messages.push();
-  };
+  }
 }
+
 
 ngOnDestroy(): void {
   this.eventSource?.close();
