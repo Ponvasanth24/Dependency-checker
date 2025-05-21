@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, input, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, input, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -23,7 +23,7 @@ import { Renderer2 } from '@angular/core';
   templateUrl: './dependencies.component.html',
   styleUrl: './dependencies.component.css'
 })
-export class DependenciesComponent implements OnInit, AfterViewInit{
+export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewChecked{
     @Input() dependencies:any = [];
     @Input() darkMode:boolean = false;
     pagedDependencies: any[] = [];
@@ -42,22 +42,34 @@ export class DependenciesComponent implements OnInit, AfterViewInit{
       private renderer: Renderer2
     ){}
   ngOnInit(): void {
-      // let state = this.location.getState() as { dependencies: any[] };
-      // this.dependencies = state.dependencies;
-      // console.log(this.dependencies);
       this.vulnService.getDarkMode().subscribe((mode: boolean) => {
         this.darkMode = mode;
       });
-       this.vulnService.dependencies$.subscribe((data:any[]) => {
-          this.dependencies = data;
-          this.updatePagedData(this. initialIndex);
-      });   
+      const deps = sessionStorage.getItem('dependencies');
+      const depsFromSession = deps ? JSON.parse(deps) : [];
+      let dependenciesFromService:any[] = [];
+      this.vulnService.dependencies$.subscribe((dependencies:any[]) => {
+         dependenciesFromService = dependencies;
+         this.dependencies = depsFromSession.length > 0 ? depsFromSession : dependenciesFromService.length > 0 ? dependenciesFromService : [];
+      this.updatePagedData(this. initialIndex);
+      });
+      console.log(this.dependencies);
+      // sessionStorage.clear();
     }
     ngAfterViewInit(): void {
-       if(this.dependencies.length === 0) {
-          this.renderer.setStyle(this.noDependency.nativeElement, 'height', '600px');
+      if(this.dependencies.length === 0) {
+          this.vulnService.navBarHeight$.subscribe((height: number) => {
+              this.renderer.setStyle(this.noDependency.nativeElement, 'height', `${window.innerHeight - height}px`);
+          }) 
         }
     }
+  ngAfterViewChecked(): void {
+    if(this.dependencies.length === 0) {
+          this.vulnService.navBarHeight$.subscribe((height: number) => {
+              this.renderer.setStyle(this.noDependency.nativeElement, 'height', `${window.innerHeight - height}px`);
+          }) 
+        }
+  }
    viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
           this.vulnService.setDarkMode(this.darkMode);

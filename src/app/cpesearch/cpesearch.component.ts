@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
 import { environment } from '../../environments/environments';
@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIcon } from '@angular/material/icon';
 import { Renderer2 } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-cpesearch',
@@ -16,7 +17,7 @@ import { Renderer2 } from '@angular/core';
   templateUrl: './cpesearch.component.html',
   styleUrls: ['./cpesearch.component.css','./cpesearch.component.scss'],
 })
-export class CpesearchComponent implements OnInit, AfterViewInit {
+export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewChecked {
   cpeData: any[] = [];
   darkMode: boolean = false;
   isLoading: boolean = false;
@@ -30,7 +31,9 @@ export class CpesearchComponent implements OnInit, AfterViewInit {
   pagedCpeData: any = [];
   cd: any;
   @ViewChild('noCpeData') noCpeData!: ElementRef;
-  constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2) {
+  constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
+    private snackBar: MatSnackBar
+  ) {
     this.vulnService.getDarkMode().subscribe((mode: boolean) => {
       this.darkMode = mode;
     });
@@ -46,10 +49,19 @@ export class CpesearchComponent implements OnInit, AfterViewInit {
     });
   }
   ngAfterViewInit(): void {
-       if(this.cpeData.length === 0) {
-          this.renderer.setStyle(this.noCpeData.nativeElement, 'height', '600px');
+      if(this.cpeData.length === 0) {
+          this.vulnService.navBarHeight$.subscribe((height: number) => {
+          this.renderer.setStyle(this.noCpeData.nativeElement, 'height', `${window.innerHeight - height}px`);
+      }) 
         }
-    }
+  }
+  ngAfterViewChecked(): void {
+    if(this.cpeData.length === 0) {
+        this.vulnService.navBarHeight$.subscribe((height: number) => {
+        this.renderer.setStyle(this.noCpeData.nativeElement, 'height', `${window.innerHeight - height}px`);
+      }) 
+      }
+  }
   searchCpeName(cpeName: string) {
     this.vulnService.setLoading(true);
     console.log(cpeName, this.isLoading);
@@ -61,7 +73,8 @@ export class CpesearchComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/vulnerabilityList']);
         this.vulnService.setLoading(false);
        },error: (error) => {
-        window.alert("Unexpected Error Occured");
+        this.snackBar.open('Unexpected Error Occured', 'Dismiss', { duration: 5000, 
+        panelClass: ['snackbar-error'] });
         this.vulnService.setLoading(false);
         console.error("Error fetching data:", error);
        }    
@@ -96,7 +109,6 @@ nextPage(): void {
     this.pageSizes = len >= 100 ? [10, 25, 50, 100] : len <= 100 && len >= 50 ? [10, 25, 50] : 
     len <= 50 && len >= 25 ? [5, 10, 25] : len <= 25 && len >= 10 ? [5,10] : len <=10 && len >= 0 ? [5] : [0];
     this.pagedCpeData = this.cpeData.slice(this.start, this.end);
-    // this.cd.detectChanges();
     console.log(this.cpeData);
    }
    onPageSizeChange(event: MatSelectChange): void {

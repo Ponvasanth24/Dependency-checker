@@ -1,0 +1,38 @@
+<div class="container padd-left py-2 mt-2" [ngClass]="{'custom-auto-black': darkMode, 'bg-white': !darkMode, 'text-white': darkMode, 'text-dark': !darkMode}">
+    <div>
+        <h5 [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">What is CVSS?.</h5>
+    <p> 
+        The Common Vulnerability Scoring System (CVSS) offers a standardized method for characterizing vulnerabilities and assigning 
+        severity scores based on a defined set of metrics. CVSS version 4.0, released on November 1, 2023, introduces 
+        enhanced Base metric granularity, a newly defined Supplemental metric group, and a revised severity determination 
+        model. These improvements support more accurate risk assessment and prioritization. Full specifications are available at 
+        <a class="d-inline" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}" target="_blank" href="https://www.first.org/cvss/v4.0/specification-document">https://www.first.org/cvss/v4.0/specification-document.</a>
+    </p>
+    </div>
+
+    <div>
+        <h5 [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">Vulnerabilities</h5>
+        <p>
+            The primary goal of the Common Vulnerabilities and Exposures (CVE) Program is to provide unique identifiers
+            for publicly known cybersecurity vulnerabilities and to associate them with specific code bases, such as software
+            applications and shared libraries. CVE IDs enable consistent and unambiguous communication between organizations,
+            researchers, and tools when referencing specific vulnerabilities. For more detailed information, visit 
+            <a class="d-inline" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}" target="_blank" href="https://cve.org">https://cve.org</a> or consult the CNA Rules at <a class="d-inline" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}" target="_blank" href="https://www.cve.org/ResourcesSupport/AllResources/CNARules">https://www.cve.org/ResourcesSupport/AllResources/CNARules.</a>
+        </p>
+    </div>
+
+    <div>
+        <h5 [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">Product Identification</h5>
+        <p>A core component of the CVE analysis process is the accurate identification of vulnerable products affected by a given 
+           vulnerability. This enables consumers of CVE data to determine whether any of the products in their environment are impacted—provided 
+           they know the associated product identifiers.
+           To achieve this, the National Vulnerability Database (NVD) currently relies on the Common Platform Enumeration (CPE) 2.3 specification. 
+           CPE is a standardized naming scheme for IT systems, software, and packages. Based on the general URI (Uniform Resource Identifier) syntax, it provides 
+           a structured format for naming, validating, and describing products. NVD analysts use CPE match strings—based on the official CPE Dictionary—to associate 
+           CVEs with specific products. If a needed CPE entry does not exist, NVD staff submit a request to have it added.
+           As part of ongoing efforts to improve vulnerability analysis, the NVD is also evaluating the use of Software Identification (SWID) Tags as a potential 
+           replacement for CPE. SWID is a standardized format for identifying software products, supporting a wide range of use cases including software asset management (SAM), 
+           vulnerability assessment, patch management, configuration compliance, integrity checking, and allowlist/denylist enforcement.
+           For more information, visit the NVD CPE Products page and the <a class="d-inline" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}" target="_blank" href="https://csrc.nist.gov/projects/Software-Identification-SWID">SWID information page.</a></p>
+    </div>
+</div>

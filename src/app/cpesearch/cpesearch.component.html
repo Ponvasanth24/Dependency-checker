@@ -1,5 +1,6 @@
+<div class="overflow-auto">
 <table *ngIf="pagedCpeData.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
-class="table border border-2 border-secondary table-responsive-lg table-borderless table-striped mt-2">
+class="table table-responsive-lg table-borderless table-striped mt-2">
 <caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total CPE Results: <span class="h5 text-warning">{{cpeData.length}}</span></caption>
     <thead>
         <tr>
@@ -12,7 +13,7 @@ class="table border border-2 border-secondary table-responsive-lg table-borderle
         </tr>
      </tbody>
 </table>
-
+</div>
 <!---------------------------------pagination-start----------------------------------------------->
 <div *ngIf="pagedCpeData.length > 0;" class="row justify-content-center height-fit-content">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">

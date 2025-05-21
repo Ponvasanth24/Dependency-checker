@@ -1,3 +1,4 @@
+<div class="overflow-auto">
 <table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
 <caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning fw-bold">{{dependencies.length}}</span><span class="float-end">
@@ -19,7 +20,7 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
         </tr>
      </tbody>
 </table>
-
+</div>
 <!--------------------------------No-vulnerability-data-start------------------------------------->
 <div #noDependency *ngIf="dependencies.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
   <div class="text-center">

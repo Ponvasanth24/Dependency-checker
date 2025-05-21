@@ -1,0 +1,19 @@
+
+.snackbar-error {
+  background-color: #dc3545 !important;
+  color: white;
+  font-weight: bold;
+  .mat-mdc-button-touch-target {
+    background-color: #dc3545;
+  }
+}
+.snackbar-success {
+  background-color: #198754 !important;
+  color: white;
+  font-weight: bold;
+  .mat-mdc-button-touch-target {
+    background-color: #198754;
+  }
+}
+
+

@@ -25,6 +25,7 @@ body {
 	transform: scale(.5);
 	clip-path: circle(49%);
 	animation: p 10s steps(100) infinite;
+	// animation: none;
 	color: HSL(calc(var(--p)*2), 100%, 65%);
 	
 	&:before, &:after {
@@ -64,4 +65,9 @@ body {
 	}
 }
 
-@keyframes p { 90%, 100% { --p: 100 } }
+// @keyframes p { 90%, 100% { --p: 100 } }
+@keyframes p {
+  0%   { --p: 0; }
+  100% { --p: 100; }
+}
+

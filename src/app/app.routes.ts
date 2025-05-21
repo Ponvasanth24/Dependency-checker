@@ -8,6 +8,10 @@ export const routes: Routes = [
       component: DashboardComponent,
       children: [
         {
+          path:'',
+          loadComponent: () => import('./dashboardcontent/dashboardcontent.component').then(m => m.DashboardcontentComponent)
+        },
+        {
           path: 'dependencies',
           loadComponent: () => import('./dependencies/dependencies.component').then(m => m.DependenciesComponent)
         },
@@ -20,8 +24,12 @@ export const routes: Routes = [
           loadComponent: () => import('./cpesearch/cpesearch.component').then(m => m.CpesearchComponent)
         }
       ]
-    },{
+      },{
           path: 'vulnerability/:id',
           loadComponent: () => import('./vulnerability/vulnerability.component').then(m => m.VulnerabilityComponent)
-        }
+      },
+      {
+        path: 'vulnerabilitySync',
+        loadComponent: () => import('./vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component').then(m => m.VulnerabilitysyncdashboardComponent)
+      }
   ];

@@ -1,39 +1,56 @@
 <div [ngClass]="{'bg-dark': darkMode, 'bg-alice': !darkMode}" class="container-fluid position-fixed h-100 overflow-auto">
-  <div class="row px-3 justify-content-center">
+  <div class="row px-2 justify-content-center">
     <!-------------------------------Top-Searchbar-start-------------------------------------->
-    <div class="row justify-content-between">
+    <div #navBar class="row justify-content-between">
       
-      <div class="col-lg-4 ps-3">
+      <div class="col-lg-4">
       <div class="d-flex pt-2">  
       <img class="w-25 rounded isteer-logo" src="images/iSteer_logo.png" alt="isteer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-      <span class="h2" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">CVSS Dashboard</span>
+      <span class="h2 mt-2 dash-font" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">CVSS Dashboard</span>
       </div>
       </div>
 <!--------------------------------Search-section-start--------------------------------------------------->
       <div [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="col-lg-4 ps-4">
-        <div class="row justify-content-evenly align-items-center pt-2">
-          <div class="custom-col-3 h5">Search Type</div>
+        <!-- <div class="row justify-content-evenly align-items-center pt-2">
+        <div class="custom-col-3 h5">Search Type</div>
         <select [(ngModel)]="searchType" (change)="searchField = 0" class="custom-col-3 rounded w-25 form-control">
           <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
         </select>
         <div class="d-flex justify-content-center custom-col-3">
-        <button data-bs-toggle="modal" class="btn btn-danger" data-bs-target="#getPortNumber" [disabled]="isScanning">Scan</button>
+        <button class="btn btn-danger" (click)="openScanModal()">Scan</button>
         </div>
         <div class="custom-col-3 show-md">
         <div class="form-switch d-flex flex-wrap justify-content-end">
-          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
+          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">&nbsp;
           <span class="form-check-label custom-fw-1 pe-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault"><img [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" [src]="darkMode ? 'images/shield_moon_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.png' : 'images/shield_moon_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png'" alt="Moon"></span>
         </div>
         </div>
-        </div> 
+        </div>  -->
+        <div class="row justify-content-evenly align-items-center pt-2">
+        <div class="d-flex justify-content-evenly align-items-center ps-2 col-8">
+        <div class="h5 text-nowrap ps-1">Search Type</div>&nbsp;&nbsp;
+        <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded form-control">
+          <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
+        </select>
+        </div>
+        <div class="ps-3 d-flex justify-content-between align-items-center col-4">
+        <div class="d-flex justify-content-center">
+        <button class="btn btn-danger" (click)="openScanModal()">Scan</button>
+        </div>
+        <div class="form-switch d-flex flex-wrap justify-content-end show-md">
+          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">&nbsp;
+          <span class="form-check-label custom-fw-1 pe-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault"><img [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" [src]="darkMode ? 'images/shield_moon_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.png' : 'images/shield_moon_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png'" alt="Moon"></span>
+        </div>
+        </div>
+        </div>
         <div id="search-type" *ngIf="searchType == 1" class="d-flex justify-content-evenly py-3" [ngClass]="{'search-type-checkbox': !darkMode}">
-        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input [(ngModel)]="searchField" type="radio" name="keyword" [value]="1"></div>
-        <div class="col-4 d-flex align-items-center">CVE ID&nbsp;&nbsp;<input [(ngModel)]="searchField" type="radio" name="keyword" [value]="2"></div>
-        <div class="col-4 d-flex align-items-center text-nowrap">CPE Name&nbsp;&nbsp;<input [(ngModel)]="searchField" type="radio" name="keyword" [value]="3"></div>
+        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="1"></div>
+        <div class="col-4 d-flex align-items-center">CVE ID&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="searchValue = 'CVE-'" type="radio" name="keyword" [value]="2"></div>
+        <div class="col-4 d-flex align-items-center">CPE Name&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="3"></div>
         </div>
         <div id="search-type" *ngIf="searchType == 2" class="d-flex py-3" [ngClass]="{'search-type-checkbox': !darkMode}">
-        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input type="radio" [(ngModel)]="searchField" name="keyword" [value]="4"></div>
-        <div class="col-8 d-flex align-items-center text-nowrap">Likely CPE Name&nbsp;&nbsp;<input type="radio" [(ngModel)]="searchField" name="keyword" [value]="5"></div>
+        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input type="radio" [(ngModel)]="searchField" (click)="onFocus($event)" name="keyword" [value]="4"></div>
+        <div class="col-8 d-flex align-items-center text-nowrap">Likely CPE Name&nbsp;&nbsp;<input type="radio" [(ngModel)]="searchField" (click)="onFocus($event)" name="keyword" [value]="5"></div>
         </div>
       </div>
 <!--------------------------------Search-section-end--------------------------------------------------->
@@ -50,7 +67,9 @@
           class="col-8 p-2 px-5 rounded-start-3 border-0"
           type="text"
           id="dependency-search"
-          [placeholder]="searchType == 1 ? 'Vulnerability Search' : 'Dependency Search'"
+          [placeholder]="searchType == 1 ? 'Vulnerability Search' : 'Dependency Search'" (focus)="onFocus($event)"
+  (keydown)="onKeyDown($event)"
+  (input)="onInputChange($event)"
         />
         <button [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" [disabled]="searchField === 0" (click)="setSearchUrl()"
           class="border-0 col-4 rounded-end-3 h-100 d-flex align-items-center"
@@ -62,21 +81,14 @@
           </mat-icon>
         </button>
       </div>
+      <span *ngIf="searchField === 5" class="ps-3 text-red fs-sm fw-bold">e.g: cpe:2.3:a:vmware:framework:5.3.20:*:*:*:*:*:*:*</span>
       </div>
       </div>
     </div>
     <!-------------------------------Top-Searchbar-end------------------------------------------>
-
-    <!--------------------------------Vulnerability-table-start--------------------------------------->
-
-    <!-- <app-vulnerabilitylist [vulnerabilityData]="vulnerabilityData" [isLoading]="isLoading" [darkMode]="darkMode" [searchVariant]="searchVariant"></app-vulnerabilitylist> -->
-
-    <!--------------------------------Vulnerability-table-end----------------------------------------->
-
-    <!--------------------------------dependencies-list-table-start---------------------------------------->
-     <!-- <app-dependencies *ngIf="dependencies && dependencies.length > 0" [dependencies]="dependencies" [isLoading]="isLoading" [darkMode]="darkMode"></app-dependencies> -->
-    <!--------------------------------dependencies-list-table-end---------------------------------------->
+    <!--------------------------------------router-outlet---------------------------------------->
     <router-outlet></router-outlet>
+    <!--------------------------------------router-outlet---------------------------------------->
     <div
       class="position-fixed h-100 d-flex justify-content-center align-items-center"
       *ngIf="isAnimate" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
@@ -84,6 +96,7 @@
       <div class="d-flex flex-column"> 
       <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
       <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center">Analyzed <span class="text-warning">{{fetchedDependencies}}</span> out of <span class="text-warning">{{totalDependencies}}</span> dependencies</p>
+      <div class="text-center"><button (click)="stopSSE()" class="btn btn-secondary">Cancel</button></div>
       </div>
     </div>
     
@@ -97,8 +110,28 @@
   </div>
 </div>
 
+<!--------------------------------------portnumber-alert-modal--------------------------------------->
+<div class="modal fade" data-bs-backdrop="static" #alertModal>
+<div class="modal-dialog">
+  <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title text-white">Reminder</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div>
+           <p>Scanned data found. Scan again?.</p>
+        </div>
+        <div>
+        <button class="btn btn-danger" data-bs-toggle="modal" (click)="openNewScan()"  data-bs-dismiss="modal">Yes</button>&nbsp;&nbsp;
+        <button class="btn btn-danger" (click)="viewScannedDependencies()" data-bs-dismiss="modal">No</button></div>
+      </div>
+  </div>
+</div>
+</div>
+<!--------------------------------------portnumber-alert-modal--------------------------------------->
 <!--------------------------------------portnumber-modal--------------------------------------->
-<div class="modal fade" id="getPortNumber">
+<div class="modal fade" data-bs-backdrop="static" #getPortNumber>
 <div class="modal-dialog">
   <div class="modal-content">
       <div class="modal-header bg-danger">
