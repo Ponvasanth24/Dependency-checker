@@ -1,0 +1,31 @@
+.text-blue-shade {
+   color: rgba(46, 194, 17, 0.945);
+   /* color: rgba(8, 8, 160, 0.945) */
+}
+.error-field {
+    color: red;
+}
+.border-green-btn {
+    border: 3px solid rgba(46, 194, 17, 0.945);
+}
+.compform {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, auto));
+}
+.compform label{
+    width: 100%;
+    color: white;
+    background-color: rgba(3, 3, 48, 0.945);
+    padding: 8px 0;
+}
+.compform input{
+    margin-top: 10px;
+}
+.succToastProgress {
+    border-bottom-left-radius: 0.5rem;
+    background-color: rgba(46, 194, 17, 0.945);
+    height: 5px;
+}
+.text-toast-green {
+    color: rgba(46, 194, 17, 0.945);
+}

@@ -222,9 +222,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.messages = [];
     this.isScanning = true;
     this.isAnimate = true;
-    this.progressInterval = setInterval(()=>{
-        this.progress++;
-    }, 1300)
+    // this.progressInterval = setInterval(()=>{
+    //     this.progress++;
+    // }, 1300)
     try {
       const url = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
       if (!url || !this.portNumber) {
@@ -329,19 +329,19 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
 
 updateProgress(fetched: number, total: number) {
   const targetProgress = total > 0 ? Math.round((fetched / total) * 100) : 0;
-  if (this.progressInterval) {
-    clearInterval(this.progressInterval);
-    this.progressInterval = null;
-  }
+  // if (this.progressInterval) {
+  //   clearInterval(this.progressInterval);
+  //   this.progressInterval = null;
+  // }
   this.progress = targetProgress;
-  this.progressInterval = setInterval(() => {
-    if (this.progress < 100) {
-      this.progress++;
-    } else {
-      clearInterval(this.progressInterval);
-      this.progressInterval = null;
-    }
-  }, 2100);
+  // this.progressInterval = setInterval(() => {
+  //   if (this.progress < 100) {
+  //     this.progress++;
+  //   } else {
+  //     clearInterval(this.progressInterval);
+  //     this.progressInterval = null;
+  //   }
+  // }, 2100);
 }
 
   changeTheme(event: any): void {
@@ -419,7 +419,7 @@ onKeyDown(event: KeyboardEvent) {
   if (
     cursorPos !== null &&
     cursorPos <= 4 &&
-    (event.key === 'Backspace' || event.key === 'Delete')
+    (event.key === 'Backspace' || event.key === 'Delete') && this.searchField === 2
   ) {
     event.preventDefault();
   }
@@ -427,10 +427,10 @@ onKeyDown(event: KeyboardEvent) {
 
 onInputChange(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (!input.value.startsWith('CVE-') && this.searchField === 2) {
-    input.value = 'CVE-';
-  }
-  const afterPrefix = input.value.slice(4).replace(/[^\d-]/g, '');
-  this.searchValue = 'CVE-' + afterPrefix;
+  // if (this.searchField === 2) {
+  //   input.value = 'CVE-';
+  // }
+  // const afterPrefix = input.value.slice(4).replace(/[^\d-]/g, '');
+  // this.searchValue = 'CVE-' + afterPrefix;
 }
 }

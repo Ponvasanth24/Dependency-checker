@@ -30,6 +30,10 @@ export const routes: Routes = [
       },
       {
         path: 'vulnerabilitySync',
-        loadComponent: () => import('./vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component').then(m => m.VulnerabilitysyncdashboardComponent)
+        loadComponent: () => import('./vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component').then(m => m.VulnerabilitysyncdashboardComponent),
+        children:[{
+          path:'computer',
+          loadComponent:()=> import('./computer/computer.component').then(m => m.ComputerComponent)
+        }]
       }
   ];
