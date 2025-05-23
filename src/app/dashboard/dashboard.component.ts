@@ -59,6 +59,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   portNumber: number = 8080;
   navigationUrl: string = '';
   private progressInterval: any = null;
+  portNumberSetStatus:boolean = false;
   regex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
@@ -97,7 +98,21 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     const navBarHeight = this.navBar.nativeElement.offsetHeight;
     this.vulnService.setNavBarHeight(navBarHeight);
     this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content")
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
+    const bootstrap = (window as any).bootstrap;
+    if (bootstrap && bootstrap.Modal && !this.portNumberSetStatus) {
+      this.ngZone.run(()=>{
+      setTimeout(()=> {
+      const scanModal = new bootstrap.Modal(
+      this.getPortNumberSearch.nativeElement
+      );
+      scanModal.show();
+      }, 50);
+      });}
+  }
+  setPortNumber(){
+    this.vulnService.setPortNumber(this.portNumber);
+    this.vulnService.setPortNumberStatus(true);
   }
 
   setSearchUrl() {

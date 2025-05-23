@@ -29,6 +29,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   pageSize: number = 10;
   pageSizes:Array<number> = [];
   pagedCpeData: any = [];
+  portNumber:number = 8080;
   cd: any;
   @ViewChild('noCpeData') noCpeData!: ElementRef;
   constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
@@ -47,13 +48,16 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
       this.updatePagedData(this.initialIndex);
       this.isLoading = false;
     });
+    this.vulnService.portNumber$.subscribe((portNumber:number)=>{
+       this.portNumber = portNumber;
+    });
   }
   ngAfterViewInit(): void {
       if(this.cpeData.length === 0) {
           this.vulnService.navBarHeight$.subscribe((height: number) => {
           this.renderer.setStyle(this.noCpeData.nativeElement, 'height', `${window.innerHeight - height}px`);
       }) 
-        }
+      }
   }
   ngAfterViewChecked(): void {
     if(this.cpeData.length === 0) {
@@ -65,7 +69,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   searchCpeName(cpeName: string) {
     this.vulnService.setLoading(true);
     console.log(cpeName, this.isLoading);
-    this.http.get<any>(environment.searchByCpeName.concat(cpeName)).subscribe({
+    this.http.get<any>(`${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}${cpeName}`).subscribe({
        next:(response)=> {
         this.vulnService.setDarkMode(this.darkMode);
         this.vulnService.setVulnerabilityData(response);
