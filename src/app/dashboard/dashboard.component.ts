@@ -93,6 +93,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.vulnService.isAnimate$.subscribe((animate: boolean) => {
       this.isAnimate = animate;
     });
+    this.vulnService.portNumberSet$.subscribe((status:boolean)=>{
+      this.portNumberSetStatus = status;
+    });
   }
   ngAfterViewInit(): void {
     const navBarHeight = this.navBar.nativeElement.offsetHeight;

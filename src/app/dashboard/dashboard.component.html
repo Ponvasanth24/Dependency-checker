@@ -67,8 +67,7 @@
           type="text"
           id="dependency-search"
           [placeholder]="searchType == 1 ? 'Vulnerability Search' : 'Dependency Search'" (focus)="onFocus($event)"
-  (keydown)="onKeyDown($event)"
-  (input)="onInputChange($event)"
+          (keydown)="onKeyDown($event)" (input)="onInputChange($event)" (keyup.enter)="searchField !== 0 && setSearchUrl()"
         />
         <button [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" [disabled]="searchField === 0" (click)="setSearchUrl()"
           class="border-0 col-4 rounded-end-3 h-100 d-flex align-items-center"
