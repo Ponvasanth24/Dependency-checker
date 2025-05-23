@@ -1,7 +1,11 @@
 <div class="overflow-auto">
-<table *ngIf="pagedCpeData.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
+<table *ngIf="cpeData.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table table-responsive-lg table-borderless table-striped mt-2">
-<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total CPE Results: <span class="h5 text-warning">{{cpeData.length}}</span></caption>
+<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total CPE Results: <span class="h5 text-warning">{{cpeData.length}}</span>
+<span class="float-end">
+  <input class="cpe-search-field" type="text" placeholder="Search" (keyup)="searchCPEs($event)">
+  </span>
+</caption>
     <thead>
         <tr>
             <th>CPE Name</th> 
@@ -12,10 +16,15 @@ class="table table-responsive-lg table-borderless table-striped mt-2">
             <td><a (click)="searchCpeName(data.cpe23Uri)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer">{{data.cpe23Uri}}</a></td>
         </tr>
      </tbody>
+     <tfoot *ngIf="pagedCpeData.length === 0">
+      <tr>
+        <td class="text-center fw-bold">No CPE Data Found</td>
+      </tr>
+     </tfoot>
 </table>
 </div>
 <!---------------------------------pagination-start----------------------------------------------->
-<div *ngIf="pagedCpeData.length > 0;" class="row justify-content-center height-fit-content">
+<div *ngIf="cpeData.length > 0;" class="row justify-content-center height-fit-content">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
   <mat-label class="text-nowrap" [ngClass]="{'bg-dark': darkMode, 'bg-alice': !darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
   <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
@@ -39,7 +48,7 @@ arrow_forward_ios
 </div>
 <!---------------------------------pagination-end------------------------------------------------>
 <!--------------------------------No-vulnerability-data-start------------------------------------->
-<div #noCpeData *ngIf="pagedCpeData.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
+<div #noCpeData *ngIf="cpeData.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
   <div class="text-center">
     <span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h3">No CPE Data Found</span>
   </div>

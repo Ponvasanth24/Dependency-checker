@@ -1,11 +1,14 @@
-<div class="d-flex flex-wrap">
-  <h2 class="text-blue-shade">Computer Details</h2>
-  <form [formGroup]="computerForm" class="compfor">
+<div>
+  <h3 class="text-blue-shade">Add Computer Details</h3>
+  <form [formGroup]="computerForm" class="bg-white">
     
-    <div class="compform">
-    <div class="">
-    <label class="fw-bold">IP Address</label>
+    <div class="compform">  
+    <div >
+    <label class="fw-bold">IP Address *</label>
+    <div class="px-2">
     <input class="form-control" matInput formControlName="ipAddress" placeholder="IP Address">
+    </div>
+    <div class="error-cont">
     <mat-error class="error-field" *ngIf="computerForm.get('ipAddress')?.touched && computerForm.get('ipAddress')?.hasError('required')">
      Please fill this field
     </mat-error>
@@ -13,9 +16,14 @@
      Please fill valid format
     </mat-error>
     </div>
-    <div class="">
-    <label class="fw-bold">Host Name</label>
+    </div>
+
+    <div>
+    <label class="fw-bold">Host Name *</label>
+    <div class="px-2">
     <input class="form-control" matInput formControlName="hostName" placeholder="Host Name">
+    </div>
+    <div class="error-cont">
     <mat-error class="error-field" *ngIf="computerForm.get('hostName')?.touched && computerForm.get('hostName')?.hasError('required')">
      Please fill this field
     </mat-error>
@@ -23,30 +31,47 @@
      Please fill valid format
     </mat-error>
     </div>
-    <div class="">
-    <label class="fw-bold">OS Name</label>
+    </div>
+
+    <div >
+    <label class="fw-bold">OS Name *</label>
+    <div class="px-2">
     <input class="form-control" matInput formControlName="osName" placeholder="OS Name">
+    </div>
+    <div class="error-cont">
     <mat-error class="error-field" *ngIf="computerForm.get('osName')?.touched && computerForm.get('osName')?.hasError('required')">
      Please fill this field
     </mat-error>
     </div>
-    <div class="">
-    <label class="fw-bold">OS Version</label>
+    </div>
+
+    <div >
+    <label class="fw-bold">OS Version *</label>
+    <div class="px-2">
     <input class="form-control" matInput formControlName="osVersion" placeholder="OS Version">
+    </div>
+    <div class="error-cont">
     <mat-error class="error-field" *ngIf="computerForm.get('osVersion')?.touched && computerForm.get('osVersion')?.hasError('required')">
      Please fill this field
     </mat-error>
     </div>
-    <div class="">
-    <label class="fw-bold">Location</label>
+    </div>
+
+    <div >
+    <label class="fw-bold">Location *</label>
+    <div class="px-2">
     <input class="form-control" matInput formControlName="location" placeholder="Location">
+    </div>
+    <div class="error-cont">
     <mat-error class="error-field" *ngIf="computerForm.get('location')?.touched && computerForm.get('location')?.hasError('required')">
      Please fill this field
     </mat-error>
     </div>
-    <div class="text-center ">
+    </div>
+
+    <div class="text-center">
         <label class="fw-bold">Action</label>
-         <button (click)="addComputerData()" class="btn btn-light border-green-btn" type="submit">Submit</button>
+        <button (click)="addComputerData()" class="btn btn-light border-green-btn mt-2" type="submit">Submit</button>
     </div>
     </div>
 </form>
@@ -55,7 +80,7 @@
 
 <!---------------------------------------------success-toast-start-------------------------------------------------->
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
-<div #successToast class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+<div #successToast class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
   <div class="toast-header"> 
     <strong class="me-auto text-success">Success !</strong>
     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -70,7 +95,7 @@
 
 <!---------------------------------------------error-toast-start-------------------------------------------------->
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
-<div #errorToast class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+<div #errorToast class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
   <div class="toast-header">
     <strong class="me-auto text-danger">Error</strong>
     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>

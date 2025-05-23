@@ -81,6 +81,18 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
     
   })
 }
+searchCPEs(event: Event) {
+const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
+    console.log(inputValue);
+      if(inputValue === '') {
+        this.pageIndex = 0;
+        this.updatePagedData(this.initialIndex);
+      } else {
+      this.pagedCpeData = this.cpeData.filter((cpe:any) => {
+          return cpe?.cpe23Uri.toLowerCase().includes(inputValue.toLowerCase());
+      });
+    }
+}
 
 nextPage(): void {
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {

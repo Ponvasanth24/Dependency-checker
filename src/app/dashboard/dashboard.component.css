@@ -1,6 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Changa:wght@200..800&family=Faster+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Nova+Square&family=Orbitron:wght@400..900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Nova+Square&family=Orbitron:wght@400..900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 .row div {
     padding: 0;
 }
@@ -97,6 +95,26 @@ input[type=number] {
 }
 .text-red {
     color: red;
+}
+.snackbar-error {
+  background-color: #dc3545 !important;
+  color: white;
+  font-weight: bold;
+  .mat-mdc-button-touch-target {
+    background-color: #dc3545;
+  }
+}
+.snackbar-success {
+  background-color: #198754 !important;
+  color: white;
+  font-weight: bold;
+  .mat-mdc-button-touch-target {
+    background-color: #198754;
+  }
+}
+.no-hover:hover {
+  color: inherit !important;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

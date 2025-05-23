@@ -10,13 +10,13 @@
 }
 .compform {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, auto));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 .compform label{
     width: 100%;
     color: white;
     background-color: rgba(3, 3, 48, 0.945);
-    padding: 8px 0;
+    padding: 8px 0 8px 4px;
 }
 .compform input{
     margin-top: 10px;
@@ -28,4 +28,9 @@
 }
 .text-toast-green {
     color: rgba(46, 194, 17, 0.945);
+}
+.error-cont {
+    min-height: 15px;
+    max-height: 25px;
+    padding-left: 4px;
 }

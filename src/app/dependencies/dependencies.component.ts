@@ -70,12 +70,23 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
           }) 
         }
   }
-   viewDependency(vulnerabilityData:any) {
+  handleDependency(dependency: any) {
+    if(dependency.vulnerabilities?.length > 0){
+      this.viewDependency(dependency.vulnerabilities);
+    } else{
+      this.viewCPEs(dependency.likelyCPEs)
+    }
+  }
+  viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
           this.vulnService.setDarkMode(this.darkMode);
           this.vulnService.setTempVulnerability(false);
           this.router.navigate(['/vulnerabilityList']);
           this.vulnService.setVulnerabilityData(vulnerabilityData);
+   }
+   viewCPEs(CPEs: any) {
+        this.vulnService.setCpeData(CPEs);
+          this.router.navigate(['/cpeSearchResults']);
    }
    nextPage(): void {
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {

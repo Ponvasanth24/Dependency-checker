@@ -62,6 +62,7 @@ export class ComputerComponent implements OnDestroy{
             delay: 5000, autohide: true});
             toast.show();
             this.setToastProgress();
+            this.computerForm.reset();
           } else {
             window.alert(this.successMessage);
           }

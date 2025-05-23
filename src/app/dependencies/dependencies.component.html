@@ -1,19 +1,30 @@
 <div class="overflow-auto">
 <table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
-<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning fw-bold">{{dependencies.length}}</span><span class="float-end">
-  <input class="dep-search-field" type="text" placeholder="Search" (keyup)="searchDependencies($event)"></span> </caption>
+<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning fw-bold">{{dependencies.length}}</span>
+  <div class="d-flex justify-content-between align-items-center float-end">
+    <div class="d-flex">
+    <div class="d-flex align-items-center"><div class="bg-primary p-2 rounded-circle w-fit-content h-fit-content"></div>&nbsp;&nbsp;likelyCPEs</div>&nbsp;&nbsp;&nbsp;&nbsp;
+    <div class="d-flex align-items-center"><div class="bg-danger p-2 rounded-circle w-fit-content h-fit-content"></div>&nbsp;&nbsp;Vulnerabilities</div>
+    </div>&nbsp;&nbsp;
+  <span>
+  <input class="dep-search-field" type="text" placeholder="Search" (keyup)="searchDependencies($event)">
+  </span>
+  </div>
+</caption>
     <thead>
         <tr>
             <th>Dependency Name</th> 
             <th>Vendor</th>
             <th>Product</th>
             <th>Version</th>
-         </tr>
+        </tr>
     </thead>
      <tbody>
         <tr *ngFor="let dependency of pagedDependencies">
-            <td><a [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}"class="text-white cursor-pointer" (click)="viewDependency(dependency.vulnerabilities)">{{dependency.dependencyName}}</a></td>
+            <td><a [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="cursor-pointer" (click)="handleDependency(dependency)">{{dependency.dependencyName}}</a>
+            &nbsp;&nbsp;<span *ngIf="dependency.vulnerabilities?.length > 0" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
+            <span *ngIf="dependency.likelyCPEs?.length > 0" class="text-primary fw-bold">[{{dependency.likelyCPEs?.length}}]</span></td>
             <td>{{dependency.cpeEnumeration?.vendor}}</td>
             <td>{{dependency.cpeEnumeration?.product}}</td>
             <td>{{dependency.cpeEnumeration?.version}}</td>

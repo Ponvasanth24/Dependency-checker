@@ -1,12 +1,11 @@
-<div [ngClass]="{'bg-dark': darkMode, 'bg-alice': !darkMode}" class="container-fluid position-fixed h-100 overflow-auto">
+<div #dashBoard [ngClass]="{'bg-dark': darkMode, 'bg-alice': !darkMode}" class="container-fluid">
   <div class="row px-2 justify-content-center">
     <!-------------------------------Top-Searchbar-start-------------------------------------->
-    <div #navBar class="row justify-content-between">
-      
+    <div #navBar class="row justify-content-between red-padd">
       <div class="col-lg-4">
       <div class="d-flex pt-2">  
       <img class="w-25 rounded isteer-logo" src="images/iSteer_logo.png" alt="isteer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-      <span class="h2 mt-2 dash-font" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">CVSS Dashboard</span>
+      <span class="h2 mt-2 dash-font" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}"><a [routerLink]="['/']" class="nav-link cursor-pointer">CVSS Dashboard</a></span>
       </div>
       </div>
 <!--------------------------------Search-section-start--------------------------------------------------->
@@ -74,7 +73,7 @@
         <button [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" [disabled]="searchField === 0" (click)="setSearchUrl()"
           class="border-0 col-4 rounded-end-3 h-100 d-flex align-items-center"
         >
-          <mat-icon [ngClass]="{'search-button': searchType !== 0, 'text-white': darkMode, 'text-dark': darkMode, 'bg-dark': darkMode, 'bg-white': !darkMode}"
+          <mat-icon [ngClass]="{'search-button': searchType !== 0, 'text-white': darkMode, 'text-dark': darkMode, 'bg-dark': darkMode, 'bg-white': !darkMode, 'no-hover': searchField === 0}"
             class="w-100 fs-3 py-3 rounded-3 d-flex justify-content-center align-items-center"
           >
             arrow_forward
@@ -96,6 +95,7 @@
       <div class="d-flex flex-column"> 
       <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
       <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center">Analyzed <span class="text-warning">{{fetchedDependencies}}</span> out of <span class="text-warning">{{totalDependencies}}</span> dependencies</p>
+      <div *ngIf="progress === 100" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center d-flex align-items-center">Please wait while we retrieve the likely CPEs. This process may take a few moments.</div>
       <div class="text-center"><button (click)="stopSSE()" class="btn btn-secondary">Cancel</button></div>
       </div>
     </div>

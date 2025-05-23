@@ -12,3 +12,7 @@ table th:nth-child(1),td:nth-child(1) {
     width: 42px;
     height: 40px;
 }
+.cpe-search-field {
+    outline-color: rgb(221, 235, 248);
+    border:1px solid rgb(171, 213, 252);
+}

@@ -12,7 +12,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environments';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
 import { VulnerabilitylistComponent } from '../vulnerabilitylist/vulnerabilitylist.component';
@@ -23,6 +23,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs/operators';
+import { Renderer2 } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,7 +37,7 @@ import { finalize } from 'rxjs/operators';
     RouterOutlet,
     MatFormFieldModule,
     MatSelectModule,
-    MatRadioModule
+    MatRadioModule, RouterModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -66,16 +67,18 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     { id: 2, value: 'CPE Search' },
   ];
   @ViewChild(RouterOutlet) outlet: RouterOutlet | undefined;
-  @ViewChild('getPortNumber') portNumberModal!: ElementRef;
-  @ViewChild('alertModal') alertModal!: ElementRef;
+  @ViewChild('getPortNumber', { static: false }) portNumberModal!: ElementRef;
+  @ViewChild('alertModal', { static: false }) alertModal!: ElementRef;
   @ViewChild('navBar') navBar!: ElementRef;
+  @ViewChild('dashBoard') dashBoard!: ElementRef;
   constructor(
     private http: HttpClient,
     private router: Router,
     private vulnService: VulnerabilityService,
     private ngZone: NgZone,
     private cd: ChangeDetectorRef,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +95,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const navBarHeight = this.navBar.nativeElement.offsetHeight;
     this.vulnService.setNavBarHeight(navBarHeight);
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content")
   }
 
   setSearchUrl() {
@@ -222,9 +227,16 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.messages = [];
     this.isScanning = true;
     this.isAnimate = true;
-    // this.progressInterval = setInterval(()=>{
-    //     this.progress++;
-    // }, 1300)
+    this.progressInterval = setInterval(()=>{
+      if(this.progress < 100) this.progress++;
+      else {
+        this.isAnimate = false;
+        clearInterval(this.progressInterval);
+        this.eventSource?.close();
+        this.snackBar.open("Unexpected error occured", 'Dismiss', { duration: 5000, 
+        panelClass: ['snackbar-error'] });
+      }
+    }, 1300)
     try {
       const url = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
       if (!url || !this.portNumber) {
@@ -250,6 +262,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
             console.log('completed');
             this.isAnimate = false;
             this.eventSource?.close();
+            clearInterval(this.progressInterval);
             this.fetchFinalResults();
           }
         } catch (messageError) {
@@ -264,6 +277,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         this.snackBar.open(`Please check if the server is running on port ${this.portNumber}`, 'Dismiss', { duration: 5000, 
         panelClass: ['snackbar-error'] });
         this.isAnimate = false;
+        this.progress = 0;
+        clearInterval(this.progressInterval);
         this.eventSource?.close();
         this.cd.detectChanges();
       };
@@ -273,6 +288,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     } catch (error: any) {
       console.error('Error:', error);
       this.vulnService.setAnimate(false);
+      this.progress = 0;
+      clearInterval(this.progressInterval);
       this.snackBar.open(`Error occurred: ${error.message || 'Please check if the server is running.'}`, 'Dismiss', { duration: 5000, 
       panelClass: ['snackbar-error'] });
       if (this.eventSource) {
@@ -286,10 +303,12 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.fetchedDependencies = 0;
     this.totalDependencies = 0;
     this.progress = 0;
+    clearInterval(this.progressInterval);
     this.eventSource?.close();
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.progressInterval);
     this.eventSource?.close();
   }
 
@@ -329,19 +348,19 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
 
 updateProgress(fetched: number, total: number) {
   const targetProgress = total > 0 ? Math.round((fetched / total) * 100) : 0;
-  // if (this.progressInterval) {
-  //   clearInterval(this.progressInterval);
-  //   this.progressInterval = null;
-  // }
+  if (this.progressInterval) {
+    clearInterval(this.progressInterval);
+    this.progressInterval = null;
+  }
   this.progress = targetProgress;
-  // this.progressInterval = setInterval(() => {
-  //   if (this.progress < 100) {
-  //     this.progress++;
-  //   } else {
-  //     clearInterval(this.progressInterval);
-  //     this.progressInterval = null;
-  //   }
-  // }, 2100);
+  this.progressInterval = setInterval(() => {
+    if (this.progress < 100) {
+      this.progress++;
+    } else {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
+  }, 2100);
 }
 
   changeTheme(event: any): void {
@@ -354,8 +373,10 @@ updateProgress(fetched: number, total: number) {
     dependencies = dep ? JSON.parse(dep) : [];
     if (dependencies.length > 0) {
       if (bootstrap && bootstrap.Modal) {
+        this.ngZone.run(()=> {
         const scanModal = new bootstrap.Modal(this.alertModal.nativeElement);
         scanModal.show();
+        })
       } else {
         console.error(
           'Bootstrap Modal is not available. Make sure Bootstrap is loaded.'
@@ -365,10 +386,12 @@ updateProgress(fetched: number, total: number) {
       }
     } else {
       if (bootstrap && bootstrap.Modal) {
+        this.ngZone.run(()=> {
         const scanModal = new bootstrap.Modal(
           this.portNumberModal.nativeElement
         );
         scanModal.show();
+        })
       } else {
         console.error(
           'Bootstrap Modal is not available. Make sure Bootstrap is loaded.'
@@ -389,11 +412,12 @@ updateProgress(fetched: number, total: number) {
     existingModal.dispose();
     }
     if (bootstrap && bootstrap.Modal) {
+      this.ngZone.run(()=>{
       const scanModal = new bootstrap.Modal(
-        this.portNumberModal.nativeElement
-        
+      this.portNumberModal.nativeElement
       );
       scanModal.show();
+      });
     } else {
       console.error(
         'Bootstrap Modal is not available. Make sure Bootstrap JS is loaded.'
@@ -427,10 +451,10 @@ onKeyDown(event: KeyboardEvent) {
 
 onInputChange(event: Event) {
   const input = event.target as HTMLInputElement;
-  // if (this.searchField === 2) {
-  //   input.value = 'CVE-';
-  // }
-  // const afterPrefix = input.value.slice(4).replace(/[^\d-]/g, '');
-  // this.searchValue = 'CVE-' + afterPrefix;
+  if (!this.searchValue.startsWith('CVE-') && this.searchField === 2) {
+    input.value = 'CVE-';
+    const afterPrefix = input.value.slice(4).replace(/[^\d-]/g, '');
+    this.searchValue = 'CVE-' + afterPrefix;
+  }
 }
 }
