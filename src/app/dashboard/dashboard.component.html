@@ -43,13 +43,13 @@
         </div>
         </div>
         <div id="search-type" *ngIf="searchType == 1" class="d-flex justify-content-evenly py-3" [ngClass]="{'search-type-checkbox': !darkMode}">
-        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="1"></div>
-        <div class="col-4 d-flex align-items-center">CVE ID&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="searchValue = 'CVE-'" type="radio" name="keyword" [value]="2"></div>
-        <div class="col-4 d-flex align-items-center">CPE Name&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="3"></div>
+        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input data-bs-toggle="modal" data-bs-target="#getPortNumberSearch" [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="1"></div>
+        <div class="col-4 d-flex align-items-center">CVE ID&nbsp;&nbsp;<input data-bs-toggle="modal" data-bs-target="#getPortNumberSearch" [(ngModel)]="searchField" (click)="searchValue = 'CVE-'" type="radio" name="keyword" [value]="2"></div>
+        <div class="col-4 d-flex align-items-center">CPE Name&nbsp;&nbsp;<input data-bs-toggle="modal" data-bs-target="#getPortNumberSearch" [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="3"></div>
         </div>
         <div id="search-type" *ngIf="searchType == 2" class="d-flex py-3" [ngClass]="{'search-type-checkbox': !darkMode}">
-        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input type="radio" [(ngModel)]="searchField" (click)="onFocus($event)" name="keyword" [value]="4"></div>
-        <div class="col-8 d-flex align-items-center text-nowrap">Likely CPE Name&nbsp;&nbsp;<input type="radio" [(ngModel)]="searchField" (click)="onFocus($event)" name="keyword" [value]="5"></div>
+        <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input data-bs-toggle="modal" data-bs-target="#getPortNumberSearch" type="radio" [(ngModel)]="searchField" (click)="onFocus($event)" name="keyword" [value]="4"></div>
+        <div class="col-8 d-flex align-items-center text-nowrap">Likely CPE Name&nbsp;&nbsp;<input data-bs-toggle="modal" data-bs-target="#getPortNumberSearch" type="radio" [(ngModel)]="searchField" (click)="onFocus($event)" name="keyword" [value]="5"></div>
         </div>
       </div>
 <!--------------------------------Search-section-end--------------------------------------------------->
@@ -142,6 +142,24 @@
         <div class="d-flex justify-content-between">
            <input type="number" class="w-75 form-control" [(ngModel)]="portNumber">
            <button class="btn btn-danger" [disabled]="portNumber.toString().length < 4" (click)="startScan()" data-bs-dismiss="modal">Scan</button>
+        </div>
+      </div>
+  </div>
+</div>
+</div>
+<!--------------------------------------portnumber-modal--------------------------------------->
+<!--------------------------------------portnumber-modal--------------------------------------->
+<div class="modal fade" data-bs-backdrop="static" id="getPortNumberSearch">
+<div class="modal-dialog">
+  <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title text-white">Enter Your Port Number</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between">
+           <input type="number" class="w-75 form-control" [(ngModel)]="portNumber">
+           <button class="btn btn-danger" [disabled]="portNumber.toString().length < 4" data-bs-dismiss="modal">Ok</button>
         </div>
       </div>
   </div>

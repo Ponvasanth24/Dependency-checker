@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,7 @@ import { Renderer2 } from '@angular/core';
   templateUrl: './computer.component.html',
   styleUrl: './computer.component.css'
 })
-export class ComputerComponent implements OnDestroy{
+export class ComputerComponent implements OnInit, OnDestroy{
   computerForm!: FormGroup;
   successMessage: string = '';
   errorMessage: string = '';
@@ -44,7 +44,18 @@ export class ComputerComponent implements OnDestroy{
         this.proggWidth = 100;
       } 
       this.renderer.setStyle(this.succToastProgress.nativeElement, 'width', `${this.proggWidth}%`);
-      },11);
+      }, 11);
+  }
+
+  ngOnInit(): void {
+      this.http.get<any>(vulnSyncEnvironments.computerCommonUrl).subscribe({
+        next:(response)=>{
+          console.log(response)
+        },
+        error:(error)=>{
+          console.log(error)
+        }
+      })
   }
 
   ngOnDestroy(): void {
@@ -53,7 +64,7 @@ export class ComputerComponent implements OnDestroy{
 
   addComputerData() {
     this.successMessage = "Computer data added successfully";
-     this.http.post<any>(vulnSyncEnvironments.addComputer, this.computerForm.value).subscribe({
+     this.http.post<any>(vulnSyncEnvironments.computerCommonUrl, this.computerForm.value).subscribe({
       next:(response)=>{
           console.log(response);
           this.successMessage = "Computer data addedd successfully";

@@ -68,6 +68,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   ];
   @ViewChild(RouterOutlet) outlet: RouterOutlet | undefined;
   @ViewChild('getPortNumber', { static: false }) portNumberModal!: ElementRef;
+  @ViewChild('getPortNumberSearch', { static: false }) getPortNumberSearch!: ElementRef;
   @ViewChild('alertModal', { static: false }) alertModal!: ElementRef;
   @ViewChild('navBar') navBar!: ElementRef;
   @ViewChild('dashBoard') dashBoard!: ElementRef;
@@ -101,11 +102,12 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
 
   setSearchUrl() {
     this.dependencies = [];
+
     if (this.searchValue !== '' && this.searchField !== 0) {
       switch (this.searchField) {
         case 1:
           if (this.searchValue.length > 0) {
-            this.searchUrl = environment.searchByKeyWordUrl;
+            this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByKeyWordUrl}`;
             this.navigationUrl = '/vulnerabilityList';
             this.searchVulnerabilities();
           } else {
@@ -114,7 +116,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
           break;
         case 2:
           if (this.searchValue.startsWith('CVE-') && this.cveRegex.test(this.searchValue)) {
-            this.searchUrl = environment.searchByCveid;
+            this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCveid}`;
             this.navigationUrl = '/vulnerabilityList';
             this.searchVulnerabilities();
           } else {
@@ -124,7 +126,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
           break;
         case 3:
           if (this.regex.test(this.searchValue)) {
-            this.searchUrl = environment.searchByCpeName;
+            this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}`;
             this.navigationUrl = '/vulnerabilityList';
             this.searchVulnerabilities();
           } else {
@@ -134,7 +136,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
           break;
         case 4:
           if (this.searchValue.length > 0) {
-            this.searchUrl = environment.searchLikelyKeyword;
+            this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchLikelyKeyword}`;
             this.navigationUrl = '/cpeSearchResults';
             this.searchVulnerabilities();
           } else {
@@ -144,7 +146,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
           break;
         case 5:
           if (this.likelyCpeRegex.test(this.searchValue)) {
-            this.searchUrl = environment.searchLikelyCpe;
+            this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchLikelyCpe}`;
             this.navigationUrl = '/cpeSearchResults';
             this.searchVulnerabilities();
           } else {
@@ -163,7 +165,6 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
 
   searchVulnerabilities(): void {
   this.isLoading = true;
-
   this.http.get<any[]>(`${this.searchUrl}${this.searchValue}`)
     .pipe(finalize(() => this.vulnService.setLoading(false)))
     .subscribe({
@@ -374,8 +375,10 @@ updateProgress(fetched: number, total: number) {
     if (dependencies.length > 0) {
       if (bootstrap && bootstrap.Modal) {
         this.ngZone.run(()=> {
+        setTimeout(()=>{
         const scanModal = new bootstrap.Modal(this.alertModal.nativeElement);
         scanModal.show();
+        }, 50);  
         })
       } else {
         console.error(
@@ -387,10 +390,13 @@ updateProgress(fetched: number, total: number) {
     } else {
       if (bootstrap && bootstrap.Modal) {
         this.ngZone.run(()=> {
+        setTimeout(()=>{
         const scanModal = new bootstrap.Modal(
-          this.portNumberModal.nativeElement
+        this.portNumberModal.nativeElement
         );
+        console.log("call",scanModal);
         scanModal.show();
+        }, 50);
         })
       } else {
         console.error(
@@ -413,10 +419,12 @@ updateProgress(fetched: number, total: number) {
     }
     if (bootstrap && bootstrap.Modal) {
       this.ngZone.run(()=>{
+      setTimeout(()=> {
       const scanModal = new bootstrap.Modal(
       this.portNumberModal.nativeElement
       );
       scanModal.show();
+      }, 50);
       });
     } else {
       console.error(
