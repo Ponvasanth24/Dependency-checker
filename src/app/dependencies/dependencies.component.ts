@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,6 +16,8 @@ import { MatSelectChange } from '@angular/material/select';
 import { ChangeDetectorRef } from '@angular/core';
 import { Renderer2 } from '@angular/core';
 import { HighlightPipe } from '../../shared/HighlightSearch';
+import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
+import { filter } from 'rxjs';
 @Component({
   selector: 'app-dependencies',
   imports: [CommonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
@@ -41,7 +43,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     @ViewChild('noDependency') noDependency!: ElementRef;
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
     constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef,
-      private renderer: Renderer2
+      private renderer: Renderer2, private paginationService: CVSSPaginationService
     ){}
     ngOnInit(): void {
       this.vulnService.getDarkMode().subscribe((mode: boolean) => {
@@ -53,8 +55,12 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       this.vulnService.dependencies$.subscribe((dependencies:any[]) => {
          dependenciesFromService = dependencies;
          this.dependencies = depsFromSession.length > 0 ? depsFromSession : dependenciesFromService.length > 0 ? dependenciesFromService : [];
-      this.updatePagedData(this.initialIndex);
+         this.initialIndex = this.paginationService.getDepInitialIndex();
+         this.pageSize = this.paginationService.getDepPageSize();
+         this.initialIndex * this.pageSize < this.dependencies.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
+         this.updatePagedData(this.pageIndex);
       });
+     
       console.log(this.dependencies);
     }
     ngAfterViewInit(): void {
@@ -69,7 +75,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
           this.vulnService.navBarHeight$.subscribe((height: number) => {
               this.renderer.setStyle(this.noDependency.nativeElement, 'height', `${window.innerHeight - height}px`);
           }) 
-        }
+        }  
   }
   handleDependency(dependency: any) {
     if(dependency.vulnerabilities?.length > 0){
@@ -92,6 +98,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
    nextPage(): void {
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
     this.pageIndex++;
+    this.paginationService.setDepInitialIndex(this.pageIndex);
     this.start = this.pageIndex * this.pageSize;
     this.end = this.start + this.pageSize;
     this.pagedDependencies = this.dependencies.slice(this.start, this.end);
@@ -120,8 +127,9 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
    }
    onPageSizeChange(event: MatSelectChange): void {
    this.pageSize = event.value;
-   this.pageIndex = 0;
-   this.updatePagedData(this.initialIndex);
+   this.paginationService.setDepPageSize(this.pageSize);
+   this.initialIndex * this.pageSize < this.dependencies.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
+   this.updatePagedData(this.pageIndex);
    }
    searchDependencies(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value.toLowerCase();

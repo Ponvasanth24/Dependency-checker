@@ -12,6 +12,7 @@ import { Renderer2 } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '@angular/common';
 import { HighlightPipe } from '../../shared/HighlightSearch';
+import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 
 @Component({
   selector: 'app-cpesearch',
@@ -36,7 +37,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   searchTerm: string = '';
   @ViewChild('noCpeData') noCpeData!: ElementRef;
   constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
-    private snackBar: MatSnackBar, private location: Location
+    private snackBar: MatSnackBar, private location: Location, private paginationService: CVSSPaginationService
   ) {
     this.vulnService.getDarkMode().subscribe((mode: boolean) => {
       this.darkMode = mode;
@@ -48,7 +49,10 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
     });
     this.vulnService.cpeData$.subscribe((data: any) => {
       this.cpeData = data;
-      this.updatePagedData(this.initialIndex);
+      this.initialIndex = this.paginationService.getCpeInitialIndex();
+      this.pageSize = this.paginationService.getCpePageSize();
+      this.initialIndex * this.pageSize < this.cpeData.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
+      this.updatePagedData(this.pageIndex);
       this.isLoading = false;
     });
     this.vulnService.portNumber$.subscribe((portNumber:number)=>{
@@ -105,14 +109,16 @@ const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
 nextPage(): void {
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
     this.pageIndex++;
+    this.paginationService.setCpeInitialIndex(this.pageIndex);
     this.start = this.pageIndex * this.pageSize;
     this.end = this.start + this.pageSize;
     this.pagedCpeData = this.cpeData.slice(this.start, this.end);
     }
    }
-   previousPage(): void {
+previousPage(): void {
     if(this.pageIndex > 0) {
       this.pageIndex--;
+      this.paginationService.setCpeInitialIndex(this.pageIndex);
       this.start = this.pageIndex * this.pageSize;
       this.end = this.start + this.pageSize;
       this.pagedCpeData = this.cpeData.slice(this.start, this.end);
@@ -133,8 +139,9 @@ nextPage(): void {
    }
    onPageSizeChange(event: MatSelectChange): void {
    this.pageSize = event.value;
-   this.pageIndex = 0
-   this.updatePagedData(this.initialIndex);
+   this.paginationService.setCpePageSize(this.pageSize);
+   this.initialIndex * this.pageSize < this.cpeData.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
+   this.updatePagedData(this.pageIndex);
    }
    goBack() {
     this.location.back()

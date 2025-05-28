@@ -100,6 +100,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
     this.vulnService.portNumberSet$.subscribe((status:boolean)=>{
       this.portNumberSetStatus = status;
     });
+    this.vulnService.portNumber$.subscribe((port:number)=>{
+      this.portNumber = port;
+    });
   }
   ngAfterViewInit(): void {
     const navBarHeight = this.navBar.nativeElement.offsetHeight;
@@ -262,8 +265,7 @@ private showFeedback(message: string, styleClass: string): void {
         this.isAnimate = false;
         clearInterval(this.progressInterval);
         this.eventSource?.close();
-        this.snackBar.open("Unexpected error occured", 'Dismiss', { duration: 5000, 
-        panelClass: ['snackbar-error'] });
+        this.showError("Unexpected error occured");
       }
     }, 1300)
     try {
@@ -296,15 +298,13 @@ private showFeedback(message: string, styleClass: string): void {
           }
         } catch (messageError) {
           console.error('Error while processing message:', messageError);
-          this.snackBar.open('Unexpected error occured.', 'Dismiss', { duration: 5000, 
-          panelClass: ['snackbar-error'] });
+          this.showError('Unexpected error occured.');
         }
       };
 
       this.eventSource.onerror = (error) => {
         console.error('SSE error:', error);
-        this.snackBar.open(`Please check if the server is running on port ${this.portNumber}`, 'Dismiss', { duration: 5000, 
-        panelClass: ['snackbar-error'] });
+        this.showError(`Please check if the server is running on port ${this.portNumber}`);
         this.isAnimate = false;
         this.progress = 0;
         clearInterval(this.progressInterval);
@@ -319,8 +319,7 @@ private showFeedback(message: string, styleClass: string): void {
       this.vulnService.setAnimate(false);
       this.progress = 0;
       clearInterval(this.progressInterval);
-      this.snackBar.open(`Error occurred: ${error.message || 'Please check if the server is running.'}`, 'Dismiss', { duration: 5000, 
-      panelClass: ['snackbar-error'] });
+      this.showError(`Error occurred: ${error.message || 'Please check if the server is running.'}`);
       if (this.eventSource) {
         this.eventSource?.close();
       }
@@ -351,11 +350,9 @@ private showFeedback(message: string, styleClass: string): void {
         this.isAnimate = false;
         let dataCount =data.length;
         if(dataCount) {
-          this.snackBar.open('Success! The data has been fetched.', 'Dismiss', { duration: 5000, 
-          panelClass: ['snackbar-success'] });
+          this.showFeedback('Success! The data has been fetched.', 'snackbar-success');
         } else {
-          this.snackBar.open('No data found.', 'Dismiss', { duration: 5000, 
-          panelClass: ['snackbar-error'] });
+          this.showError('No data found.');
         }
         this.vulnService.setDependencies(data);
         sessionStorage.setItem('dependencies', JSON.stringify(data));
@@ -365,8 +362,7 @@ private showFeedback(message: string, styleClass: string): void {
       })
       .catch((error) => {
         console.error('Error fetching final results:', error);
-        this.snackBar.open('Error fetching final results:', 'Dismiss', { duration: 5000, 
-        panelClass: ['snackbar-error'] });
+        this.showError('Error fetching final results:');
       });
   }
 
