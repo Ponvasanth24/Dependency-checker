@@ -7,6 +7,7 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  AfterViewChecked,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environments';
@@ -42,16 +43,19 @@ import { Renderer2 } from '@angular/core';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
 })
-export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
+export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, AfterViewChecked {
   isLoading = true;
   isAnimate = false;
+  searchVariant: boolean = false;
+  darkMode: boolean = false;
+  portNumberSetStatus:boolean = false;
+
   vulnerabilityData: any = [];
   searchType: number = 1;
   searchField: number = 0;
   searchValue: string = '';
   searchUrl: string = '';
-  searchVariant: boolean = false;
-  darkMode: boolean = false;
+  
   progress: number = 0;
   animationStyle: string = 'none';
   fetchedDependencies: number = 0;
@@ -59,7 +63,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   portNumber: number = 8080;
   navigationUrl: string = '';
   private progressInterval: any = null;
-  portNumberSetStatus:boolean = false;
+  
   regex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
@@ -100,8 +104,6 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const navBarHeight = this.navBar.nativeElement.offsetHeight;
     this.vulnService.setNavBarHeight(navBarHeight);
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
     const bootstrap = (window as any).bootstrap;
     if (bootstrap && bootstrap.Modal && !this.portNumberSetStatus) {
       this.ngZone.run(()=>{
@@ -112,6 +114,14 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
       scanModal.show();
       }, 50);
       });}
+  }
+  ngAfterViewChecked(): void {
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
+  }
+  ngOnDestroy(): void {
+    clearInterval(this.progressInterval);
+    this.eventSource?.close();
   }
   setPortNumber(){
     this.vulnService.setPortNumber(this.portNumber);
@@ -129,7 +139,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
             this.navigationUrl = '/vulnerabilityList';
             this.searchVulnerabilities();
           } else {
-            window.alert('Please enter a valid keyword');
+            this.showError('Please enter a valid keyword');
           }
           break;
         case 2:
@@ -138,8 +148,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
             this.navigationUrl = '/vulnerabilityList';
             this.searchVulnerabilities();
           } else {
-            this.snackBar.open('Please enter a valid CVE ID', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
+
+            this.showError('Please enter a valid CVE ID');
           }
           break;
         case 3:
@@ -148,8 +158,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
             this.navigationUrl = '/vulnerabilityList';
             this.searchVulnerabilities();
           } else {
-            this.snackBar.open('Please enter a valid CPE Name', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
+            this.showError('Please enter a valid CPE Name');
           }
           break;
         case 4:
@@ -158,8 +167,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
             this.navigationUrl = '/cpeSearchResults';
             this.searchVulnerabilities();
           } else {
-            this.snackBar.open('Please enter a valid Keyword', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
+            this.showError('Please enter a valid Keyword');
           }
           break;
         case 5:
@@ -168,16 +176,14 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
             this.navigationUrl = '/cpeSearchResults';
             this.searchVulnerabilities();
           } else {
-            this.snackBar.open('Please enter a valid CPE Name', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
+            this.showError('Please enter a valid CPE Name');
           }
           break;
-        default:
+          default:
           return;
       }
     } else {
-            this.snackBar.open('Please enter a value in this field.', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
+            this.showError('Please enter a value in this field.');
     }
   }
 
@@ -194,32 +200,36 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         if (this.searchField === 4 || this.searchField === 5) {
           this.vulnService.setCpeData(response);
           this.router.navigate([this.navigationUrl]);
-          if(dataCount > 0) {
-            this.snackBar.open('Success! The data has been fetched.', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-success'] });
-          } else {
-            this.snackBar.open('No data found.', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
-          }
         } else {
           this.vulnService.setVulnerabilityData(response);
           this.router.navigate([this.navigationUrl]);
-          if(dataCount > 0) {
-            this.snackBar.open('Success! The data has been fetched.', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-success'] });
-          } else {
-            this.snackBar.open('No data found.', 'Dismiss', { duration: 5000, 
-            panelClass: ['snackbar-error'] });
-          }
         }
+        this.showFeedback(
+          dataCount ? 'Success! The data has been fetched.' : 'No data found.',
+          dataCount ? 'snackbar-success' : 'snackbar-error'
+        );
       },
       error: (error) => {
         console.log(error);
-        this.snackBar.open('An error occurred while searching for vulnerabilities.', 'Dismiss', { duration: 5000, 
-        panelClass: ['snackbar-error'] });
+        this.showError("An error occurred while searching for vulnerabilities");
       }
     });
 }
+
+private showError(message: string): void {
+  this.snackBar.open(message, 'Dismiss', {
+    duration: 5000,
+    panelClass: ['snackbar-error'],
+  });
+}
+
+private showFeedback(message: string, styleClass: string): void {
+  this.snackBar.open(message, 'Dismiss', {
+    duration: 5000,
+    panelClass: [styleClass],
+  });
+}
+
 
   getFirstMetricKey(metrics: any): string {
     return Object.keys(metrics)[0];
@@ -322,11 +332,6 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.fetchedDependencies = 0;
     this.totalDependencies = 0;
     this.progress = 0;
-    clearInterval(this.progressInterval);
-    this.eventSource?.close();
-  }
-
-  ngOnDestroy(): void {
     clearInterval(this.progressInterval);
     this.eventSource?.close();
   }
@@ -460,7 +465,7 @@ updateProgress(fetched: number, total: number) {
     this.searchValue = 'CVE-';
   }
   else {
-     this.searchValue = ""; 
+     this.searchValue = this.searchValue === 'CVE-' ? '' : this.searchValue; 
   }
 }
 

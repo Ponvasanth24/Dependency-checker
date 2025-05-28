@@ -93,10 +93,11 @@
 .bg-alice {
     background-color: rgb(221, 235, 248);
     /* background-color: rgb(251, 251, 251); */
+    /* background-color: rgba(238, 238, 194, 0.986); */
 }
 .w-fit-content {
-    width: fit-content;
+    width: fit-content !important;
 }
 .h-fit-content {
-  height: fit-content;
+  height: fit-content !important;
 }

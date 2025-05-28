@@ -1,4 +1,4 @@
-<div class="container padd-left py-2 mt-2" [ngClass]="{'custom-auto-black': darkMode, 'bg-white': !darkMode, 'text-white': darkMode, 'text-dark': !darkMode}">
+<div class="container border-left mt-2 pt-2" [ngClass]="{'custom-auto-black': darkMode, 'bg-white': !darkMode, 'text-white': darkMode, 'text-dark': !darkMode}">
     <div>
         <h5 [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">What is CVSS?.</h5>
     <p> 
@@ -23,7 +23,7 @@
 
     <div>
         <h5 [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}">Product Identification</h5>
-        <p>A core component of the CVE analysis process is the accurate identification of vulnerable products affected by a given 
+        <p class="pb-1">A core component of the CVE analysis process is the accurate identification of vulnerable products affected by a given 
            vulnerability. This enables consumers of CVE data to determine whether any of the products in their environment are impacted—provided 
            they know the associated product identifiers.
            To achieve this, the National Vulnerability Database (NVD) currently relies on the Common Platform Enumeration (CPE) 2.3 specification. 

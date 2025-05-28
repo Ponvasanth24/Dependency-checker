@@ -1,6 +1,7 @@
-<div #dashBoard [ngClass]="{'bg-dark': darkMode, 'bg-alice': !darkMode}" class="container-fluid">
-  <div class="row px-2 justify-content-center">
+<div #dashBoard *ngIf="!isAnimate && !isLoading" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="container-fluid pb-2">
+
     <!-------------------------------Top-Searchbar-start-------------------------------------->
+    <div class="container-fluid">
     <div #navBar class="row justify-content-between red-padd">
       <div class="col-lg-4">
       <div class="d-flex pt-2">  
@@ -9,7 +10,7 @@
       </div>
       </div>
 <!--------------------------------Search-section-start--------------------------------------------------->
-      <div [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="col-lg-4 ps-4">
+      <div [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="col-lg-4">
         <!-- <div class="row justify-content-evenly align-items-center pt-2">
         <div class="custom-col-3 h5">Search Type</div>
         <select [(ngModel)]="searchType" (change)="searchField = 0" class="custom-col-3 rounded w-25 form-control">
@@ -26,13 +27,13 @@
         </div>
         </div>  -->
         <div class="row justify-content-evenly align-items-center pt-2">
-        <div class="d-flex justify-content-evenly align-items-center ps-2 col-8">
-        <div class="h5 text-nowrap ps-1">Search Type</div>&nbsp;&nbsp;
+        <div class="d-flex justify-content-evenly align-items-center px-2 col-sm-8">
+        <div class="search-titl h5 text-nowrap ps-1 mt-2">Search Type</div>&nbsp;&nbsp;
         <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded form-control">
           <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
         </select>
         </div>
-        <div class="ps-3 d-flex justify-content-between align-items-center col-4">
+        <div class="ps-3 d-flex justify-content-between align-items-center col-sm-4">
         <div class="d-flex justify-content-center">
         <button class="btn btn-danger" (click)="openScanModal()">Scan</button>
         </div>
@@ -83,30 +84,12 @@
       </div>
       </div>
     </div>
+    </div>
     <!-------------------------------Top-Searchbar-end------------------------------------------>
     <!--------------------------------------router-outlet---------------------------------------->
     <router-outlet></router-outlet>
     <!--------------------------------------router-outlet---------------------------------------->
-    <div
-      class="position-fixed h-100 d-flex justify-content-center align-items-center"
-      *ngIf="isAnimate" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
-    >
-      <div class="d-flex flex-column"> 
-      <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
-      <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center">Analyzed <span class="text-warning">{{fetchedDependencies}}</span> out of <span class="text-warning">{{totalDependencies}}</span> dependencies</p>
-      <div *ngIf="progress === 100" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center d-flex align-items-center">Please wait while we retrieve the likely CPEs. This process may take a few moments.</div>
-      <div class="text-center"><button (click)="stopSSE()" class="btn btn-secondary">Cancel</button></div>
-      </div>
-    </div>
-    
-    <div
-      class="position-fixed h-100 d-flex justify-content-center align-items-center"
-      *ngIf="isLoading" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
-    >
-      <div id="progress-bar" class="loader" style="--n: 16; --f: 0.2">  
-      </div>
-    </div>
-  </div>
+
 </div>
 
 <!--------------------------------------portnumber-alert-modal--------------------------------------->
@@ -165,3 +148,23 @@
 </div>
 </div>
 <!--------------------------------------portnumber-modal--------------------------------------->
+ <div
+      class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+      *ngIf="isAnimate" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
+    >
+      <div class="d-flex flex-column"> 
+      <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
+      <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center">Analyzed <span class="text-warning">{{fetchedDependencies}}</span> out of <span class="text-warning">{{totalDependencies}}</span> dependencies</p>
+      <div *ngIf="progress === 100" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center d-flex align-items-center">Please wait while we retrieve the likely CPEs. This process may take a few moments.</div>
+      <div class="text-center"><button (click)="stopSSE()" class="btn btn-secondary">Cancel</button></div>
+      </div>
+    </div>
+
+    <div
+  class="position-fixed top-0 w-100 h-100 d-flex justify-content-center align-items-center"
+  *ngIf="isLoading"
+  [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
+  style="z-index: 1055"
+>
+  <div id="progress-bar" class="loader" style="--n: 16; --f: 0.2"></div>
+</div>

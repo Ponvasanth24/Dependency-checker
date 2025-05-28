@@ -9,18 +9,18 @@
 .border-green-btn {
     border: 3px solid rgba(46, 194, 17, 0.945);
 }
-.compform {
+.appform {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
-.compform label{
+.appform label{
     width: 100%;
     color: white;
     font-weight: 500;
     background-color: rgba(3, 3, 48, 0.945);
     padding: 8px 0 8px 10px;
 }
-.compform input{
+.appform input{
     margin-top: 10px;
 }
 .succToastProgress {
@@ -46,23 +46,21 @@
 .dash-theme{
     background-color: rgba(3, 3, 48, 0.945) !important;   
 }
-#comp-detail-table thead{
+#app-detail-table thead{
     background-color: rgba(3, 3, 48, 0.945) !important;
 }
-#comp-detail-table thead th {
-    white-space: nowrap;
+#app-detail-table thead th {
     padding: 10px 0 10px 5px;
     font-weight: 500;
 }
-#comp-detail-table tbody tr td {
-    font-weight: 400 !important;
+#app-detail-table tbody tr td {
     padding: 6px 0 6px 5px;
     font-weight: 500;
 }
-#comp-detail-table tbody tr:nth-child(even) {
+#app-detail-table tbody tr:nth-child(even) {
     background-color: rgb(202, 200, 200);
 }
-#comp-detail-table tbody tr:nth-child(odd) {
+#app-detail-table tbody tr:nth-child(odd) {
     background-color: rgb(230, 228, 228);
 }
 .btn-gray-shade {
@@ -78,7 +76,7 @@
     outline: none;
 }
 .page-size-width {
-    width: 100px;
+    width: 100px !important;
 }
 ::ng-deep .custom-dialog-container {
   background-color: #f9f9f9;

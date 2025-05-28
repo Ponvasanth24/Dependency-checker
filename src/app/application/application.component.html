@@ -1,0 +1,220 @@
+<div class="mt-3">
+  <h5 class="text-secondary">Add Application Details</h5>
+  <form [formGroup]="applicationForm" class="bg-white">
+    
+    <div class="appform">   
+    <div>
+    <label>Computer Id</label>
+    <div class="px-2">
+    <input class="form-control" matInput formControlName="computerId" placeholder="Computer Id" [value]="computerId" readonly>
+    </div>      
+    </div>
+    <div>
+    <label>Name *</label>
+    <div class="px-2">
+    <input class="form-control" matInput formControlName="name" placeholder="Name">
+    </div>
+    <div class="error-cont">
+    <mat-error class="error-field" *ngIf="applicationForm.get('name')?.touched && applicationForm.get('name')?.hasError('required')">
+     Please fill this field
+    </mat-error>
+    </div>
+    </div>
+
+    <div>
+    <label>Version *</label>
+    <div class="px-2">
+    <input class="form-control" matInput formControlName="version" placeholder="version">
+    </div>
+    <div class="error-cont">
+    <mat-error class="error-field" *ngIf="applicationForm.get('version')?.touched && applicationForm.get('version')?.hasError('required')">
+     Please fill this field
+    </mat-error>
+    <mat-error class="error-field" *ngIf="applicationForm.get('version')?.touched && applicationForm.get('version')?.hasError('pattern')">
+     Please fill valid format
+    </mat-error>
+    </div>
+    </div>
+
+    <div>
+    <label>Vendor *</label>
+    <div class="px-2">
+    <input class="form-control" matInput formControlName="vendor" placeholder="Vendor">
+    </div>
+    <div class="error-cont">
+    <mat-error class="error-field" *ngIf="applicationForm.get('vendor')?.touched && applicationForm.get('vendor')?.hasError('required')">
+     Please fill this field
+    </mat-error>
+    </div>
+    </div>
+
+    <div>
+    <label>Install Date *</label>
+    <div class="px-2">
+    <input class="form-control" matInput formControlName="installDate" placeholder="Install Date" type="date">
+    </div>
+    <div class="error-cont">
+    <mat-error class="error-field" *ngIf="applicationForm.get('installDate')?.touched && applicationForm.get('installDate')?.hasError('required')">
+     Please fill this field
+    </mat-error>
+    </div>
+    </div>
+
+    <div class="text-center pb-3">
+        <label>Action</label>
+        <button (click)="addApplicationData()" class="btn btn-gray-shade mt-2" type="submit">Submit</button>
+    </div>
+    </div>
+</form>
+
+</div>
+
+<div class="mt-3">
+  <h5 class="text-secondary">Application Details</h5>
+
+<div class="overflow-auto">
+  <table id="app-detail-table" class="w-100">
+     <thead class="text-white">
+      <tr>
+        <th>Name</th>
+        <th>Version</th>
+        <th>Vendor</th>
+        <th>Install Date</th>
+        <th>Action</th>
+      </tr>
+     </thead>
+     <tbody class="text-dark">
+      <tr *ngFor="let data of pagedApplicationData">
+        <td>{{data.name}}</td>
+        <td>{{data.version}}</td>
+        <td>{{data.vendor}}</td>
+        <td>{{data.installDate}}</td>
+        <td>
+          <span (click)="openUpdateDialog(data)" class="material-symbols-outlined cursor-pointer">edit_square</span>
+          &nbsp; 
+          <span (click)="deleteApplicationData(data.id)" class="material-symbols-outlined cursor-pointer">delete</span>
+        </td>
+      </tr>
+     </tbody>
+  </table>
+<!------------------------------pagination-start----------------------------------------->
+<div *ngIf="storedApplicationData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
+<div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
+  <mat-label class="text-nowrap custom-fw-1">Page Size</mat-label>&nbsp;&nbsp;
+  <mat-select class="border rounded p-2 bg-gray-shade" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
+    <mat-option class="bg-gray-shade" *ngFor="let size of pageSizes" [value]="size">
+      {{ size }}
+    </mat-option>
+  </mat-select>
+  &nbsp;&nbsp;
+<span class="custom-fw-1 text-nowrap">{{start}} - {{end}} out of {{storedApplicationData.length}} total Applications</span>
+&nbsp;&nbsp;
+<button (click)="previousPage()" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm"> 
+<mat-icon class="material-symbols-outlined">
+arrow_back_ios
+</mat-icon>  
+</button>
+&nbsp;&nbsp;
+<button (click)="nextPage()" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm">
+<mat-icon class="material-symbols-outlined">
+arrow_forward_ios
+</mat-icon>
+</button>
+</div>
+</div>
+<!--------------------------------------------pagination-end------------------------------------------------>
+</div>
+</div>
+
+<!---------------------------------------------success-toast-start-------------------------------------------------->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
+<div #successToast class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header"> 
+    <strong class="me-auto text-success">Success !</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+  <div class="toast-body text-success fw-bold">
+    {{successMessage}}
+  </div>
+  <div #succToastProgress class="succToastProgress" style="width: 100%;"></div>
+</div>
+</div>
+<!---------------------------------------------success-toast-end------------------------------------------------------>
+
+<!---------------------------------------------error-toast-start-------------------------------------------------->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
+<div #errorToast class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="me-auto text-danger">Error</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+  <div class="toast-body text-danger fw-bold">
+    {{errorMessage}}
+  </div>
+  <div #errorToastProgress class="errorToastProgress" style="width: 100%;"></div>
+</div>
+</div>
+<!---------------------------------------------error-toast-end----------------------------------------------------->
+
+<!-----------------------------------------update-form-start--------------------------------------->
+<ng-template #updateDialog let-dialogRef="dialogRef" class="rounded-1">
+  <h5 class="dialog-title p-2 text-center">Update Application Data</h5>
+  <form [formGroup]="updateApplicationForm" class="container-fluid" (ngSubmit)="updateApplicationData(dialogRef)" mat-dialog-content>
+    <div class="row">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Name</mat-label>
+      <input matInput formControlName="name" placeholder="Name">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('name')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Version</mat-label>
+      <input matInput formControlName="version" placeholder="Version">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('version')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Vendor</mat-label>
+      <input matInput formControlName="vendor" placeholder="Vendor">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('vendor')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Install Date</mat-label>
+      <input matInput formControlName="installDate" placeholder="OS Version" type="date">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('installDate')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+    <div mat-dialog-actions class="d-flex justify-content-end py-2">
+      <button class="btn btn-gray-shade" type="button" (click)="dialogRef.close()">Cancel</button>
+      &nbsp;
+      <button class="btn btn-gray-shade" type="submit" [disabled]="!updateApplicationForm.valid">
+        Update
+      </button>
+    </div>
+    </div>
+  </form>
+</ng-template>
+<!-----------------------------------------update-form-end--------------------------------------->
+<!---------------------------------------delete-confirm-toast------------------------------------>
+<!-- Dialog Template -->
+<ng-template #confirmDialog>
+  <h6 class="dialog-title ps-2 py-3">Delete</h6>
+  <mat-dialog-content>Are you sure you want to delete this application data?</mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button class="btn btn-gray-shade" (click)="dialogRef.close(false)">Cancel</button> 
+    &nbsp;
+    <button class="btn btn-gray-shade" (click)="dialogRef.close(true)">Confirm</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<!---------------------------------------delete-confirm-toast-end-------------------------------->
+

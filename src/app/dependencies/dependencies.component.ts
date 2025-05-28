@@ -15,10 +15,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectChange } from '@angular/material/select';
 import { ChangeDetectorRef } from '@angular/core';
 import { Renderer2 } from '@angular/core';
+import { HighlightPipe } from '../../shared/HighlightSearch';
 @Component({
   selector: 'app-dependencies',
   imports: [CommonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
-    MatSelectModule, FormsModule, MatIconModule, MatButtonModule
+    MatSelectModule, FormsModule, MatIconModule, MatButtonModule, HighlightPipe
   ],
   templateUrl: './dependencies.component.html',
   styleUrl: './dependencies.component.css'
@@ -35,13 +36,14 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     pageSizes:Array<number> = [];
     start:number = 0;
     end:number = 0;
+    searchTerm: string = '';
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild('noDependency') noDependency!: ElementRef;
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
     constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef,
       private renderer: Renderer2
     ){}
-  ngOnInit(): void {
+    ngOnInit(): void {
       this.vulnService.getDarkMode().subscribe((mode: boolean) => {
         this.darkMode = mode;
       });
@@ -51,10 +53,9 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       this.vulnService.dependencies$.subscribe((dependencies:any[]) => {
          dependenciesFromService = dependencies;
          this.dependencies = depsFromSession.length > 0 ? depsFromSession : dependenciesFromService.length > 0 ? dependenciesFromService : [];
-      this.updatePagedData(this. initialIndex);
+      this.updatePagedData(this.initialIndex);
       });
       console.log(this.dependencies);
-      // sessionStorage.clear();
     }
     ngAfterViewInit(): void {
       if(this.dependencies.length === 0) {
@@ -125,6 +126,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
    searchDependencies(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
     console.log(inputValue);
+    this.searchTerm = inputValue;
       if(inputValue === '') {
         this.pageIndex = 0;
         this.updatePagedData(this.initialIndex);
@@ -136,5 +138,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     }
      this.cd.detectChanges();
    }
-   
+   goBack(): void {
+   this.location.back();
+  }
 }

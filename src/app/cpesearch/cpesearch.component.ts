@@ -10,10 +10,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIcon } from '@angular/material/icon';
 import { Renderer2 } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Location } from '@angular/common';
+import { HighlightPipe } from '../../shared/HighlightSearch';
 
 @Component({
   selector: 'app-cpesearch',
-  imports: [CommonModule, FormsModule, MatSelectModule, MatIcon],
+  imports: [CommonModule, FormsModule, MatSelectModule, MatIcon, HighlightPipe],
   templateUrl: './cpesearch.component.html',
   styleUrls: ['./cpesearch.component.css','./cpesearch.component.scss'],
 })
@@ -31,9 +33,10 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   pagedCpeData: any = [];
   portNumber:number = 8080;
   cd: any;
+  searchTerm: string = '';
   @ViewChild('noCpeData') noCpeData!: ElementRef;
   constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar, private location: Location
   ) {
     this.vulnService.getDarkMode().subscribe((mode: boolean) => {
       this.darkMode = mode;
@@ -88,6 +91,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
 searchCPEs(event: Event) {
 const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
     console.log(inputValue);
+    this.searchTerm = inputValue;
       if(inputValue === '') {
         this.pageIndex = 0;
         this.updatePagedData(this.initialIndex);
@@ -131,5 +135,8 @@ nextPage(): void {
    this.pageSize = event.value;
    this.pageIndex = 0
    this.updatePagedData(this.initialIndex);
+   }
+   goBack() {
+    this.location.back()
    }
 }

@@ -112,6 +112,14 @@ input[type=number] {
     background-color: #198754;
   }
 }
+.mdc-snackbar__label {
+    background-color: #198754 !important;
+  color: white;
+  font-weight: bold;
+  .mat-mdc-button-touch-target {
+    background-color: #198754;
+  }
+}
 .no-hover:hover {
   color: inherit !important;
   cursor: not-allowed;

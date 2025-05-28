@@ -1,14 +1,14 @@
 <div class="overflow-auto">
 <table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
-<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total dependencies found: <span class="h5 text-warning fw-bold">{{dependencies.length}}</span>
+<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1"><span class="cursor-pointer" (click)="goBack()"><img [src]="darkMode ? 'images/arrow_back_32dp_FFFFFF_FILL0_wght400_GRAD0_opsz40.png' : 'images/arrow_back_32dp_000000_FILL0_wght400_GRAD0_opsz40.png'" alt=""></span>&nbsp;&nbsp;Total dependencies found: <span class="h5 text-warning fw-bold">{{dependencies.length}}</span>
   <div class="d-flex justify-content-between align-items-center float-end">
     <div class="d-flex">
     <div class="d-flex align-items-center"><div class="bg-primary p-2 rounded-circle w-fit-content h-fit-content"></div>&nbsp;&nbsp;likelyCPEs</div>&nbsp;&nbsp;&nbsp;&nbsp;
     <div class="d-flex align-items-center"><div class="bg-danger p-2 rounded-circle w-fit-content h-fit-content"></div>&nbsp;&nbsp;Vulnerabilities</div>
     </div>&nbsp;&nbsp;
   <span>
-  <input class="dep-search-field" type="text" placeholder="Search" (keyup)="searchDependencies($event)">
+  <input class="dep-search-field ps-3 py-1" type="text" [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" placeholder="Search" (keyup)="searchDependencies($event)">
   </span>
   </div>
 </caption>
@@ -22,12 +22,15 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
     </thead>
      <tbody>
         <tr *ngFor="let dependency of pagedDependencies">
-            <td><a [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="cursor-pointer" (click)="handleDependency(dependency)">{{dependency.dependencyName}}</a>
+            <td><a  [innerHTML]="dependency.dependencyName | highlight:searchTerm" [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="cursor-pointer" (click)="handleDependency(dependency)"></a>
             &nbsp;&nbsp;<span *ngIf="dependency.vulnerabilities?.length > 0" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
             <span *ngIf="dependency.likelyCPEs?.length > 0" class="text-primary fw-bold">[{{dependency.likelyCPEs?.length}}]</span></td>
-            <td>{{dependency.cpeEnumeration?.vendor}}</td>
-            <td>{{dependency.cpeEnumeration?.product}}</td>
-            <td>{{dependency.cpeEnumeration?.version}}</td>
+            <!-- <td>{{dependency.cpeEnumeration?.vendor | highlight:searchTerm}}</td>
+            <td>{{dependency.cpeEnumeration?.product | highlight:searchTerm}}</td>
+            <td>{{dependency.cpeEnumeration?.version | highlight:searchTerm}}</td> -->
+            <td [innerHTML]="dependency.cpeEnumeration?.vendor | highlight:searchTerm"></td>
+            <td [innerHTML]="dependency.cpeEnumeration?.product | highlight:searchTerm"></td>
+            <td [innerHTML]="dependency.cpeEnumeration?.version | highlight:searchTerm"></td>
         </tr>
      </tbody>
 </table>

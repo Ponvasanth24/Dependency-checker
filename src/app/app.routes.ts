@@ -34,6 +34,10 @@ export const routes: Routes = [
         children:[{
           path:'computer',
           loadComponent:()=> import('./computer/computer.component').then(m => m.ComputerComponent)
+        },
+      {
+          path:'application/:computerId',
+          loadComponent:()=> import('./application/application.component').then(m => m.ApplicationComponent)
         }]
       }
   ];

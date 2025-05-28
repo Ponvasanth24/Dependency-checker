@@ -1,9 +1,9 @@
 <div class="overflow-auto">
 <table *ngIf="cpeData.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table table-responsive-lg table-borderless table-striped mt-2">
-<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1">Total CPE Results: <span class="h5 text-warning">{{cpeData.length}}</span>
+<caption [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1"><span class="cursor-pointer" (click)="goBack()"><img [src]="darkMode ? 'images/arrow_back_32dp_FFFFFF_FILL0_wght400_GRAD0_opsz40.png' : 'images/arrow_back_32dp_000000_FILL0_wght400_GRAD0_opsz40.png'" alt=""></span>&nbsp;&nbsp;<span>Total CPE Results: <span class="h5 text-warning">{{cpeData.length}}</span></span>
 <span class="float-end">
-  <input class="cpe-search-field" type="text" placeholder="Search" (keyup)="searchCPEs($event)">
+  <input class="cpe-search-field rounded ps-3 py-1" [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" type="text" placeholder="Search" (keyup)="searchCPEs($event)">
   </span>
 </caption>
     <thead>
@@ -13,7 +13,7 @@ class="table table-responsive-lg table-borderless table-striped mt-2">
     </thead>
      <tbody>
         <tr *ngFor="let data of pagedCpeData">
-            <td><a (click)="searchCpeName(data.cpe23Uri)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer">{{data.cpe23Uri}}</a></td>
+            <td><a [innerHTML]="data.cpe23Uri | highlight:searchTerm" (click)="searchCpeName(data.cpe23Uri)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer"></a></td>
         </tr>
      </tbody>
      <tfoot *ngIf="pagedCpeData.length === 0">
