@@ -1,7 +1,5 @@
 <div class="mt-3">
-  <h5 class="text-secondary">Add Computer Details</h5>
-  <form [formGroup]="computerForm" class="bg-white">
-    
+  <span class="h5 text-secondary">Add Computer Details</span>
     <div class="compform">     
     <div>
     <label>IP Address *</label>
@@ -74,16 +72,170 @@
         <button (click)="addComputerData()" class="btn btn-gray-shade mt-2" type="submit">Submit</button>
     </div>
     </div>
-</form>
+</form> -->
+<form [formGroup]="computerForm" class="responsive-form">
+  <div class="table-wrapper mat-elevation-z1">
+    <table class="compform-table bg-white">
+      <thead>
+        <tr>
+          <th>IP Address *</th>
+          <th>Host Name *</th>
+          <th>OS Name *</th>
+          <th>OS Version *</th>
+          <th>Location *</th>
+        </tr>
+      </thead>
 
+      <tbody>
+        <tr>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="ipAddress" placeholder="Enter IP Address">
+              <mat-error *ngIf="computerForm.get('ipAddress')?.touched && computerForm.get('ipAddress')?.hasError('required')">
+                Please fill this field
+              </mat-error>
+              <mat-error *ngIf="computerForm.get('ipAddress')?.touched && computerForm.get('ipAddress')?.hasError('pattern')">
+                Please enter a valid format
+              </mat-error>
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="hostName" placeholder="Enter Host Name">
+              <mat-error *ngIf="computerForm.get('hostName')?.touched && computerForm.get('hostName')?.hasError('required')">
+                Please fill this field
+              </mat-error>
+              <mat-error *ngIf="computerForm.get('hostName')?.touched && computerForm.get('hostName')?.hasError('pattern')">
+                Please enter a valid format
+              </mat-error>
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="osName" placeholder="Enter OS Name">
+              <mat-error *ngIf="computerForm.get('osName')?.touched && computerForm.get('osName')?.hasError('required')">
+                Please fill this field
+              </mat-error>
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="osVersion" placeholder="Enter OS Version">
+              <mat-error *ngIf="computerForm.get('osVersion')?.touched && computerForm.get('osVersion')?.hasError('required')">
+                Please fill this field
+              </mat-error>
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="location" placeholder="Enter Location">
+              <mat-error *ngIf="computerForm.get('location')?.touched && computerForm.get('location')?.hasError('required')">
+                Please fill this field
+              </mat-error>
+            </mat-form-field>
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <td colspan="5" class="text-center">
+            <button mat-raised-button class="bg-gray-shade mt-3" (click)="addComputerData()" type="submit">
+              Submit
+            </button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</form>
 </div>
 
 <div class="mt-3">
-  <h5 class="text-secondary">Computer Details</h5>
+  <div class="d-flex justify-content-between">
+  <span class="text-secondary h5">Computer Details</span>
+  <span class="text-secondary h5 me-2">Total Items: {{storedComputerData.length}}</span>
+  </div>
 
 <div class="overflow-auto">
-  <table id="comp-detail-table" class="w-100">
-     <thead class="text-white">
+  
+  <table mat-table [dataSource]="pagedComputerData" class="mat-elevation-z1 w-100" id="comp-detail-table">
+    
+    <ng-container matColumnDef="ipAddress">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Ip Address</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.ipAddress}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="hostname">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Host Name</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.hostName}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="osName">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Name</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.osName}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="osVersion">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Version</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.osVersion}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="location">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Location</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.location}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created At</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.createdAt}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="updatedAt">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Updated At</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.updatedAt}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="active">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Status</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.active ? 'Active' : 'No'}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Action</th>
+      <td mat-cell *matCellDef="let computer" class="text-dark">
+        <div class="d-flex">
+        <span (click)="openUpdateDialog(computer)" matTooltip="Edit Computer" class="material-symbols-outlined cursor-pointer">edit_square</span>
+        &nbsp;&nbsp;&nbsp;
+        <span (click)="addApplication(computer)" matTooltip="Add Application" class="material-symbols-outlined cursor-pointer">new_window</span>
+        &nbsp;&nbsp;&nbsp;
+        <span (click)="deleteComputerData(computer.uuid)" matTooltip="Delete Computer" class="material-symbols-outlined cursor-pointer">delete</span>
+        </div>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns" class="comp-table-header"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr *ngIf="isLoading">
+     <td [attr.colspan]="displayedColumns.length" class="text-center">
+     <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+     </td>
+    </tr>
+    
+    
+
+  </table>
+  <div *ngIf="isLoading" class="d-flex justify-content-center py-3">
+  <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+  </div>
+  <div *ngIf="storedComputerData.length === 0 && !isLoading" class="text-center text-muted py-3">
+    No data found.
+  </div>
+  <!-- <table id="comp-detail-table" class="w-100">
+     <thead class="text-white text-nowrap">
       <tr>
         <th>Ip Address</th>
         <th>Host Name</th>
@@ -108,34 +260,32 @@
         <td>{{computer.active ? 'Active' : 'No'}}</td>
         <td class="d-flex">
           <span (click)="openUpdateDialog(computer)" class="material-symbols-outlined cursor-pointer">edit_square</span>
-          &nbsp;<span class="material-symbols-outlined cursor-pointer" (click)="addApplication(computer.id)">new_window</span>
-          <!-- <button class="action-btn h-fit-content" (click)="openUpdateDialog(data)"><img src="images/edit_square_24dp_000000_FILL0_wght400_GRAD0_opsz24.png" alt="update"></button> -->
-          &nbsp; 
+          &nbsp;&nbsp;&nbsp;<span class="material-symbols-outlined cursor-pointer" (click)="addApplication(computer)">new_window</span>
+          &nbsp;&nbsp;&nbsp; 
           <span (click)="deleteComputerData(computer.id)" class="material-symbols-outlined cursor-pointer">delete</span>
-          <!-- <button class="action-btn" (click)="deleteComputerData(computer.id)"><img src="images/delete_24dp_000000_FILL0_wght400_GRAD0_opsz24.png" alt="delete"></button> -->
         </td>
       </tr>
      </tbody>
-  </table>
+  </table> -->
 <!------------------------------pagination-start----------------------------------------->
 <div *ngIf="storedComputerData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
-  <mat-label class="text-nowrap custom-fw-1">Page Size</mat-label>&nbsp;&nbsp;
-  <mat-select class="border rounded page-size-width p-2 bg-gray-shade" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
-    <mat-option class="bg-gray-shade" *ngFor="let size of pageSizes" [value]="size">
+  <label class="text-nowrap custom-fw-1">Page Size</label>&nbsp;&nbsp;
+  <mat-select class="border rounded page-size-width p-2 bg-white" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
+    <mat-option class="bg-white" *ngFor="let size of pageSizes" [value]="size">
       {{ size }}
     </mat-option>
   </mat-select>
   &nbsp;&nbsp;
 <span class="custom-fw-1 text-nowrap">{{start}} - {{end}} out of {{storedComputerData.length}} total Items</span>
 &nbsp;&nbsp;
-<button (click)="previousPage()" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm"> 
+<button (click)="previousPage()" class="bg-white page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle mat-elevation-z1"> 
 <mat-icon class="material-symbols-outlined">
 arrow_back_ios
 </mat-icon>  
 </button>
 &nbsp;&nbsp;
-<button (click)="nextPage()" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm">
+<button (click)="nextPage()" class="bg-white page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle mat-elevation-z1">
 <mat-icon class="material-symbols-outlined">
 arrow_forward_ios
 </mat-icon>
@@ -176,62 +326,6 @@ arrow_forward_ios
 </div>
 <!---------------------------------------------error-toast-end----------------------------------------------------->
 
-<!-----------------------------------------update-form-start--------------------------------------->
-<ng-template #updateDialog let-dialogRef="dialogRef" class="rounded-1">
-  <h5 class="dialog-title p-2 text-center">Update Computer Data</h5>
-  <form [formGroup]="updateComputerForm" class="container-fluid" (ngSubmit)="updateComputerData(dialogRef)" mat-dialog-content>
-    <div class="row">
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label class="fw-bold">IP Address</mat-label>
-      <input matInput formControlName="ipAddress" placeholder="IP Address">
-      <mat-error class="error-field" *ngIf="updateComputerForm.get('ipAddress')?.hasError('required')">
-        Please fill this field
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label class="fw-bold">Host Name</mat-label>
-      <input matInput formControlName="hostName" placeholder="Host Name">
-      <mat-error class="error-field" *ngIf="updateComputerForm.get('hostName')?.hasError('required')">
-        Please fill this field
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label class="fw-bold">OS Name</mat-label>
-      <input matInput formControlName="osName" placeholder="OS Name">
-      <mat-error class="error-field" *ngIf="updateComputerForm.get('osName')?.hasError('required')">
-        Please fill this field
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label class="fw-bold">OS Version</mat-label>
-      <input matInput formControlName="osVersion" placeholder="OS Version">
-      <mat-error class="error-field" *ngIf="updateComputerForm.get('osVersion')?.hasError('required')">
-        Please fill this field
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label class="fw-bold">Location</mat-label>
-      <input matInput formControlName="location" placeholder="Location">
-      <mat-error class="error-field" *ngIf="updateComputerForm.get('location')?.hasError('required')">
-        Please fill this field
-      </mat-error>
-    </mat-form-field>
-
-    <div mat-dialog-actions class="d-flex justify-content-end py-2">
-      <button class="btn btn-gray-shade" type="button" (click)="dialogRef.close()">Cancel</button>
-      &nbsp;
-      <button class="btn btn-gray-shade" type="submit" [disabled]="!updateComputerForm.valid">
-        Update
-      </button>
-    </div>
-    </div>
-  </form>
-</ng-template>
-<!-----------------------------------------update-form-end--------------------------------------->
 <!---------------------------------------delete-confirm-toast------------------------------------>
 <!-- Dialog Template -->
 <ng-template #confirmDialog>

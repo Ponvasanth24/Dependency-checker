@@ -1,15 +1,3 @@
-::ng-deep .mat-form-field {
-  .mat-form-field-infix {
-    padding: 0 !important;
-    height: 32px;
-  }
-
-  .mat-input-element {
-    height: 32px;
-    padding: 4px 0;
-    font-size: 14px;
-  }
-}
 // styles.scss (or component SCSS)
 ::ng-deep .mat-calendar {
   background-color: #f9f9f9;

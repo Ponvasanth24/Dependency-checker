@@ -1,9 +1,8 @@
-import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, Inject } from '@angular/core';
+import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { ReactiveFormsModule } from '@angular/forms';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
@@ -13,46 +12,42 @@ import { ChangeDetectorRef } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar} from '@angular/material/snack-bar';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
-import { MatTableModule } from '@angular/material/table';
-import { Computer } from '../../vulnSyncModels/ComputerData';
+import { Router,ActivatedRoute } from '@angular/router';
 import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
-import { UpdateComputerDialogComponent } from './update-computer-dialog.computer.component';
+import { Computer, Dependency } from '../../vulnSyncModels/ComputerData';
+import { UpdateDependencyDialogComponent } from './update-dependency-dialog.component';
+import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 @Component({
-  selector: 'app-computer',
-  standalone: true,
+  selector: 'app-applicationdependency',
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
-    FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatProgressSpinnerModule
-  ],
-  templateUrl: './computer.component.html',
-  styleUrl: './computer.component.css'
+    FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule],
+  templateUrl: './applicationdependency.component.html',
+  styleUrl: './applicationdependency.component.css'
 })
-export class ComputerComponent implements OnInit, OnDestroy{
-  isLoading: boolean = false;
-  computerForm!: FormGroup;
-  updateComputerForm!: FormGroup;
+export class ApplicationdependencyComponent {
+  dependencyForm!: FormGroup;
   successMessage: string = '';
   errorMessage: string = '';
   successInterval:any = 0;
   proggWidth = 100;
-  storedComputerData:Computer[] = [];
+  storedDependencyData:Dependency[] = [];
   pageIndex:number = 0;
-  pageSize:number = 5;
+  pageSize:number = 10;
   initialIndex:number = 0;
   currentPageSize:number = this.pageSize;
   totalPages:number = 0;
   pageSizes:Array<number> = [];
   start:number = 0;
   end:number = 0;
-  pagedComputerData: any[] = [];
-  selectedComputerId: number | null = null;
+  pagedDependencyData: any[] = [];
+  applicationId: string | null = null;
+  application: any = {};
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;  
   @ViewChild('succToastProgress') succToastProgress!: ElementRef; 
@@ -60,73 +55,83 @@ export class ComputerComponent implements OnInit, OnDestroy{
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
   dialogRef!: MatDialogRef<any>;
   displayedColumns: string[] = [
-  'ipAddress',
-  'hostname',
-  'osName',
-  'osVersion',
+  'name',
+  'version',
+  'groupId',
+  'artifactId',
   'location',
   'createdAt',
   'updatedAt',
-  'active',
+  'status',
   'action'
-];
-
-
+  ];
+  applicationDetail: string[] = ['name', 'version', 'vendor'];
   private bootstrap = (window as any).bootstrap;
   snackBar: MatSnackBar;
   constructor (private fb: FormBuilder, private http: HttpClient, private renderer: Renderer2, private cd: ChangeDetectorRef, private destroyRef: DestroyRef,
     private dialog: MatDialog, snackBar: MatSnackBar, private router: Router, private vulnSyncService: VulnerabilitySyncService
   ) {
     this.snackBar = snackBar;
-    this.computerForm = this.fb.group({
-      ipAddress: ['', [Validators.required, Validators.pattern(/^(25[0-5]|2[0-4][0-9]|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4][0-9]|1\d{2}|[1-9]?\d)){3}$/)]],
-      hostName: ['', [Validators.required]],
-      osName: ['', [Validators.required]],
-      osVersion: ['', [Validators.required]],
-      location: ['', [Validators.required]]
+    this.dependencyForm = this.fb.group({
+      applicationId: ['', [Validators.required]],
+      name: ['', [Validators.required]],
+      version: ['', [Validators.required]],
+      groupId: ['', [Validators.required]],
+      artifactId: ['', [Validators.required]]
     });
   };
 
   ngOnInit(): void {
-      this.fetchComputerData();
+      this.application = this.vulnSyncService.getApplicationData();
+      this.applicationId = this.application?.uuid ?? null;
+      if (!this.isExistApplicationId()) return;  
+      console.log(this.application)
+      this.storedDependencyData = this.application?.dependencies ?? [];
+      this.fetchDependencyData();
   }
-  fetchComputerData() {
-      this.isLoading = true;
-      this.http.get<Computer[]>(vulnSyncEnvironments.getComputers).subscribe({
+  fetchDependencyData() {
+      if (!this.isExistApplicationId()) return;
+      let params = {applicationUuid: this.applicationId!};
+      this.http.get<Dependency[]>(vulnSyncEnvironments.getAllDependenciesUrl,{ params }).subscribe({
         next:(response)=>{
-          console.log(response);
-          this.storedComputerData = response;
+          console.log(response)
+          this.storedDependencyData = response;
           this.updatePagedData(this.initialIndex);
-          this.isLoading = false;
-          this.cd.detectChanges();
         },
         error:(error)=>{
-          this.isLoading = false;
-          this.cd.detectChanges();
           console.log(error)
         }
       });
   }
 
   ngOnDestroy(): void {
-
+      clearInterval(this.successInterval)
+  }
+  isExistApplicationId(): boolean {
+  if (!this.applicationId) {
+    this.showToast("ApplicationId not found", 'error');
+    return false;
+  }
+  return true;
   }
 
-  addComputerData() {
-    if (this.computerForm.invalid) {
+  addDependencyData() {
+    if (this.dependencyForm.invalid) {
       this.showToast("Make sure all fields are filled correctly", 'error');
       return;
     }
-     this.http.post<any>(vulnSyncEnvironments.computerCommonUrl, this.computerForm.value).subscribe({
+     if (!this.isExistApplicationId()) return;
+      let params = { applicationUuid: this.applicationId! };
+     this.http.post<any>(vulnSyncEnvironments.dependenciesCommonUrl, this.dependencyForm.value, {params}).subscribe({
       next:(response)=>{
           console.log(response);
           let successMessage = "Computer data added successfully";
-          this.computerForm.reset();
+          this.dependencyForm.reset({applicationId: this.dependencyForm.get('applicationId')?.value});
           this.showToast(successMessage, 'success');
-          this.fetchComputerData();
+          this.fetchDependencyData();
       },
       error:(error)=>{
-        let errorMessage = error.error.errorMessage;
+        let errorMessage = "Make sure all fields are filled correctly";
         this.showToast(errorMessage, 'error');
         console.log(error);
       }
@@ -159,8 +164,8 @@ export class ComputerComponent implements OnInit, OnDestroy{
     this.pageIndex++;
     this.start = this.pageIndex * this.pageSize;
     this.end = this.start + this.pageSize;
-    this.pagedComputerData = this.storedComputerData.slice(this.start, this.end);
-    console.log(this.pagedComputerData, this.start, this.end);
+    this.pagedDependencyData = this.storedDependencyData.slice(this.start, this.end);
+    console.log(this.pagedDependencyData, this.start, this.end);
     this.cd.detectChanges();
     }
    }
@@ -169,7 +174,7 @@ export class ComputerComponent implements OnInit, OnDestroy{
       this.pageIndex--;
       this.start = this.pageIndex * this.pageSize;
       this.end = this.start + this.pageSize;
-      this.pagedComputerData = this.storedComputerData.slice(this.start, this.end);
+      this.pagedDependencyData = this.storedDependencyData.slice(this.start, this.end);
       this.cd.detectChanges();
     }
    }
@@ -179,58 +184,56 @@ export class ComputerComponent implements OnInit, OnDestroy{
      this.updatePagedData(this.initialIndex);
   }
   updatePagedData(initialIndex: number): void {
-    let totalItems = this.storedComputerData.length;
+    let totalItems = this.storedDependencyData.length;
     let pages = Math.ceil(totalItems / this.pageSize);
     this.totalPages = pages;
     this.start = initialIndex * this.pageSize;
     this.end = this.start + this.pageSize;
     this.pageSizes = totalItems >= 100 ? [10, 25, 50, 100] : totalItems <= 100 && totalItems >= 50 ? [10, 25, 50] : 
     totalItems <= 50 && totalItems >= 25 ? [10, 25] : totalItems <= 25 && totalItems >= 10 ? [10] : [5];
-    this.pagedComputerData = this.storedComputerData.slice(this.start, this.end);
+    this.pagedDependencyData = this.storedDependencyData.slice(this.start, this.end);
    }
 
-  openUpdateDialog(computer: any): void {
-  const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
+  openUpdateDialog(dependency: any): void {
+  const dialogRef = this.dialog.open(UpdateDependencyDialogComponent, {
     width: '500px',
     disableClose: false,
-    data: { ...computer }
+    data: { ...dependency }
   });
 
   dialogRef.afterClosed().subscribe(result => {
     if (result) {
-      console.log('Updated computer data:', result);
-      this.showToast('Computer data updated successfully', 'success');
-      this.fetchComputerData();
+      console.log('Updated dependency data:', result);
+      this.showToast('Dependency data updated successfully', 'success');
+      this.fetchDependencyData();
     } else {
-      this.showToast('An error occurred while updating the computer', 'error');
       console.log('Update dialog was closed without saving.');
     }
    });
   }
-
-  async deleteComputerData(computerId: number): Promise<void> {
+  
+  async deleteDependencyData(dependencyId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
     if (!confirmed) return;
 
     try {
       await firstValueFrom(
-        this.http.delete(`${vulnSyncEnvironments.computerCommonUrl}`, {
-          params: { computerUuid: computerId }
+        this.http.delete(`${vulnSyncEnvironments.dependenciesCommonUrl}`, {
+          params: { uuid: dependencyId }
         })
       ).then((res) => {
-        this.fetchComputerData();
-        let successMessage = "Computer data deleted successfully";
+        this.fetchDependencyData();
+        let successMessage = "Dependency data deleted successfully";
         this.showToast(successMessage, 'success');
       });
-      console.log('Computer data deleted.');
+      console.log('Dependency data deleted.');
     } catch (error) {
-      console.error('Error deleting computer data:', error);
+      console.error('Error deleting dependency data:', error);
     }
   }
-  addApplication(computer: any): void {
-  this.vulnSyncService.setComputerData(computer);
-  this.router.navigate(['/vulnerabilitySync/computer', computer.uuid], {state: {computer:computer}});
+  addVulnerability(dependency: any): void {
+  this.vulnSyncService.setDependencyData(dependency);
+  this.router.navigate(['/vulnerabilitySync/dependency', dependency.uuid]);
   }
-
 }

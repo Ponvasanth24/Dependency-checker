@@ -35,9 +35,17 @@ export const routes: Routes = [
           path:'computer',
           loadComponent:()=> import('./computer/computer.component').then(m => m.ComputerComponent)
         },
-      {
-          path:'application/:computerId',
+       {
+          path:'computer/:computerUuid',
           loadComponent:()=> import('./application/application.component').then(m => m.ApplicationComponent)
-        }]
+        },
+      {
+        path:'application/:applicationUuid',
+        loadComponent:()=> import('./applicationdependency/applicationdependency.component').then(m=> m.ApplicationdependencyComponent)
+      },
+    {
+        path:'dependency/:dependencyId',
+        loadComponent:()=> import('./dependencyvulnerabilities/dependencyvulnerabilities.component').then(m=> m.DependencyvulnerabilitiesComponent)
+      }]
       }
   ];

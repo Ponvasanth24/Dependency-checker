@@ -208,8 +208,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
           this.router.navigate([this.navigationUrl]);
         }
         this.showFeedback(
-          dataCount ? 'Success! The data has been fetched.' : 'No data found.',
-          dataCount ? 'snackbar-success' : 'snackbar-error'
+          dataCount ? 'Success! The data has been fetched.' : 'No data found.'
         );
       },
       error: (error) => {
@@ -221,15 +220,13 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
 
 private showError(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
-    duration: 5000,
-    panelClass: ['snackbar-error'],
+    duration: 5000
   });
 }
 
-private showFeedback(message: string, styleClass: string): void {
+private showFeedback(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
-    duration: 5000,
-    panelClass: [styleClass],
+    duration: 5000
   });
 }
 
@@ -350,7 +347,7 @@ private showFeedback(message: string, styleClass: string): void {
         this.isAnimate = false;
         let dataCount =data.length;
         if(dataCount) {
-          this.showFeedback('Success! The data has been fetched.', 'snackbar-success');
+          this.showFeedback('Success! The data has been fetched.');
         } else {
           this.showError('No data found.');
         }

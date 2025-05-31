@@ -15,17 +15,30 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
-
+import { Router,ActivatedRoute } from '@angular/router';
+import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
+import { Application, Computer } from '../../vulnSyncModels/ComputerData';
+import { UpdateApplicationDialogComponent } from './update-application-dialog.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
 @Component({
   selector: 'app-application',
   standalone: true,
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
-    FormsModule, MatIconModule, MatDialogModule],
+  FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatCardModule,
+  MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule],
+  providers: [
+    provideNativeDateAdapter()
+  ],
   templateUrl: './application.component.html',
   styleUrl: './application.component.css'
 })
 export class ApplicationComponent implements OnInit, OnDestroy {
+  isLoading: boolean = false;
   applicationForm!: FormGroup;
   updateApplicationForm!: FormGroup;
   successMessage = '';
@@ -34,7 +47,7 @@ export class ApplicationComponent implements OnInit, OnDestroy {
   proggWidth = 100;
   storedApplicationData: any = [];
   pageIndex: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 5;
   initialIndex: number = 0;
   currentPageSize: number = this.pageSize;
   totalPages: number = 0;
@@ -43,7 +56,10 @@ export class ApplicationComponent implements OnInit, OnDestroy {
   end: number = 0;
   pagedApplicationData: any[] = [];
   selectedApplicationId: number | null = null;
-  computerId: string | null = null;
+  computerUuid: string | null = null;
+  computer: any = {};
+  computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location'];
+  displayedColumns: string[] = ['name', 'version', 'vendor', 'installDate', 'createdAt','status', 'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
@@ -60,33 +76,25 @@ export class ApplicationComponent implements OnInit, OnDestroy {
     private destroyRef: DestroyRef,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router, private vulnSyncService: VulnerabilitySyncService
   ) {
     this.applicationForm = this.fb.group({
-      computerId: ['', Validators.required],
+      computerUuid: ['', Validators.required],
       name: ['', Validators.required],
       vendor: ['', Validators.required],
       version: ['', Validators.required],
-      installDate: ['', Validators.required],
-    });
-
-    this.updateApplicationForm = this.fb.group({
-      name: ['', Validators.required],
-      vendor: ['', Validators.required],
-      version: ['', Validators.required],
-      installDate: ['', Validators.required],
+      installedDate: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
+    this.computer = this.vulnSyncService.getComputerData();
+    console.log(this.computer);
+    this.computerUuid = this.computer?.uuid;
+    if(!this.isExistComputrtId()) return;
+    this.storedApplicationData = this.computer.applications;
     this.fetchApplicationData();
-    this.route.paramMap.subscribe(params => {
-    const computerId = params.get('computerId');
-    if (computerId) {
-      this.applicationForm.patchValue({ computerId: computerId });
-      this.computerId = computerId;
-    }
-  });
   }
 
   ngOnDestroy(): void {
@@ -94,34 +102,54 @@ export class ApplicationComponent implements OnInit, OnDestroy {
   }
 
   fetchApplicationData(): void {
-    this.http.get<any>(vulnSyncEnvironments.applicationCommonUrl).subscribe({
+    if(!this.isExistComputrtId()) return;
+    this.isLoading = true;
+    let params = {computerUuid:this.computerUuid ? this.computerUuid : ""};
+    this.http.get<any>(vulnSyncEnvironments.getApplicationsUrl, {params}).subscribe({
       next: (response) => {
+        console.log(params);
         this.storedApplicationData = response;
         this.updatePagedData(this.initialIndex);
+        this.isLoading = false;
       },
-      error: (error) => console.error(error)
+      error: (error) => {
+        console.error(error);
+        this.isLoading = false;
+      }
     });
   }
-
+  isExistComputrtId():boolean {
+    if(!this.computerUuid) {
+        let errorMessage = "ComputerUuid not found"
+        this.showToast(errorMessage, 'error');
+        return false;
+      }  
+      return true
+  }
   addApplicationData(): void {
     if (this.applicationForm.invalid) {
-      this.showToast("Make sure all fields are completed correctly", 'error');
+      this.showToast("Make sure all fields are filled correctly", 'error');
       return;
     }
-
-    this.http.post<any>(vulnSyncEnvironments.applicationCommonUrl, this.applicationForm.value).subscribe({
+    if(!this.isExistComputrtId()) return;
+    let params = {computerUuid:this.computer.uuid};
+    this.http.post<any>(vulnSyncEnvironments.applicationCommonUrl, this.applicationForm.value, {params}).subscribe({
       next: () => {
-        this.applicationForm.reset();
+        this.applicationForm.reset({computerUuid: this.applicationForm.get('computerUuid')?.value});
         this.showToast("Application data added successfully", 'success');
         this.fetchApplicationData();
       },
       error: (error) => {
-        this.showToast("Make sure all fields are filled correctly", 'error');
+        let errorMessage = error.error.errorMessage;
+        this.showToast(errorMessage, 'error');
         console.error(error);
       }
     });
   }
-
+  addDependency(application: Application) {
+    this.vulnSyncService.setApplicationData(application);
+    this.router.navigate(['/vulnerabilitySync/application', application.uuid]);
+  }
   updatePagedData(initialIndex: number): void {
     const totalItems = this.storedApplicationData.length;
     this.totalPages = Math.ceil(totalItems / this.pageSize);
@@ -158,43 +186,27 @@ export class ApplicationComponent implements OnInit, OnDestroy {
   }
 
   openUpdateDialog(application: any): void {
-    this.selectedApplicationId = application.id;
-    this.updateApplicationForm.patchValue(application);
-    this.dialog.open(this.updateDialog, {
-      width: '700px',
-      panelClass: 'custom-dialog-container',
-      backdropClass: 'custom-dialog-backdrop',
+    const dialogRef = this.dialog.open(UpdateApplicationDialogComponent, {
+      width: '500px',
       disableClose: false,
+      data:{...application}
     });
-  }
 
-  updateApplicationData(dialogRef: any): void {
-    if (!this.updateApplicationForm.valid || !this.selectedApplicationId) return;
-
-    const params = { applicationId: this.selectedApplicationId };
-    this.http.put(`${vulnSyncEnvironments.applicationCommonUrl}`, this.updateApplicationForm.value, { params })
-      .subscribe({
-        next: () => {
-          dialogRef.close();
-          this.showToast("Application data updated successfully", 'success');
-          this.fetchApplicationData();
-        },
-        error: (err) => {
-          this.showToast("Make sure all fields are filled correctly", 'error');
-          console.error(err);
-        }
-      });
+    dialogRef.afterClosed().subscribe(result => {
+      if(result) {
+        this.showToast("Application data updated successfully", 'success');
+        this.fetchApplicationData();
+      }
+    })
   }
 
   async deleteApplicationData(applicationId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
     if (!confirmed) return;
-
+    let params = { applicationUuid: applicationId }
     try {
-      await firstValueFrom(this.http.delete(`${vulnSyncEnvironments.applicationCommonUrl}`, {
-        params: { applicationId: applicationId.toString() }
-      }));
+      await firstValueFrom(this.http.delete(`${vulnSyncEnvironments.applicationCommonUrl}`, {params}));
       this.fetchApplicationData();
       this.showToast("Application data deleted successfully", 'success');
     } catch (error) {

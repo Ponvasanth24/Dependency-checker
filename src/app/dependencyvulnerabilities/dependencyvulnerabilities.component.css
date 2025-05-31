@@ -9,18 +9,18 @@
 .border-green-btn {
     border: 3px solid rgba(46, 194, 17, 0.945);
 }
-.appform {
+.vulnerabilityform {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
-.appform label{
+.vulnerabilityform label{
     width: 100%;
     color: white;
     font-weight: 500;
     background-color: rgba(3, 3, 48, 0.945);
     padding: 8px 0 8px 10px;
 }
-.appform input{
+.vulnerabilityform input{
     margin-top: 10px;
 }
 .succToastProgress {
@@ -46,21 +46,21 @@
 .dash-theme{
     background-color: rgba(3, 3, 48, 0.945) !important;   
 }
-#app-detail-table thead{
+#vul-detail-table thead{
     background-color: rgba(3, 3, 48, 0.945) !important;
 }
-#app-detail-table thead th {
+#vul-detail-table thead th {
     padding: 10px 0 10px 5px;
     font-weight: 500;
 }
-#app-detail-table tbody tr td {
+#vul-detail-table tbody tr td {
     padding: 6px 0 6px 5px;
     font-weight: 500;
 }
-#app-detail-table tbody tr:nth-child(even) {
+#vul-detail-table tbody tr:nth-child(even) {
     background-color: rgb(202, 200, 200);
 }
-#app-detail-table tbody tr:nth-child(odd) {
+#vul-detail-table tbody tr:nth-child(odd) {
     background-color: rgb(230, 228, 228);
 }
 .btn-gray-shade {
@@ -82,49 +82,6 @@
   width: 42px;
   height: 40px;
 }
-.dash-theme{
-    background-color: rgba(3, 3, 48, 0.945) !important;   
-}
-.full-width {
-  width: 100%;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-@media (max-width: 768px) {
-  .mat-table,
-  .mat-table thead,
-  .mat-table tbody,
-  .mat-table tr,
-  .mat-table td,
-  .mat-table th {
-    display: block;
-    width: 100%;
-  }
-
-  .mat-table thead {
-    display: none;
-  }
-
-  .mat-table td::before {
-    content: attr(data-label);
-    font-weight: bold;
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  .mat-form-field {
-    width: 100%;
-  }
-
-  .mat-cell {
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
-  }
-}
-
 ::ng-deep .custom-dialog-container {
   background-color: #f9f9f9;
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
@@ -146,65 +103,62 @@
   'GRAD' 0,
   'opsz' 24
 }
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.appform-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.appform-table th{
-    color: white;
-    background-color: rgba(3, 3, 48, 0.945);
-}
-.appform-table th,
-.appform-table td {
-  padding: 8px;
-  text-align: left;
-  vertical-align: top;
-  min-width: 150px;
-}
 
 .full-width {
   width: 100%;
 }
 
-.text-center {
-  text-align: center;
+.table-wrapper {
+  overflow-x: auto;
 }
 
-/* Responsive table fallback for small screens */
+table.mat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.mat-table th,
+table.mat-table td {
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
 @media (max-width: 768px) {
-  .appform-table,
-  .appform-table thead,
-  .appform-table tbody,
-  .appform-table th,
-  .appform-table td,
-  .appform-table tr {
+  table.mat-table, thead, tbody, tr, th, td {
     display: block;
     width: 100%;
   }
 
-  .appform-table thead {
+  thead {
     display: none;
   }
 
-  .appform-table td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+  tbody tr {
+    margin-bottom: 1rem;
   }
 
-  .appform-table td::before {
+  td {
+    padding: 8px 0;
+  }
+
+  td::before {
     content: attr(data-label);
     font-weight: bold;
     display: block;
     margin-bottom: 4px;
   }
 
-  .appform-table tfoot td {
-    text-align: center;
+  .mat-form-field {
+    width: 100%;
   }
+}
+
+
+table.mat-table thead {
+  color: white;  
+  background-color: rgba(3, 3, 48, 0.945);
+  font-weight: 600;
 }
 
 @keyframes reduceWidth {
@@ -214,5 +168,4 @@
     to {
         width: 0;
     }
-    
 }

@@ -1,0 +1,47 @@
+<!-----------------------------------------update-form-start--------------------------------------->
+  <h5 class="dialog-title py-3 text-center">Update Application Data</h5>
+  <form [formGroup]="updateApplicationForm" class="container-fluid" (ngSubmit)="onSubmit()" mat-dialog-content>
+    <div class="row">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Name</mat-label>
+      <input matInput formControlName="name" placeholder="Name">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('name')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Version</mat-label>
+      <input matInput formControlName="version" placeholder="Version">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('version')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label class="fw-bold">Vendor</mat-label>
+      <input matInput formControlName="vendor" placeholder="Vendor">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('vendor')?.hasError('required')">
+        Please fill this field
+      </mat-error>
+    </mat-form-field>
+
+   <mat-form-field appearance="fill" class="full-width">
+   <mat-label class="fw-bold">Install Date</mat-label>
+   <input matInput [matDatepicker]="picker" formControlName="installedDate" placeholder="Choose a date">
+   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+   <mat-datepicker #picker></mat-datepicker>
+   <mat-error class="error-field" *ngIf="updateApplicationForm.get('installedDate')?.hasError('required')">
+    Please fill this field
+   </mat-error>
+   </mat-form-field>
+
+    <div mat-dialog-actions class="d-flex justify-content-end py-2">
+      <button class="btn btn-gray-shade" type="button" (click)="dialogRef.close()">Cancel</button>
+      &nbsp;
+      <button class="btn btn-gray-shade" type="submit" [disabled]="!updateApplicationForm.valid">
+        Update
+      </button>
+    </div>
+    </div>
+  </form>

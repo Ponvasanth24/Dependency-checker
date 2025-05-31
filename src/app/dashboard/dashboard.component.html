@@ -1,8 +1,8 @@
-<div #dashBoard *ngIf="!isAnimate && !isLoading" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="container-fluid pb-2">
+<div #dashBoard *ngIf="!isAnimate && !isLoading" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="container-flui w-100 pb-2">
 
     <!-------------------------------Top-Searchbar-start-------------------------------------->
-    <div class="container-fluid">
-    <div #navBar class="row justify-content-between red-padd">
+    <div class="container-fluid sticky-top mat-elevation-z2" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}">
+    <div #navBar class="row justify-content-between red-padd p-2">
       <div class="col-lg-4">
       <div class="d-flex pt-2">  
       <img class="w-25 rounded isteer-logo" src="images/iSteer_logo.png" alt="isteer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
@@ -10,39 +10,42 @@
       </div>
       </div>
 <!--------------------------------Search-section-start--------------------------------------------------->
-      <div [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="col-lg-4">
-        <!-- <div class="row justify-content-evenly align-items-center pt-2">
-        <div class="custom-col-3 h5">Search Type</div>
-        <select [(ngModel)]="searchType" (change)="searchField = 0" class="custom-col-3 rounded w-25 form-control">
+      <div [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="col-lg-5">
+        <div class="d-flex search-type align-items-center pt-2">
+        <div class="col-10 d-flex">  
+        <div class="search-title w-fit-content h5 text-nowrap">Search Type</div>
+        <div class="col-6 ps-3">
+        <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded form-control">
           <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
         </select>
-        <div class="d-flex justify-content-center custom-col-3">
+        </div>
+        <div class="col-3 d-flex justify-content-center">
         <button class="btn btn-danger" (click)="openScanModal()">Scan</button>
         </div>
-        <div class="custom-col-3 show-md">
+        </div>
+        <div class="col-2 show-md">
         <div class="form-switch d-flex flex-wrap justify-content-end">
           <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">&nbsp;
           <span class="form-check-label custom-fw-1 pe-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault"><img [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" [src]="darkMode ? 'images/shield_moon_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.png' : 'images/shield_moon_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png'" alt="Moon"></span>
         </div>
         </div>
-        </div>  -->
-        <div class="row justify-content-evenly align-items-center pt-2">
-        <div class="d-flex justify-content-evenly align-items-center px-2 col-sm-8">
-        <div class="search-titl h5 text-nowrap ps-1 mt-2">Search Type</div>&nbsp;&nbsp;
-        <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded form-control">
+        </div> 
+        <!-- <div class="row justify-content-evenly align-items-center pt-2">
+        <div class="search-type px-2 col-sm-12">
+        <div class="search-title h5 text-nowrap ps-1 mt-2">Search Type&nbsp;&nbsp;</div>
+        <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded w-25 form-control">
           <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
         </select>
-        </div>
-        <div class="ps-3 d-flex justify-content-between align-items-center col-sm-4">
-        <div class="d-flex justify-content-center">
+
         <button class="btn btn-danger" (click)="openScanModal()">Scan</button>
-        </div>
+
         <div class="form-switch d-flex flex-wrap justify-content-end show-md">
           <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">&nbsp;
           <span class="form-check-label custom-fw-1 pe-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault"><img [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" [src]="darkMode ? 'images/shield_moon_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.png' : 'images/shield_moon_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png'" alt="Moon"></span>
         </div>
         </div>
-        </div>
+        </div> -->
+
         <div id="search-type" *ngIf="searchType == 1" class="d-flex justify-content-evenly py-3" [ngClass]="{'search-type-checkbox': !darkMode}">
         <div class="col-4 d-flex align-items-center">KeyWord&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="onFocus($event)" type="radio" name="keyword" [value]="1"></div>
         <div class="col-4 d-flex align-items-center">CVE ID&nbsp;&nbsp;<input [(ngModel)]="searchField" (click)="searchValue = 'CVE-'" type="radio" name="keyword" [value]="2"></div>
@@ -54,14 +57,8 @@
         </div>
       </div>
 <!--------------------------------Search-section-end--------------------------------------------------->
-      <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
-        <div class="w-100 pb-1 d-flex justify-content-end">
-        <div class="form-check form-switch show-lg">
-          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
-          <label class="form-check-label custom-fw-1 text-wrap" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault">Dark Mode</label>
-        </div>
-      </div>
-      <div class="pt-2 w-100">
+      <div class="col-lg-3 d-flex flex-column align-items-center">
+      <div class="w-100 pt-2">
       <div class="w-100 dep-inp-ht d-flex align-items-center">
         <input [(ngModel)]="searchValue" [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}"
           class="col-8 p-2 px-5 rounded-start-3 border-0"
@@ -80,14 +77,26 @@
           </mat-icon>
         </button>
       </div>
-      <span *ngIf="searchField === 5" class="ps-3 text-red fs-sm fw-bold">e.g: cpe:2.3:a:vmware:framework:5.3.20:*:*:*:*:*:*:*</span>
       </div>
+      <span *ngIf="searchField === 5" class="ps-3 text-red fs-sm fw-bold">e.g: cpe:2.3:a:vmware:framework:5.3.20:*:*:*:*:*:*:*</span>
+      
+        <div class="w-100 mt-3 d-flex justify-content-end">
+        <div class="form-check form-switch show-lg">
+          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
+          <label class="form-check-label custom-fw-1 text-wrap" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault">Dark Mode</label>
+        </div>
+      </div>
+      
       </div>
     </div>
     </div>
     <!-------------------------------Top-Searchbar-end------------------------------------------>
     <!--------------------------------------router-outlet---------------------------------------->
+    <div class="container-fluid pt-3">
+    <div class="row">
     <router-outlet></router-outlet>
+    </div>
+    </div>
     <!--------------------------------------router-outlet---------------------------------------->
 
 </div>
