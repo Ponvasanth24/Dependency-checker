@@ -137,7 +137,7 @@
       <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Action</th>
       <td mat-cell *matCellDef="let computer" class="text-dark">
         <div class="d-flex">
-        <span (click)="openUpdateDialog(computer)" matTooltip="Edit Computer" class="material-symbols-outlined cursor-pointer">edit_square</span>
+        <span (click)="openUpdateDialog($event, computer)" matTooltip="Edit Computer" class="material-symbols-outlined cursor-pointer">edit_square</span>
         &nbsp;&nbsp;&nbsp;
         <span (click)="addApplication(computer)" matTooltip="Add Application" class="material-symbols-outlined cursor-pointer">new_window</span>
         &nbsp;&nbsp;&nbsp;
@@ -197,7 +197,7 @@
   </table> -->
 <!------------------------------pagination-start----------------------------------------->
 <div *ngIf="storedComputerData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
-<div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
+<div class="col-lg-6 d-flex justify-content-evenly align-items-center height-fit-content">
   <label class="text-nowrap custom-fw-1">Page Size</label>&nbsp;&nbsp;
   <mat-select class="border rounded page-size-width p-2 bg-white" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
     <mat-option class="bg-white" *ngFor="let size of pageSizes" [value]="size">

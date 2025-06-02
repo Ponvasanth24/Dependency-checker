@@ -108,7 +108,7 @@ export class ApplicationComponent implements OnInit, OnDestroy {
     this.http.get<any>(vulnSyncEnvironments.getApplicationsUrl, {params}).subscribe({
       next: (response) => {
         console.log(params);
-        this.storedApplicationData = response;
+        this.storedApplicationData = response || [];
         this.updatePagedData(this.initialIndex);
         this.isLoading = false;
       },
@@ -196,6 +196,8 @@ export class ApplicationComponent implements OnInit, OnDestroy {
       if(result) {
         this.showToast("Application data updated successfully", 'success');
         this.fetchApplicationData();
+      } else {
+        result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
       }
     })
   }

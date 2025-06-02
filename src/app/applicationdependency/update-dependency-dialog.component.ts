@@ -57,6 +57,7 @@ export class UpdateDependencyDialogComponent {
           this.dialogRef.close(this.updateDependencyForm.value);
         },
         error: (err) => {
+          this.dialogRef.close(false);
           console.error('Update error:', err);
         }
       });

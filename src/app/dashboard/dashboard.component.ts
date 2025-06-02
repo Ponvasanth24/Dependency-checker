@@ -134,7 +134,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
   setSearchUrl() {
     this.dependencies = [];
 
-    if (this.searchValue !== '' && this.searchField !== 0) {
+    if (this.searchValue.trim() !== '' && this.searchField !== 0) {
       switch (this.searchField) {
         case 1:
           if (this.searchValue.length > 0) {

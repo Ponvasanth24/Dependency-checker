@@ -21,16 +21,17 @@ import { Computer, Dependency } from '../../vulnSyncModels/ComputerData';
 import { UpdateDependencyDialogComponent } from './update-dependency-dialog.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-applicationdependency',
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
-    FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule],
+    FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatProgressSpinnerModule],
   templateUrl: './applicationdependency.component.html',
   styleUrl: './applicationdependency.component.css'
 })
 export class ApplicationdependencyComponent {
+  isLoading: boolean = false;
   dependencyForm!: FormGroup;
   successMessage: string = '';
   errorMessage: string = '';
@@ -91,14 +92,17 @@ export class ApplicationdependencyComponent {
   }
   fetchDependencyData() {
       if (!this.isExistApplicationId()) return;
+      this.isLoading = true;
       let params = {applicationUuid: this.applicationId!};
       this.http.get<Dependency[]>(vulnSyncEnvironments.getAllDependenciesUrl,{ params }).subscribe({
         next:(response)=>{
           console.log(response)
-          this.storedDependencyData = response;
+          this.storedDependencyData = response || [];
           this.updatePagedData(this.initialIndex);
+          this.isLoading = false;
         },
         error:(error)=>{
+          this.isLoading = false;
           console.log(error)
         }
       });
@@ -207,6 +211,7 @@ export class ApplicationdependencyComponent {
       this.showToast('Dependency data updated successfully', 'success');
       this.fetchDependencyData();
     } else {
+      result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
       console.log('Update dialog was closed without saving.');
     }
    });

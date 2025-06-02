@@ -95,7 +95,7 @@ export class ComputerComponent implements OnInit, OnDestroy{
       this.http.get<Computer[]>(vulnSyncEnvironments.getComputers).subscribe({
         next:(response)=>{
           console.log(response);
-          this.storedComputerData = response;
+          this.storedComputerData = response || [];
           this.updatePagedData(this.initialIndex);
           this.isLoading = false;
           this.cd.detectChanges();
@@ -189,20 +189,43 @@ export class ComputerComponent implements OnInit, OnDestroy{
     this.pagedComputerData = this.storedComputerData.slice(this.start, this.end);
    }
 
-  openUpdateDialog(computer: any): void {
-  const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
-    width: '500px',
-    disableClose: false,
-    data: { ...computer }
-  });
+  openUpdateDialog(event:MouseEvent, computer: any): void {
+  //   const rect = (event.target as HTMLElement).getBoundingClientRect();
+  //   const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
+  //   width: '500px',
+  //   disableClose: false,
+  //   panelClass: 'custom-dialog-container',
+  //   enterAnimationDuration: '1s',
+  //   exitAnimationDuration: '1s',
+  //   data: { ...computer }
+  // });
+  const target = event.target as HTMLElement;
+  const rect = target.getBoundingClientRect();
 
+  const origin = {
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height
+  };
+
+  const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
+    data: { computer, origin },
+    panelClass: 'animated-dialog-container',
+    hasBackdrop: true,
+    backdropClass: 'custom-backdrop',
+    disableClose: true 
+  });
+dialogRef.backdropClick().subscribe(() => {
+  dialogRef.componentInstance.startCloseAnimation();
+});
   dialogRef.afterClosed().subscribe(result => {
     if (result) {
       console.log('Updated computer data:', result);
       this.showToast('Computer data updated successfully', 'success');
       this.fetchComputerData();
     } else {
-      this.showToast('An error occurred while updating the computer', 'error');
+      result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
       console.log('Update dialog was closed without saving.');
     }
    });

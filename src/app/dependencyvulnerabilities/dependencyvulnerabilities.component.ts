@@ -23,17 +23,20 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-dependencyvulnerabilities',
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
-  FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatNativeDateModule, MatDatepickerModule],
+  FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatNativeDateModule, MatDatepickerModule,
+  MatProgressSpinnerModule],
   providers: [provideNativeDateAdapter()],
   templateUrl: './dependencyvulnerabilities.component.html',
   styleUrl: './dependencyvulnerabilities.component.css'
 })
 export class DependencyvulnerabilitiesComponent {
-  vulnerabilityForm!: FormGroup;
+    isLoading: boolean = false;
+    vulnerabilityForm!: FormGroup;
     updateVulnerabilityForm!: FormGroup;
     successMessage = '';
     errorMessage = '';
@@ -101,13 +104,18 @@ export class DependencyvulnerabilitiesComponent {
   
     fetchVulnerabilityData(): void {
       if(!this.isExistDependencyId()) return;
+      this.isLoading = true;
       let params = {dependencyUuid: this.dependencyId!};
       this.http.get<any>(vulnSyncEnvironments.getVulnerabilitiesUrl,{params}).subscribe({
         next: (response) => {
           this.storedVulnerabilityData = response || [];
           this.updatePagedData(this.initialIndex);
+          this.isLoading = false;
         },
-        error: (error) => console.error(error)
+        error: (error) => {
+          this.isLoading = false;
+          console.error(error)
+        }
       });
     }
     isExistDependencyId(): boolean {
@@ -198,6 +206,8 @@ export class DependencyvulnerabilitiesComponent {
         if(result) {
           this.showToast("Application data updated successfully", 'success');
           this.fetchVulnerabilityData();
+        } else {
+          result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
         }
       })
     }

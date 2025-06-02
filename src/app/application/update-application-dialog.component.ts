@@ -62,6 +62,7 @@ export class UpdateApplicationDialogComponent {
           this.dialogRef.close(this.updateApplicationForm.value);
         },
         error: (err) => {
+          this.dialogRef.close(false);
           console.error('Update error:', err);
         }
       });

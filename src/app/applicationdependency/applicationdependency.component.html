@@ -186,6 +186,12 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
 </table>
+  <div *ngIf="isLoading" class="d-flex justify-content-center py-3">
+  <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+  </div>
+  <div *ngIf="storedDependencyData.length === 0 && !isLoading" class="text-center text-muted py-3">
+    No data found.
+  </div>
 
   <!-- <table id="dep-detail-table" class="w-100">
      <thead class="text-white">
@@ -222,7 +228,7 @@
   </table> -->
 <!------------------------------pagination-start----------------------------------------->
 <div *ngIf="storedDependencyData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
-<div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
+<div class="col-lg-6 d-flex justify-content-evenly align-items-center height-fit-content">
   <mat-label class="text-nowrap custom-fw-1">Page Size</mat-label>&nbsp;&nbsp;
   <mat-select class="border rounded page-size-width p-2 bg-gray-shade" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
     <mat-option class="bg-gray-shade" *ngFor="let size of pageSizes" [value]="size">
