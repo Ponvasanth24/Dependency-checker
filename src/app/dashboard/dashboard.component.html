@@ -170,10 +170,11 @@
     </div>
 
     <div
-  class="position-fixed top-0 w-100 h-100 d-flex justify-content-center align-items-center"
+  class="position-fixed top-0 w-100 h-100 d-flex justify-content-center align-items-center flex-column"
   *ngIf="isLoading"
   [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
   style="z-index: 1055"
 >
   <div id="progress-bar" class="loader" style="--n: 16; --f: 0.2"></div>
+  <div class="text-center"><button (click)="cancelSearch()" class="btn btn-secondary">Cancel</button></div>
 </div>

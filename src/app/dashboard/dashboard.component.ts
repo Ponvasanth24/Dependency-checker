@@ -23,8 +23,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { Renderer2 } from '@angular/core';
+import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
+import { Subject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -63,7 +65,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
   portNumber: number = 8080;
   navigationUrl: string = '';
   private progressInterval: any = null;
-  
+  private cancelRequest$ = new Subject<void>();
+
   regex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
@@ -84,7 +87,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
     private ngZone: NgZone,
     private cd: ChangeDetectorRef,
     private snackBar: MatSnackBar,
-    private renderer: Renderer2
+    private renderer: Renderer2, private paginationService: CVSSPaginationService
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +128,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
   ngOnDestroy(): void {
     clearInterval(this.progressInterval);
     this.eventSource?.close();
+    this.cancelRequest$.next();
+    this.cancelRequest$.complete();
   }
   setPortNumber(){
     this.vulnService.setPortNumber(this.portNumber);
@@ -140,6 +145,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
           if (this.searchValue.length > 0) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByKeyWordUrl}`;
             this.navigationUrl = '/vulnerabilityList';
+            this.paginationService.setVulInitialIndex(0);
+            this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
           } else {
             this.showError('Please enter a valid keyword');
@@ -149,6 +156,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
           if (this.searchValue.startsWith('CVE-') && this.cveRegex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCveid}`;
             this.navigationUrl = '/vulnerabilityList';
+            this.paginationService.setVulInitialIndex(0);
+            this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
           } else {
 
@@ -159,6 +168,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
           if (this.regex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}`;
             this.navigationUrl = '/vulnerabilityList';
+            this.paginationService.setVulInitialIndex(0);
+            this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
           } else {
             this.showError('Please enter a valid CPE Name');
@@ -168,6 +179,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
           if (this.searchValue.length > 0) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchLikelyKeyword}`;
             this.navigationUrl = '/cpeSearchResults';
+            this.paginationService.setCpeInitialIndex(0);
+            this.paginationService.setCpePageSize(10);
             this.searchVulnerabilities();
           } else {
             this.showError('Please enter a valid Keyword');
@@ -177,6 +190,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
           if (this.likelyCpeRegex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchLikelyCpe}`;
             this.navigationUrl = '/cpeSearchResults';
+            this.paginationService.setCpeInitialIndex(0);
+            this.paginationService.setCpePageSize(10);
             this.searchVulnerabilities();
           } else {
             this.showError('Please enter a valid CPE Name');
@@ -193,13 +208,14 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
   searchVulnerabilities(): void {
   this.isLoading = true;
   this.http.get<any[]>(`${this.searchUrl}${this.searchValue}`)
-    .pipe(finalize(() => this.vulnService.setLoading(false)))
+    .pipe(takeUntil(this.cancelRequest$),
+    finalize(() => this.vulnService.setLoading(false)))
     .subscribe({
       next: (response) => {
         this.searchVariant = true;
         this.vulnService.setSearchVariant(this.searchVariant);
         this.vulnService.setDarkMode(this.darkMode);
-        let dataCount = response.length
+        let dataCount = response.length;
         if (this.searchField === 4 || this.searchField === 5) {
           this.vulnService.setCpeData(response);
           this.router.navigate([this.navigationUrl]);
@@ -264,7 +280,7 @@ private showFeedback(message: string): void {
         this.eventSource?.close();
         this.showError("Unexpected error occured");
       }
-    }, 1300)
+    }, 1300);
     try {
       const url = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
       if (!url || !this.portNumber) {
@@ -293,8 +309,8 @@ private showFeedback(message: string): void {
             clearInterval(this.progressInterval);
             this.fetchFinalResults();
           }
-        } catch (messageError) {
-          console.error('Error while processing message:', messageError);
+        } catch (error) {
+          console.error('Error while processing message:', error);
           this.showError('Unexpected error occured.');
         }
       };
@@ -351,6 +367,8 @@ private showFeedback(message: string): void {
         } else {
           this.showError('No data found.');
         }
+        this.paginationService.setDepInitialIndex(0);
+        this.paginationService.setCpePageSize(5);
         this.vulnService.setDependencies(data);
         sessionStorage.setItem('dependencies', JSON.stringify(data));
         this.router.navigate(['/dependencies']);
@@ -481,4 +499,9 @@ onInputChange(event: Event) {
     this.searchValue = 'CVE-' + afterPrefix;
   }
 }
+cancelSearch(): void {
+    this.cancelRequest$.next();
+    this.showFeedback('Search request cancelled.');
+}
+
 }
