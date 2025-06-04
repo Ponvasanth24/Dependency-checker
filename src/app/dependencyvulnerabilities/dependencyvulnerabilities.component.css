@@ -125,21 +125,25 @@ table.mat-table td {
 }
 
 @media (max-width: 768px) {
-  table.mat-table, thead, tbody, tr, th, td {
+  .mat-table,
+  .mat-table thead,
+  .mat-table tbody,
+  .mat-table tr,
+  .mat-table td,
+  .mat-table th {
     display: block;
     width: 100%;
   }
-
-  thead {
+ .mat-table thead {
     display: none;
   }
-
+ 
   tbody tr {
     margin-bottom: 1rem;
   }
 
   td {
-    padding: 8px 0;
+    padding: 8px 10px;
   }
 
   td::before {

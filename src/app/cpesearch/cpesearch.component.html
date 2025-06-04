@@ -1,10 +1,10 @@
-<div class="overflow-auto">
+<div  #cpeList class="overflow-auto container-fluid">
   <div [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1"><span class="cursor-pointer" (click)="goBack()"><img [src]="darkMode ? 'images/arrow_back_32dp_FFFFFF_FILL0_wght400_GRAD0_opsz40.png' : 'images/arrow_back_32dp_000000_FILL0_wght400_GRAD0_opsz40.png'" alt="back"></span>&nbsp;&nbsp;<span>Total CPE Results: <span [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}" class="h5">{{cpeData.length}}</span></span>
 <span *ngIf="cpeData.length > 0" class="float-end">
   <input class="cpe-search-field rounded ps-3 py-1" [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" type="text" placeholder="Search" (keyup)="searchCPEs($event)">
   </span>
 </div>
-<table *ngIf="cpeData.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
+<table #table *ngIf="cpeData.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table table-responsive-lg table-borderless table-striped mt-2">
     <thead>
         <tr>
@@ -12,21 +12,17 @@ class="table table-responsive-lg table-borderless table-striped mt-2">
         </tr>
     </thead>
      <tbody>
-        <tr *ngFor="let data of pagedCpeData">
-            <td><a [innerHTML]="data.cpe23Uri | highlight:searchTerm" (click)="searchCpeName(data.cpe23Uri)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer"></a></td>
+        <tr *ngFor="let data of pagedCpeData; let i = index" #cpeRow [attr.data-id]="i">
+            <td><a [innerHTML]="data.cpe23Uri | highlight:searchTerm" (click)="searchCpeName(data.cpe23Uri, i)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer"></a></td>
         </tr>
      </tbody>
-     <tfoot *ngIf="pagedCpeData.length === 0">
+     <tfoot>
       <tr>
-        <td class="text-center fw-bold">No CPE Data Found</td>
-      </tr>
-     </tfoot>
-</table>
-</div>
-<!---------------------------------pagination-start----------------------------------------------->
+        <td>
+          <!---------------------------------pagination-start----------------------------------------------->
 <div *ngIf="cpeData.length > 0;" class="row justify-content-center height-fit-content">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
-  <mat-label class="text-nowrap" [ngClass]="{'bg-dark': darkMode, 'bg-alice': !darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
+  <mat-label class="text-nowrap" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
   <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
     <mat-option [ngClass]="{'bg-dark':darkMode, 'bg-white':!darkMode, 'text-white':darkMode, 'text-dark': !darkMode}" *ngFor="let size of pageSizes" [value]="size">
       {{ size }}
@@ -47,6 +43,10 @@ arrow_forward_ios
 </div>
 </div>
 <!---------------------------------pagination-end------------------------------------------------>
+        </td>
+      </tr>
+     </tfoot>
+</table>
 <!--------------------------------No-vulnerability-data-start------------------------------------->
 <div #noCpeData *ngIf="cpeData.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
   <div class="text-center">
@@ -54,6 +54,8 @@ arrow_forward_ios
   </div>
 </div>
 <!--------------------------------No-vulnerability-data-end--------------------------------------->
+</div>
+
 <div class="position-fixed h-100 d-flex justify-content-center align-items-center" *ngIf="isLoading"
     [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}">
     <div id="progress-bar" class="loader" style="--n: 16; --f: 0.2">

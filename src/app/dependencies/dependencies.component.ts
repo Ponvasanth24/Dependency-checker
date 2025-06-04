@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, input, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, input, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -41,10 +41,14 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     searchTerm: string = '';
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild('noDependency') noDependency!: ElementRef;
+    @ViewChildren('dependencyRow') dependencyRows!: QueryList<ElementRef>;
+    @ViewChild('table') table!: ElementRef;
+    @ViewChild('depList') depList!: ElementRef;
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
     constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef,
       private renderer: Renderer2, private paginationService: CVSSPaginationService
     ){}
+
     ngOnInit(): void {
       this.vulnService.getDarkMode().subscribe((mode: boolean) => {
         this.darkMode = mode;
@@ -60,29 +64,48 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
          this.initialIndex * this.pageSize < this.dependencies.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
          this.updatePagedData(this.pageIndex);
       });
-     
       console.log(this.dependencies);
     }
     ngAfterViewInit(): void {
+      this.renderer.setStyle(this.depList.nativeElement, 'min-height', `${window.innerHeight}px`);
+      this.renderer.setStyle(this.depList.nativeElement, 'max-height', "fit-content");
       if(this.dependencies.length === 0) {
           this.vulnService.navBarHeight$.subscribe((height: number) => {
               this.renderer.setStyle(this.noDependency.nativeElement, 'height', `${window.innerHeight - height}px`);
           }) 
-        }
+      }
+      const selectedDepIndex = sessionStorage.getItem('selectedDependencyIndex');
+      if (selectedDepIndex) {
+      const element = this.dependencyRows.find(row => row.nativeElement.dataset.id === selectedDepIndex);
+      if (element) {
+        setTimeout(() => {
+      const rows = this.table.nativeElement.querySelectorAll('tr');
+      if (rows[+selectedDepIndex]) {
+        rows[+selectedDepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      }, 100);
+      const anchor = element.nativeElement.querySelector('a');
+      if (anchor) {
+      this.renderer.addClass(anchor, 'highlight-row');
+      }
+    }
+      sessionStorage.removeItem('selectedDependencyIndex');
+      }  
     }
   ngAfterViewChecked(): void {
     if(this.dependencies.length === 0) {
           this.vulnService.navBarHeight$.subscribe((height: number) => {
-              this.renderer.setStyle(this.noDependency.nativeElement, 'height', `${window.innerHeight - height}px`);
-          }) 
+            this.renderer.setStyle(this.noDependency.nativeElement, 'margin-top', `${height}px`);
+          }); 
         }  
   }
-  handleDependency(dependency: any) {
+  handleDependency(dependency: any, index:number) {
     if(dependency.vulnerabilities?.length > 0){
       this.viewDependency(dependency.vulnerabilities);
     } else{
       this.viewCPEs(dependency.likelyCPEs)
     }
+    sessionStorage.setItem('selectedDependencyIndex', index.toString());
   }
   viewDependency(vulnerabilityData:any) {
           console.log(vulnerabilityData);
@@ -109,6 +132,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
    previousPage(): void {
     if(this.pageIndex > 0) {
       this.pageIndex--;
+      this.paginationService.setDepInitialIndex(this.pageIndex);
       this.start = this.pageIndex * this.pageSize;
       this.end = this.start + this.pageSize;
       this.pagedDependencies = this.dependencies.slice(this.start, this.end);
@@ -126,10 +150,11 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     this.pagedDependencies = this.dependencies.slice(this.start, this.end);
    }
    onPageSizeChange(event: MatSelectChange): void {
-   this.pageSize = event.value;
-   this.paginationService.setDepPageSize(this.pageSize);
-   this.initialIndex * this.pageSize < this.dependencies.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
-   this.updatePagedData(this.pageIndex);
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.paginationService.setDepInitialIndex(this.pageIndex)
+    this.paginationService.setDepPageSize(this.pageSize);
+    this.updatePagedData(this.pageIndex);
    }
    searchDependencies(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
@@ -141,11 +166,12 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       } else {
       this.pagedDependencies = this.dependencies.filter((dep:any) => {
           return dep?.dependencyName.toLowerCase().includes(inputValue.toLowerCase()) || dep?.cpeEnumeration?.vendor.toLowerCase().includes(inputValue.toLowerCase()) ||
-           dep?.cpeEnumeration?.product.toLowerCase().includes(inputValue.toLowerCase()) || dep?.cpeEnumeration?.version.toLowerCase().includes(inputValue.toLowerCase());
+          dep?.cpeEnumeration?.product.toLowerCase().includes(inputValue.toLowerCase()) || dep?.cpeEnumeration?.version.toLowerCase().includes(inputValue.toLowerCase());
       });
     }
      this.cd.detectChanges();
    }
+   
    goBack(): void {
    this.location.back();
   }

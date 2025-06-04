@@ -52,21 +52,7 @@
 #comp-detail-table thead{
     background-color: rgba(3, 3, 48, 0.945) !important;
 }
-#comp-detail-table thead th {
-    white-space: nowrap;
-    padding: 10px 0 10px 5px;
-    font-weight: 350;
-}
-#comp-detail-table tbody tr td {
-    padding: 6px 0 6px 5px;
-    font-weight: 600 !important;
-}
-#comp-detail-table tbody tr:nth-child(even) {
-    background-color: rgb(202, 200, 200);
-}
-#comp-detail-table tbody tr:nth-child(odd) {
-    background-color: rgb(230, 228, 228);
-}
+
 .btn-gray-shade {
     color: white;
     background-color: gray;

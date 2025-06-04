@@ -24,7 +24,6 @@ import { MatDividerModule } from '@angular/material/divider';
   ]
 })
 export class UpdateComputerDialogComponent {
-  // @HostBinding('@scaleDialog') scale = true;
   @HostBinding('style.transformOrigin') transformOrigin: string = 'center center';
   originStyle = {};
   animate = false;
@@ -67,15 +66,15 @@ ngOnInit(): void {
   close(): void {
     this.animate = false;
     this.startCloseAnimation();
-    // Wait for the animation to finish before closing
     setTimeout(() => this.dialogRef.close(), 300);
   
 }  
   onSubmit(): void {
   if (this.updateComputerForm.valid) {
-    const uuid = this.data?.uuid;
+    const uuid = this.data?.computer.uuid;
 
     if (!uuid) {
+      this.dialogRef.close(0);
       console.error('UUID not provided for update');
       return;
     }

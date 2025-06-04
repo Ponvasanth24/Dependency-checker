@@ -1,4 +1,4 @@
-<div class="overflow-auto">
+<div #depList class="overflow-auto container-fluid">
   <div [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="caption-side-top custom-fw-1"><span class="cursor-pointer" (click)="goBack()"><img [src]="darkMode ? 'images/arrow_back_32dp_FFFFFF_FILL0_wght400_GRAD0_opsz40.png' : 'images/arrow_back_32dp_000000_FILL0_wght400_GRAD0_opsz40.png'" alt=""></span>&nbsp;&nbsp;Total dependencies found: <span [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}" class="h5 fw-bold">{{dependencies.length}}</span>
   <div class="d-flex justify-content-between align-items-center float-end">
     <div class="d-flex">
@@ -10,7 +10,7 @@
   </span>
   </div>
 </div>
-<table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
+<table #table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
 class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
     <thead>
         <tr>
@@ -21,8 +21,8 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
         </tr>
     </thead>
      <tbody>
-        <tr *ngFor="let dependency of pagedDependencies">
-            <td><a  [innerHTML]="dependency.dependencyName | highlight:searchTerm" [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="cursor-pointer" (click)="handleDependency(dependency)"></a>
+        <tr *ngFor="let dependency of pagedDependencies;let i = index" #dependencyRow [attr.data-id]="i">
+            <td><a  [innerHTML]="dependency.dependencyName | highlight:searchTerm" [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="cursor-pointer" (click)="handleDependency(dependency, i)"></a>
             &nbsp;&nbsp;<span *ngIf="dependency.vulnerabilities?.length > 0" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
             <span *ngIf="dependency.likelyCPEs?.length > 0" class="text-primary fw-bold">[{{dependency.likelyCPEs?.length}}]</span></td>
             <!-- <td>{{dependency.cpeEnumeration?.vendor | highlight:searchTerm}}</td>
@@ -33,19 +33,11 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
             <td [innerHTML]="dependency.cpeEnumeration?.version | highlight:searchTerm"></td>
         </tr>
      </tbody>
-</table>
-</div>
-<!--------------------------------No-vulnerability-data-start------------------------------------->
-<div #noDependency *ngIf="dependencies.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
-  <div class="text-center">
-    <span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h3">No Dependency Data Found</span>
-  </div>
-</div>
-<!--------------------------------No-vulnerability-data-end--------------------------------------->
-
-
-<div *ngIf="dependencies.length > 0" class="row justify-content-center height-fit-content">
-<div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
+     <tfoot>
+      <tr>
+        <td colspan="4">
+        <div *ngIf="dependencies.length > 0" class="row justify-content-center height-fit-content">
+<div class="col-lg-6 d-flex justify-content-evenly align-items-center height-fit-content">
   <mat-label class="text-nowrap custom-fw-1" [ngClass]="{'bg-dark': darkMode, 'bg-alice': darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
   <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
     <mat-option [ngClass]="{'bg-dark':darkMode, 'bg-white':!darkMode, 'text-white':darkMode, 'text-dark': !darkMode}" *ngFor="let size of pageSizes" [value]="size">
@@ -67,3 +59,17 @@ arrow_forward_ios
 </div>
 </div>
 
+
+        </td>
+      </tr>
+     </tfoot>
+</table>
+<!--------------------------------No-vulnerability-data-start------------------------------------->
+<div #noDependency *ngIf="dependencies.length === 0" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="d-flex justify-content-center align-items-center mt-2">
+  <div class="text-center">
+    <span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h3">No Dependency Data Found</span>
+  </div>
+</div>
+<!--------------------------------No-vulnerability-data-end--------------------------------------->
+
+</div>

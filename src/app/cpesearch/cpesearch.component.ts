@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
 import { environment } from '../../environments/environments';
@@ -36,6 +36,9 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   cd: any;
   searchTerm: string = '';
   @ViewChild('noCpeData') noCpeData!: ElementRef;
+  @ViewChildren('cpeRow') cpeRows!: QueryList<ElementRef>;
+  @ViewChild('table') table!: ElementRef;
+  @ViewChild('cpeList') cpeList!: ElementRef;
   constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
     private snackBar: MatSnackBar, private location: Location, private paginationService: CVSSPaginationService
   ) {
@@ -60,20 +63,42 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
     });
   }
   ngAfterViewInit(): void {
+       this.vulnService.navBarHeight$.subscribe((height: number) => {
+       this.renderer.setStyle(this.cpeList.nativeElement, 'min-height', `${window.innerHeight - height}px`);
+      }) 
+      // this.renderer.setStyle(this.cpeList.nativeElement, 'min-height', `${window.innerHeight}px`);
+      this.renderer.setStyle(this.cpeList.nativeElement, 'max-height', "fit-content");
       if(this.cpeData.length === 0) {
           this.vulnService.navBarHeight$.subscribe((height: number) => {
-          this.renderer.setStyle(this.noCpeData.nativeElement, 'height', `${window.innerHeight - height}px`);
+          this.renderer.setStyle(this.noCpeData.nativeElement, 'height', `${window.innerHeight - height - 100}px`);
       }) 
       }
+      const selectedDepIndex = sessionStorage.getItem('selectedCpeIndex');
+      if (selectedDepIndex) {
+      const element = this.cpeRows.find(row => row.nativeElement.dataset.id === selectedDepIndex);
+      if (element) {
+        setTimeout(() => {
+      const rows = this.table.nativeElement.querySelectorAll('tr');
+      if (rows[+selectedDepIndex]) {
+        rows[+selectedDepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      }, 100);
+      const anchor = element.nativeElement.querySelector('a');
+      if (anchor) {
+      this.renderer.addClass(anchor, 'highlight-row');
+      }
+    }
+      sessionStorage.removeItem('selectedCpeIndex');
   }
+}
   ngAfterViewChecked(): void {
     if(this.cpeData.length === 0) {
         this.vulnService.navBarHeight$.subscribe((height: number) => {
-        this.renderer.setStyle(this.noCpeData.nativeElement, 'height', `${window.innerHeight - height}px`);
+        this.renderer.setStyle(this.noCpeData.nativeElement, 'margin-top', `${height}px`);  
       }) 
-      }
+    }
   }
-  searchCpeName(cpeName: string) {
+  searchCpeName(cpeName: string, index: number) {
     this.vulnService.setLoading(true);
     console.log(cpeName, this.isLoading);
     this.http.get<any>(`${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}${cpeName}`).subscribe({
@@ -90,7 +115,8 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
         console.error("Error fetching data:", error);
        }    
     
-  })
+  });
+  sessionStorage.setItem('selectedCpeIndex', index.toString());
 }
 searchCPEs(event: Event) {
 const inputValue = (event.target as HTMLInputElement).value.toLowerCase();
@@ -139,8 +165,9 @@ previousPage(): void {
    }
    onPageSizeChange(event: MatSelectChange): void {
    this.pageSize = event.value;
+   this.pageIndex = 0;
+   this.paginationService.setCpeInitialIndex(this.pageIndex);
    this.paginationService.setCpePageSize(this.pageSize);
-   this.initialIndex * this.pageSize < this.cpeData.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
    this.updatePagedData(this.pageIndex);
    }
    goBack() {

@@ -106,8 +106,12 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
     this.vulnService.portNumber$.subscribe((port:number)=>{
       this.portNumber = port;
     });
+    sessionStorage.removeItem('selectedCpeIndex');
+    sessionStorage.removeItem('selectedDependencyIndex');
   }
   ngAfterViewInit(): void {
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
+    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
     const navBarHeight = this.navBar.nativeElement.offsetHeight;
     this.vulnService.setNavBarHeight(navBarHeight);
     const bootstrap = (window as any).bootstrap;
@@ -122,8 +126,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
       });}
   }
   ngAfterViewChecked(): void {
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
+    // this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
+    // this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
   }
   ngOnDestroy(): void {
     clearInterval(this.progressInterval);
@@ -428,7 +432,6 @@ updateProgress(fetched: number, total: number) {
         const scanModal = new bootstrap.Modal(
         this.portNumberModal.nativeElement
         );
-        console.log("call",scanModal);
         scanModal.show();
         }, 50);
         })

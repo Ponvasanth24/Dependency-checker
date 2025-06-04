@@ -3,7 +3,7 @@ export const environment = {
   baseLocaUrl: "http://localhost:",
   fetchVulnerability: "/cvss/getVulnerabilities",
   getVulnerabilities: "/cvss/vulnerabilities",
-  searchByKeyWordUrl: "/cvss/search/cve/keywords?keywords=",
+  searchByKeyWordUrl: "/cvss/search/cve/keyword?keywords=",
   searchByCveid: "/cvss/search/cve/cveId?cveId=",
   searchByCpeName: "/cvss/search/cve/cpeName?cpe=",
   apiKey: "ca987215-dbe8-42f0-a656-e5da368c3c70",

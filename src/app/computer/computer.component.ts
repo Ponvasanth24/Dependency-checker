@@ -96,7 +96,7 @@ export class ComputerComponent implements OnInit, OnDestroy{
         next:(response)=>{
           console.log(response);
           this.storedComputerData = response || [];
-          this.updatePagedData(this.initialIndex);
+          this.updatePagedData(this.pageIndex);
           this.isLoading = false;
           this.cd.detectChanges();
         },
@@ -176,7 +176,7 @@ export class ComputerComponent implements OnInit, OnDestroy{
   onPageSizeChange(event: MatSelectChange): void {
      this.pageSize = event.value;
      this.pageIndex = 0;
-     this.updatePagedData(this.initialIndex);
+     this.updatePagedData(this.pageIndex);
   }
   updatePagedData(initialIndex: number): void {
     let totalItems = this.storedComputerData.length;
@@ -224,7 +224,10 @@ dialogRef.backdropClick().subscribe(() => {
       console.log('Updated computer data:', result);
       this.showToast('Computer data updated successfully', 'success');
       this.fetchComputerData();
-    } else {
+    } else if(result === 0){
+        this.showToast("UUID not provided for update", 'error');
+    }
+    else {
       result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
       console.log('Update dialog was closed without saving.');
     }
