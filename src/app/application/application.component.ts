@@ -25,6 +25,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
+import { ViewApplicationDialogComponent } from './view-application.component';
 @Component({
   selector: 'app-application',
   standalone: true,
@@ -59,7 +60,7 @@ export class ApplicationComponent implements OnInit, OnDestroy {
   computerUuid: string | null = null;
   computer: any = {};
   computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location'];
-  displayedColumns: string[] = ['name', 'version', 'vendor', 'installDate', 'createdAt','status', 'action'];
+  displayedColumns: string[] = ['name', 'version', 'vendor', 'installDate', 'createdAt', 'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
@@ -200,6 +201,15 @@ export class ApplicationComponent implements OnInit, OnDestroy {
         result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
       }
     })
+  }
+  openViewApplicationDialog(uuid: string){
+      this.dialog.open(ViewApplicationDialogComponent, {
+      hasBackdrop: true,
+      width: '90vw',
+      maxHeight: '90vh',
+      panelClass: 'large-dialog',
+      data:{ applicationUuid: uuid}
+    });
   }
 
   async deleteApplicationData(applicationId: number): Promise<void> {

@@ -22,6 +22,7 @@ import { UpdateDependencyDialogComponent } from './update-dependency-dialog.comp
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ViewDependencyDialogComponent } from './view-dependency.component';
 
 @Component({
   selector: 'app-applicationdependency',
@@ -63,7 +64,6 @@ export class ApplicationdependencyComponent {
   'location',
   'createdAt',
   'updatedAt',
-  'status',
   'action'
   ];
   applicationDetail: string[] = ['name', 'version', 'vendor'];
@@ -216,7 +216,15 @@ export class ApplicationdependencyComponent {
     }
    });
   }
-  
+  openViewDependencyDialog(uuid: string){
+  this.dialog.open(ViewDependencyDialogComponent, {
+      hasBackdrop: true,
+      width: '90vw',
+      maxHeight: '90vh',
+      panelClass: 'large-dialog',
+      data:{ dependencyUuid: uuid}
+    });
+  }
   async deleteDependencyData(dependencyId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());

@@ -70,7 +70,6 @@ export class DependencyvulnerabilitiesComponent {
     'publishedDate',
     'createdAt',
     'updatedAt',
-    'status',
     'action'
    ];
     dependencyDetailColumns: string[] = ['name', 'version', 'artifactId', 'groupId'];
@@ -211,7 +210,6 @@ export class DependencyvulnerabilitiesComponent {
         }
       })
     }
-  
     async deleteVulnerabilityData(vulnerabilityId: number): Promise<void> {
       this.dialogRef = this.dialog.open(this.confirmDialog);
       const confirmed = await firstValueFrom(this.dialogRef.afterClosed());

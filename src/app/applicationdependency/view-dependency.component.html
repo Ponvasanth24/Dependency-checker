@@ -1,0 +1,53 @@
+<table class="styled-table">
+  <thead>
+    <tr class="section-subtitle">
+        <td colspan="5" class="text-center dialog-heading sticky-top">🔗 Dependency</td>
+    </tr>
+    <tr class="dash-theme text-white">
+        <th>Name</th>
+        <th>Group Id</th>
+        <th>Artifact Id</th>
+        <th colspan="2">Version</th>
+    </tr>
+  </thead>
+  <tbody>
+
+        <!-- Dependencies -->
+        <ng-container *ngFor="let dep of dependencyData;">
+        
+        <tr *ngIf="!dependencyData.length">
+          <td colspan="5" class="empty">No dependencies found</td>
+        </tr>
+          <tr>
+            <td>{{ dep.name }}</td>
+            <td>{{ dep.groupId }}</td>
+            <td>{{ dep.artifactId }}</td>
+            <td colspan="2">{{ dep.version }}</td>
+          </tr>
+
+          <!-- Vulnerabilities -->
+          <tr class="section-subtitle">
+            <td colspan="5" class="text-center sticky-top dialog-heading">⚠️ Vulnerabilities</td>
+          </tr>
+          <tr *ngIf="!dep.vulnerabilities?.length">
+            <td colspan="5" class="empty">No vulnerabilities found</td>
+          </tr>
+            <tr class="dash-theme text-white" *ngIf="dep.vulnerabilities?.length">
+              <th>S.No</th>
+              <th>CVE ID</th>
+              <th>CVSS Score</th>
+              <th>Description</th>
+              <th colspan="2">Severity</th>
+            </tr>
+          <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
+            <tr>
+              <td class="text-danger fw-bold">{{i + 1}}</td>
+              <td>{{ vul.cveId }}</td>
+              <td>{{ vul.cvssScore }}</td>
+              <td>{{ vul.description }}</td>
+              <td>{{ vul.severity }}</td>
+            </tr>
+          </ng-container>
+      </ng-container>
+  </tbody>
+</table>

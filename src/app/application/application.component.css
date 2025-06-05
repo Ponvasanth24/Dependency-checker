@@ -216,3 +216,35 @@
     }
     
 }
+.dialog-heading {
+  background-color: #fafafa;
+}
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  background-color: #fafafa;
+}
+
+.styled-table th, .styled-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.section-subtitle {
+  background-color: #eeeeee;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+.large-dialog .mat-dialog-container {
+  padding: 0;
+  overflow: auto;
+}
+

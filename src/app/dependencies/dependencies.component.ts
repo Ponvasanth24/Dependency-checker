@@ -69,11 +69,6 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     ngAfterViewInit(): void {
       this.renderer.setStyle(this.depList.nativeElement, 'min-height', `${window.innerHeight}px`);
       this.renderer.setStyle(this.depList.nativeElement, 'max-height', "fit-content");
-      if(this.dependencies.length === 0) {
-          this.vulnService.navBarHeight$.subscribe((height: number) => {
-              this.renderer.setStyle(this.noDependency.nativeElement, 'height', `${window.innerHeight - height}px`);
-          }) 
-      }
       const selectedDepIndex = sessionStorage.getItem('selectedDependencyIndex');
       if (selectedDepIndex) {
       const element = this.dependencyRows.find(row => row.nativeElement.dataset.id === selectedDepIndex);

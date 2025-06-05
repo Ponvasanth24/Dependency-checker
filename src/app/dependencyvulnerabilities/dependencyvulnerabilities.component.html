@@ -184,14 +184,6 @@
     <td mat-cell *matCellDef="let vulnerability" class="text-dark">{{ vulnerability.updatedAt }}</td>
   </ng-container>
 
-  <!-- Status -->
-  <ng-container matColumnDef="status">
-    <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Status</th>
-    <td mat-cell *matCellDef="let vulnerability" class="text-dark">
-      {{ vulnerability.status ? 'Active' : 'No' }}
-    </td>
-  </ng-container>
-
   <!-- Action -->
   <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef class="text-white">Action</th>

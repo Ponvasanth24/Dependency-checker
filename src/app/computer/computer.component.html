@@ -139,6 +139,8 @@
         <div class="d-flex">
         <span (click)="openUpdateDialog($event, computer)" matTooltip="Edit Computer" class="material-symbols-outlined cursor-pointer">edit_square</span>
         &nbsp;&nbsp;&nbsp;
+        <span (click)="openViewComputerDialog(computer.uuid)" matTooltip="View Computer" class="material-symbols-outlined cursor-pointer">visibility</span>
+        &nbsp;&nbsp;&nbsp;
         <span (click)="addApplication(computer)" matTooltip="Add Application" class="material-symbols-outlined cursor-pointer">new_window</span>
         &nbsp;&nbsp;&nbsp;
         <span (click)="deleteComputerData(computer.uuid)" matTooltip="Delete Computer" class="material-symbols-outlined cursor-pointer">delete</span>

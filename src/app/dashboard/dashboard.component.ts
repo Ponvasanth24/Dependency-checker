@@ -45,7 +45,7 @@ import { Subject, Subscription } from 'rxjs';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
 })
-export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, AfterViewChecked {
+export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   isLoading = true;
   isAnimate = false;
   searchVariant: boolean = false;
@@ -124,10 +124,6 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit, Aft
       scanModal.show();
       }, 50);
       });}
-  }
-  ngAfterViewChecked(): void {
-    // this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
-    // this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
   }
   ngOnDestroy(): void {
     clearInterval(this.progressInterval);

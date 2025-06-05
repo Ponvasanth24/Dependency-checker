@@ -203,4 +203,43 @@
   background: transparent; /* Optional: background handled by inner content */
   box-shadow: none;        /* Optional: shadow comes from wrapper */
 }
+.dialog-heading {
+  background-color: #fafafa;
+}
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  background-color: #fafafa;
+}
+
+.styled-table th, .styled-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.section-title {
+  background-color: #1976d2;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.section-subtitle {
+  background-color: #eeeeee;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+.large-dialog .mat-dialog-container {
+  padding: 0;
+  overflow: auto;
+}
 

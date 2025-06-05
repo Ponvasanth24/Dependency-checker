@@ -24,6 +24,7 @@ import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService'
 import { UpdateComputerDialogComponent } from './update-computer-dialog.computer.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ViewComputerDialogComponent } from './view-computer.component';
 
 @Component({
   selector: 'app-computer',
@@ -225,6 +226,30 @@ dialogRef.backdropClick().subscribe(() => {
       this.showToast('Computer data updated successfully', 'success');
       this.fetchComputerData();
     } else if(result === 0){
+      this.showToast("UUID not provided for update", 'error');
+    }
+    else {
+      result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
+      console.log('Update dialog was closed without saving.');
+    }
+   });
+  };
+
+  openViewComputerDialog(uuid: string) {
+    console.log(uuid)
+    const dialogRef = this.dialog.open(ViewComputerDialogComponent, {
+    data: { computerUuid: uuid },
+    hasBackdrop: true,
+    width: '90vw',
+    maxHeight: '90vh',
+    panelClass: 'large-dialog',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      console.log('Updated computer data:', result);
+      this.showToast('Computer data updated successfully', 'success');
+    } else if(result === 0){
         this.showToast("UUID not provided for update", 'error');
     }
     else {
@@ -233,7 +258,6 @@ dialogRef.backdropClick().subscribe(() => {
     }
    });
   }
-
   async deleteComputerData(computerId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
