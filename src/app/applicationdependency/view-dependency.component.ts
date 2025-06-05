@@ -14,30 +14,30 @@ import { HttpClient } from '@angular/common/http';
   ]
 })
 export class ViewDependencyDialogComponent {
-  dependencyData: any= [];
+  dependencyData: any = [];
   constructor(
     public dialogRef: MatDialogRef<ViewDependencyDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient) {};
+    @Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient) { };
 
   ngOnInit(): void {
-     const dependencyUuid = this.data.dependencyUuid;
-     const params = {dependencyUuid}
-     this.http.get(vulnSyncEnvironments.getDependencyByUuid, { params })
+    const dependencyUuid = this.data.dependencyUuid;
+    const params = { dependencyUuid }
+    this.http.get(vulnSyncEnvironments.getDependencyByUuid, { params })
       .subscribe({
         next: (response) => {
-        console.log('fetch success:', response);
-        this.dependencyData = [response]; 
-        console.log(this.dependencyData)
-        this.dependencyData.forEach((dependency: any) => {
-        dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
-    });
+          console.log('fetch success:', response);
+          this.dependencyData = [response];
+          console.log(this.dependencyData)
+          this.dependencyData.forEach((dependency: any) => {
+            dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
+          });
         },
         error: (err) => {
           console.error('fetch error:', err);
           this.dialogRef.close(false);
         }
       });
-  }  
+  }
 }
 
 

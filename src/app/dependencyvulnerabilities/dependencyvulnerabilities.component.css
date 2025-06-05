@@ -1,27 +1,6 @@
-.text-blue-shade {
-   color: rgba(46, 194, 17, 0.945);
-   /* color: rgba(8, 8, 160, 0.945) */
-}
 .error-field {
     padding-left: 10px;
     color: red;
-}
-.border-green-btn {
-    border: 3px solid rgba(46, 194, 17, 0.945);
-}
-.vulnerabilityform {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-.vulnerabilityform label{
-    width: 100%;
-    color: white;
-    font-weight: 500;
-    background-color: rgba(3, 3, 48, 0.945);
-    padding: 8px 0 8px 10px;
-}
-.vulnerabilityform input{
-    margin-top: 10px;
 }
 .succToastProgress {
     border-bottom-left-radius: 0.5rem;
@@ -48,20 +27,6 @@
 }
 #vul-detail-table thead{
     background-color: rgba(3, 3, 48, 0.945) !important;
-}
-#vul-detail-table thead th {
-    padding: 10px 0 10px 5px;
-    font-weight: 500;
-}
-#vul-detail-table tbody tr td {
-    padding: 6px 0 6px 5px;
-    font-weight: 500;
-}
-#vul-detail-table tbody tr:nth-child(even) {
-    background-color: rgb(202, 200, 200);
-}
-#vul-detail-table tbody tr:nth-child(odd) {
-    background-color: rgb(230, 228, 228);
 }
 .btn-gray-shade {
     color: white;

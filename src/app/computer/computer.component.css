@@ -1,6 +1,5 @@
 .text-blue-shade {
    color: rgba(46, 194, 17, 0.945);
-   /* color: rgba(8, 8, 160, 0.945) */
 }
 .error-field {
     padding-left: 10px;
@@ -16,10 +15,14 @@
 .compform label{
     width: 100%;
     color: white;
-    /* font-weight: 350; */
     background-color: rgba(3, 3, 48, 0.945);
     padding: 8px 0 8px 10px;
 }
+.four-side-shadow {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* x, y, blur, color */
+  border-radius: 4px; /* optional */
+}
+
 .compform input{
     margin-top: 10px;
 }
@@ -76,7 +79,6 @@
   background-color: #f9f9f9;
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
   max-height: 90vh;
-  /* overflow: auto; */
 }
 .mat-progress-spinner {
   margin: 10px auto;
@@ -122,16 +124,14 @@
 .text-center {
   text-align: center;
 }
-/* Add to your global styles.css or component styles */
 
 .custom-dialog-container .mat-dialog-container {
   padding: 0;
   border-radius: 8px;
   overflow: hidden;
-  transform-origin: top left; /* Will appear to grow from button */
+  transform-origin: top left;
 }
 
-/* Responsive table fallback for small screens */
 @media (max-width: 768px) {
   .compform-table,
   .compform-table thead,
@@ -200,8 +200,8 @@
   padding: 0;
   border-radius: 8px;
   overflow: hidden;
-  background: transparent; /* Optional: background handled by inner content */
-  box-shadow: none;        /* Optional: shadow comes from wrapper */
+  background: transparent;
+  box-shadow: none;     
 }
 .dialog-heading {
   background-color: #fafafa;
@@ -216,14 +216,6 @@
 .styled-table th, .styled-table td {
   border: 1px solid #ddd;
   padding: 8px;
-}
-
-.section-title {
-  background-color: #1976d2;
-  color: white;
-  font-weight: bold;
-  font-size: 1rem;
-  text-align: left;
 }
 
 .section-subtitle {

@@ -40,28 +40,28 @@ export class UpdateDependencyDialogComponent {
   }
 
   onSubmit(): void {
-  if (this.updateDependencyForm.valid) {
-    const uuid = this.data?.uuid;
+    if (this.updateDependencyForm.valid) {
+      const uuid = this.data?.uuid;
 
-    if (!uuid) {
-      console.error('UUID not provided for update');
-      return;
+      if (!uuid) {
+        console.error('UUID not provided for update');
+        return;
+      }
+
+      const params = { dependencyUuid: uuid };
+
+      this.http.put(vulnSyncEnvironments.dependenciesCommonUrl, this.updateDependencyForm.value, { params })
+        .subscribe({
+          next: (res) => {
+            console.log('Update success:', res);
+            this.dialogRef.close(this.updateDependencyForm.value);
+          },
+          error: (err) => {
+            this.dialogRef.close(false);
+            console.error('Update error:', err);
+          }
+        });
     }
-
-    const params = { uuid: uuid };
-
-    this.http.put(vulnSyncEnvironments.dependenciesCommonUrl, this.updateDependencyForm.value, { params })
-      .subscribe({
-        next: (res) => {
-          console.log('Update success:', res);
-          this.dialogRef.close(this.updateDependencyForm.value);
-        },
-        error: (err) => {
-          this.dialogRef.close(false);
-          console.error('Update error:', err);
-        }
-      });
   }
-}
 
 }

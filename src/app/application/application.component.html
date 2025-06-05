@@ -26,6 +26,19 @@
         <td mat-cell *matCellDef="let computer"> {{ computer.location }} </td>
       </ng-container>
 
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let computer"> {{ computer.active ? 'Active' : 'Not Active' }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef> Action </th>
+        <td mat-cell *matCellDef="let computer"> 
+          <span class="material-symbols-outlined cursor-pointer" matTooltip="Activate" (click)="activateComputer(computer.uuid)">laptop_mac</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="material-symbols-outlined cursor-pointer" matTooltip="Deactivate" (click)="deActivateComputer(computer.uuid)">mimo_disconnect</span>
+        </td>
+      </ng-container>
+
       <tr mat-header-row *matHeaderRowDef="computerDetailTable" class="dash-theme text-white"></tr>
       <tr mat-row *matRowDef="let row; columns: computerDetailTable;"></tr>
     </table>
@@ -117,11 +130,7 @@
   <h5 class="text-secondary">Application Details</h5>
 
 <div class="overflow-auto">
-   <table mat-table [dataSource]="pagedApplicationData" class="mat-elevation-z1" id="app-detail-table">
-    <!-- <ng-container matColumnDef="applicationId">
-      <th mat-header-cell *matHeaderCellDef class="text-white">Application Id</th>
-      <td mat-cell *matCellDef="let application" class="text-dark">{{ application.uuid }}</td>
-    </ng-container> -->
+   <table mat-table [dataSource]="pagedApplicationData" class="mat-elevation-z1 border" id="app-detail-table">
     <!-- Name Column -->
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Name</th>
@@ -154,7 +163,7 @@
         <div class="d-flex">
         <span (click)="openUpdateDialog(application)" class="material-symbols-outlined cursor-pointer" matTooltip="Edit">edit_square</span>
         &nbsp;&nbsp;&nbsp;
-        <span (click)="openViewApplicationDialog(application.uuid)" matTooltip="View Computer" class="material-symbols-outlined cursor-pointer">visibility</span>
+        <span (click)="openViewApplicationDialog(application.uuid)" matTooltip="View Application" class="material-symbols-outlined cursor-pointer">visibility</span>
         &nbsp;&nbsp;&nbsp;
         <span (click)="addDependency(application)" class="material-symbols-outlined cursor-pointer" matTooltip="Add Dependency">new_window</span>
         &nbsp;&nbsp;&nbsp;
@@ -173,31 +182,6 @@
   <div *ngIf="storedApplicationData.length === 0 && !isLoading" class="text-center text-muted py-3">
     No data found.
   </div>
-  <!-- <table id="app-detail-table" class="w-100">
-     <thead class="text-white">
-      <tr>
-        <th>Name</th>
-        <th>Version</th>
-        <th>Vendor</th>
-        <th>Install Date</th>
-        <th>Action</th>
-      </tr>
-     </thead>
-     <tbody class="text-dark">
-      <tr *ngFor="let application of pagedApplicationData">
-        <td>{{application.name}}</td>
-        <td>{{application.version}}</td>
-        <td>{{application.vendor}}</td>
-        <td>{{application.installDate}}</td>
-        <td>
-          <span (click)="openUpdateDialog(application)" class="material-symbols-outlined cursor-pointer">edit_square</span>
-          &nbsp;<span class="material-symbols-outlined cursor-pointer" (click)="addDependency(application)">new_window</span>
-          &nbsp;
-          <span (click)="deleteApplicationData(application.uuid)" class="material-symbols-outlined cursor-pointer">delete</span>
-        </td>
-      </tr>
-     </tbody>
-  </table> -->
 <!------------------------------pagination-start----------------------------------------->
 <div *ngIf="storedApplicationData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
 <div class="col-lg-6 d-flex justify-content-evenly align-items-center height-fit-content">

@@ -4,7 +4,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
 import { Renderer2 } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
@@ -59,7 +59,7 @@ export class ApplicationComponent implements OnInit, OnDestroy {
   selectedApplicationId: number | null = null;
   computerUuid: string | null = null;
   computer: any = {};
-  computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location'];
+  computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location', 'status', 'action'];
   displayedColumns: string[] = ['name', 'version', 'vendor', 'installDate', 'createdAt', 'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
@@ -226,6 +226,46 @@ export class ApplicationComponent implements OnInit, OnDestroy {
     }
   }
 
+  activateComputer(uuid: string) {
+     const params = {computerUuid: uuid}
+     this.http.patch<any>(vulnSyncEnvironments.activateComputer, null, {headers: new HttpHeaders({ 'Content-Type': 'application/json' }), params}).subscribe({
+      next: (response) => {
+        console.log(response)
+        if(response.statusCode === 5014) {
+          this.showToast("computer activated successfully", 'success');
+        }
+      },
+      error: (error) => {
+        if(error.error.errorCode === 2008) {
+         let errorMessage = error.error.errorMessage;
+         this.showToast(errorMessage, 'error');
+        } else{
+         this.showToast('Unexpected error occured', 'error');
+        }
+        console.error(error);
+      }
+    });
+  }
+
+  deActivateComputer(uuid: string) {
+     const params = {computerUuid: uuid}
+     this.http.patch<any>(vulnSyncEnvironments.deActivateComputer, null, {headers: new HttpHeaders({ 'Content-Type': 'application/json' }), params}).subscribe({
+      next: (response) => {
+        if(response.statusCode === 2006) {
+          this.showToast("computer deactivated successfully", 'success');
+        }
+      },
+      error: (error) => {
+        if(error.error.errorCode === 2008) {
+         let errorMessage = error.error.errorMessage;
+         this.showToast(errorMessage, 'error');
+        } else{
+         this.showToast('Unexpected error occured', 'error');
+        }
+        console.error(error);
+      }
+    });
+  }
   showToast(message: string, type: 'success' | 'error'): void {
     if (type === 'success') {
       this.successMessage = message;
