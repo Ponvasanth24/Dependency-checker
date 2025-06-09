@@ -13,7 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '@angular/common';
 import { HighlightPipe } from '../../shared/HighlightSearch';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
-
+import { AppRoutes } from '../../shared/AppRoutes';
 @Component({
   selector: 'app-cpesearch',
   imports: [CommonModule, FormsModule, MatSelectModule, MatIcon, HighlightPipe],
@@ -106,7 +106,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
         this.vulnService.setDarkMode(this.darkMode);
         this.vulnService.setVulnerabilityData(response);
         this.vulnService.setTempVulnerability(false);
-        this.router.navigate(['/vulnerabilityList']);
+        this.router.navigate([AppRoutes.VULNERABILITY_LIST]);
         this.vulnService.setLoading(false);
        },error: (error) => {
         this.snackBar.open('Unexpected Error Occured', 'Dismiss', { duration: 5000, 

@@ -23,11 +23,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { finalize, takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil, switchMap, tap, catchError, debounceTime } from 'rxjs/operators';
 import { Renderer2 } from '@angular/core';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 import { Subject, Subscription } from 'rxjs';
-
+import { AppRoutes } from '../../shared/AppRoutes';
+import { Observable, of } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -66,7 +68,10 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   navigationUrl: string = '';
   private progressInterval: any = null;
   private cancelRequest$ = new Subject<void>();
-
+  private destroy$ = new Subject<void>();
+  searchQuery: string = '';
+  searchResults: any[] = [];
+private searchTerms = new Subject<string>();
   regex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
@@ -108,6 +113,36 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     });
     sessionStorage.removeItem('selectedCpeIndex');
     sessionStorage.removeItem('selectedDependencyIndex');
+    this.searchTerms.pipe(
+    debounceTime(300), // Wait for 300ms pause in typing
+    distinctUntilChanged(), // Only emit if the search term changes
+    switchMap(term => { // switchMap automatically cancels previous inner observable
+      this.isLoading = true;
+      this.searchResults = [];
+      if (!term.trim()) {
+        this.isLoading = false;
+        return of([]); // Return empty if no search term
+      }
+      return this.fetchData(term).pipe(
+        takeUntil(this.cancelRequest$), // Still good to have for explicit cancellation button
+        catchError(error => {
+          if (error.name === 'HttpErrorResponse' && error.statusText === 'unknown') {
+            console.log('Request was cancelled by new search or explicit cancel.');
+          } else {
+            console.error('Search error:', error);
+            this.showFeedback('Search failed.');
+          }
+          this.isLoading = false;
+          return of([]);
+        })
+      );
+    }),
+    takeUntil(this.destroy$) // Ensure the whole stream is unsubscribed on component destroy
+  ).subscribe(data => {
+    this.searchResults = data;
+    this.isLoading = false;
+    this.showFeedback('Search results loaded.');
+  });
   }
   ngAfterViewInit(): void {
     this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
@@ -128,14 +163,22 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   ngOnDestroy(): void {
     clearInterval(this.progressInterval);
     this.eventSource?.close();
-    this.cancelRequest$.next();
     this.cancelRequest$.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
   setPortNumber(){
     this.vulnService.setPortNumber(this.portNumber);
     this.vulnService.setPortNumberStatus(true);
   }
-
+fetchData(term: string): Observable<any[]> { // <-- Changed to accept 'term'
+    const url = `${this.searchUrl}${term}`; //
+    console.log('Fetching data for term:', term);
+    return this.http.get<any[]>(url); // Simulate a slow network request
+  }
+  onSearchChange(term: string): void {
+  this.searchTerms.next(term);
+}
   setSearchUrl() {
     this.dependencies = [];
 
@@ -144,7 +187,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         case 1:
           if (this.searchValue.length > 0) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByKeyWordUrl}`;
-            this.navigationUrl = '/vulnerabilityList';
+            this.navigationUrl = AppRoutes.VULNERABILITY_LIST;
             this.paginationService.setVulInitialIndex(0);
             this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
@@ -155,7 +198,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         case 2:
           if (this.searchValue.startsWith('CVE-') && this.cveRegex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCveid}`;
-            this.navigationUrl = '/vulnerabilityList';
+            this.navigationUrl = AppRoutes.VULNERABILITY_LIST;
             this.paginationService.setVulInitialIndex(0);
             this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
@@ -167,7 +210,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         case 3:
           if (this.regex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}`;
-            this.navigationUrl = '/vulnerabilityList';
+            this.navigationUrl = AppRoutes.VULNERABILITY_LIST;
             this.paginationService.setVulInitialIndex(0);
             this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
@@ -178,7 +221,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         case 4:
           if (this.searchValue.length > 0) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchLikelyKeyword}`;
-            this.navigationUrl = '/cpeSearchResults';
+            this.navigationUrl = AppRoutes.CPE_SEARCH;
             this.paginationService.setCpeInitialIndex(0);
             this.paginationService.setCpePageSize(10);
             this.searchVulnerabilities();
@@ -189,7 +232,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
         case 5:
           if (this.likelyCpeRegex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchLikelyCpe}`;
-            this.navigationUrl = '/cpeSearchResults';
+            this.navigationUrl = AppRoutes.CPE_SEARCH;
             this.paginationService.setCpeInitialIndex(0);
             this.paginationService.setCpePageSize(10);
             this.searchVulnerabilities();
@@ -206,6 +249,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   searchVulnerabilities(): void {
+  this.cancelSearch();
   this.isLoading = true;
   this.http.get<any[]>(`${this.searchUrl}${this.searchValue}`)
     .pipe(takeUntil(this.cancelRequest$),
@@ -371,7 +415,7 @@ private showFeedback(message: string): void {
         this.paginationService.setCpePageSize(5);
         this.vulnService.setDependencies(data);
         sessionStorage.setItem('dependencies', JSON.stringify(data));
-        this.router.navigate(['/dependencies']);
+        this.router.navigate([AppRoutes.DEPENDENCIES]);
         console.log('Final vulnerability data:', data);
         this.cd.detectChanges();
       })
@@ -500,7 +544,8 @@ onInputChange(event: Event) {
 }
 cancelSearch(): void {
     this.cancelRequest$.next();
+    this.isLoading = false;
     this.showFeedback('Search request cancelled.');
-}
-
+    console.log('Cancellation signal sent.');
+  }
 }

@@ -1,4 +1,4 @@
-import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,7 +34,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   templateUrl: './dependencyvulnerabilities.component.html',
   styleUrl: './dependencyvulnerabilities.component.css'
 })
-export class DependencyvulnerabilitiesComponent {
+export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit {
     isLoading: boolean = false;
     vulnerabilityForm!: FormGroup;
     updateVulnerabilityForm!: FormGroup;
@@ -98,9 +98,12 @@ export class DependencyvulnerabilitiesComponent {
       this.dependency = this.vulnSyncService.getDependencyData();
       console.log(this.dependency);
       this.dependencyId = this.dependency?.uuid;
+      this.vulnSyncService.setLoading(true);
       this.fetchVulnerabilityData();
     }
-  
+    ngAfterViewInit(): void {
+      this.vulnSyncService.setLoading(false);
+    }
     fetchVulnerabilityData(): void {
       if(!this.isExistDependencyId()) return;
       this.isLoading = true;

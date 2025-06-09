@@ -1,3 +1,4 @@
+<div class="view-table border-theme overflow-auto">
 <table class="styled-table">
   <thead>
     <tr class="section-subtitle">
@@ -41,7 +42,7 @@
       </tr>
       <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
         <tr>
-          <td class="text-danger fw-bold">{{i + 1}}</td>
+          <td>{{i + 1}}</td>
           <td>{{ vul.cveId }}</td>
           <td>{{ vul.cvssScore }}</td>
           <td>{{ vul.description }}</td>
@@ -51,3 +52,4 @@
     </ng-container>
   </tbody>
 </table>
+</div>

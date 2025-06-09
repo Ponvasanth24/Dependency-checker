@@ -1,6 +1,7 @@
-<table class="styled-table">
+<div class="view-table border-theme overflow-auto">
+<table class="styled-table" *ngIf="!isLoading">
   <thead>
-    <tr class="section-titl">
+    <tr>
         <th colspan="5" class="text-center sticky-top dialog-heading">🖥️ Computer Info</th>
       </tr>
     <tr class="dash-theme text-white">
@@ -33,11 +34,11 @@
       </tr>
       
       <ng-container *ngFor="let app of computer.applications; let i = index">
-        <tr class="section-titl">
-        <td colspan="5" class="text-center sticky-top dialog-heading">📦 Application</td>
+        <tr>
+        <td colspan="5" class="text-center sticky-top dialog-heading text-primary">📦 Application</td>
         </tr>
         <tr class="section-subtitle">
-          <td colspan="5" class="text-primary fw-bold">{{i+1}}. {{ app.name }}</td>
+          <td colspan="5" class="text-dark">{{i+1}}. {{ app.name }}</td>
         </tr>
         <tr class="dash-theme text-white">
           <th>Name</th>
@@ -55,13 +56,13 @@
         <!-- Dependencies -->
         <ng-container *ngFor="let dep of app.dependencies;let i = index">
         <tr class="section-subtitle">
-          <td colspan="5" class="text-center sticky-top dialog-heading">🔗 Dependency</td>
+          <td colspan="5" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
         </tr>
         <tr *ngIf="!app.dependencies?.length">
           <td colspan="5" class="empty">No dependencies found</td>
         </tr>
         <tr class="section-subtitle">
-          <td colspan="5" class="text-success fw-bold">{{i+1}}. {{ dep.name }}</td>
+          <td colspan="5" class="text-dark">{{i+1}}. {{ dep.name }}</td>
         </tr>
           <tr class="dash-theme text-white">
             <th>Name</th>
@@ -78,12 +79,12 @@
 
           <!-- Vulnerabilities -->
           <tr class="section-subtitle">
-            <td colspan="5" class="text-center sticky-top dialog-heading">⚠️ Vulnerabilities</td>
+            <td colspan="5" class="text-center sticky-top dialog-heading text-danger">⚠️ Vulnerabilities</td>
           </tr>
           <tr *ngIf="!dep.vulnerabilities?.length">
             <td colspan="5" class="empty">No vulnerabilities found</td>
           </tr>
-            <tr class="dash-theme text-white" *ngIf="dep.vulnerabilities?.length">
+            <tr class="dash-theme text-white table-danger" *ngIf="dep.vulnerabilities?.length">
               <th>S.No</th>
               <th>CVE ID</th>
               <th>CVSS Score</th>
@@ -91,8 +92,8 @@
               <th colspan="2">Severity</th>
             </tr>
           <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
-            <tr>
-              <td class="text-danger fw-bold">{{i + 1}}</td>
+            <tr class="table-danger">
+              <td class="text-dark">{{i + 1}}</td>
               <td>{{ vul.cveId }}</td>
               <td>{{ vul.cvssScore }}</td>
               <td>{{ vul.description }}</td>
@@ -104,3 +105,9 @@
     </ng-container>
   </tbody>
 </table>
+</div>
+<!------------------------------------Progress-bar--------------------------------------------------->
+<div *ngIf="isLoading" class="position-fixed top-0 start-0 h-100 w-100 d-flex justify-content-center align-items-center spinner-opacity">
+    <mat-spinner></mat-spinner>
+</div>
+<!------------------------------------Progress-bar-end-------------------------------------------------->

@@ -1,3 +1,4 @@
+<div class="view-table border-theme overflow-auto">
 <table class="styled-table">
   <thead>
     <tr>
@@ -18,7 +19,7 @@
         <td colspan="5" class="empty">No applications found</td>
       </tr>
         <tr class="section-subtitle">
-          <td colspan="5" class="text-primary fw-bold">{{i+1}}. {{ app.name }}</td>
+          <td colspan="5">{{i+1}}. {{ app.name }}</td>
         </tr>
         <tr>
           <td>{{ app.name }}</td>
@@ -30,13 +31,13 @@
         <!-- Dependencies -->
         <ng-container *ngFor="let dep of app.dependencies;let i = index">
         <tr class="section-subtitle">
-          <td colspan="5" class="text-center sticky-top dialog-heading">🔗 Dependency</td>
+          <td colspan="5" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
         </tr>
         <tr *ngIf="!app.dependencies?.length">
           <td colspan="5" class="empty">No dependencies found</td>
         </tr>
         <tr class="section-subtitle">
-          <td colspan="5" class="text-success fw-bold">{{i+1}}. {{ dep.name }}</td>
+          <td colspan="5">{{i+1}}. {{ dep.name }}</td>
         </tr>
           <tr class="dash-theme text-white">
             <th>Name</th>
@@ -53,7 +54,7 @@
 
           <!-- Vulnerabilities -->
           <tr class="section-subtitle">
-            <td colspan="5" class="text-center sticky-top dialog-heading">⚠️ Vulnerabilities</td>
+            <td colspan="5" class="text-center text-danger sticky-top dialog-heading">⚠️ Vulnerabilities</td>
           </tr>
           <tr *ngIf="!dep.vulnerabilities?.length">
             <td colspan="5" class="empty">No vulnerabilities found</td>
@@ -67,7 +68,7 @@
             </tr>
           <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
             <tr>
-              <td class="text-danger fw-bold">{{i + 1}}</td>
+              <td>{{i + 1}}</td>
               <td>{{ vul.cveId }}</td>
               <td>{{ vul.cvssScore }}</td>
               <td>{{ vul.description }}</td>
@@ -78,3 +79,4 @@
     </ng-container>
   </tbody>
 </table>
+</div>

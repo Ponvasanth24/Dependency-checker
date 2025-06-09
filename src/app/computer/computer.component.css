@@ -1,3 +1,38 @@
+*{
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+ .material-icons {
+  font-family: 'Material Icons' !important;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important; 
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
 .text-blue-shade {
    color: rgba(46, 194, 17, 0.945);
 }
@@ -12,17 +47,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
-.compform label{
-    width: 100%;
-    color: white;
-    background-color: rgba(3, 3, 48, 0.945);
-    padding: 8px 0 8px 10px;
-}
 .four-side-shadow {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* x, y, blur, color */
-  border-radius: 4px; /* optional */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px; 
 }
-
 .compform input{
     margin-top: 10px;
 }
@@ -47,15 +75,13 @@
     padding-left: 4px;
 }
 .dash-theme{
-    background-color: rgba(3, 3, 48, 0.945) !important;   
+    /* background-color: rgba(3, 3, 48, 0.945) !important;    */
+    background-color: #833AB4;
 }
 .comp-table-header {
-    background-color: rgba(3, 3, 48, 0.945) !important;
+  font-weight: 500;
+    background-color: #833AB4 !important;
 }
-#comp-detail-table thead{
-    background-color: rgba(3, 3, 48, 0.945) !important;
-}
-
 .btn-gray-shade {
     color: white;
     background-color: gray;
@@ -75,6 +101,18 @@
   width: 42px;
   height: 40px;
 }
+
+.mat-mdc-row:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.mat-mdc-row:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.mat-mdc-row:hover {
+  background-color: #e0e0e0;
+}
 ::ng-deep .custom-dialog-container {
   background-color: #f9f9f9;
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
@@ -84,11 +122,11 @@
   margin: 10px auto;
 }
 ::ng-deep .custom-dialog-backdrop {
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: #833AB4;
 }
 ::ng-deep .dialog-title {
     color: white;
-    background-color: rgba(3, 3, 48, 0.945) !important;
+    background-color: #833AB4 !important;
 }
 .material-symbols-outlined {
   font-variation-settings:
@@ -100,14 +138,17 @@
 .table-wrapper {
   overflow-x: auto;
 }
-
 .compform-table {
   width: 100%;
   border-collapse: collapse;
 }
 .compform-table th{
     color: white;
-    background-color: rgba(3, 3, 48, 0.945);
+    /* background-color: rgba(3, 3, 48, 0.945); */
+    background-color: #833AB4;
+}
+.compform-table thead{
+    font-weight: 500;
 }
 .compform-table th,
 .compform-table td {
@@ -124,14 +165,34 @@
 .text-center {
   text-align: center;
 }
-
 .custom-dialog-container .mat-dialog-container {
   padding: 0;
   border-radius: 8px;
   overflow: hidden;
   transform-origin: top left;
 }
+.spinner-opacity{
+  background-color: rgba(80, 80, 80, 0.4);
+  z-index: 1001; 
+}
+::ng-deep .mat-sort-header-arrow {
+  opacity: 1 !important;   
+  color: white !important;   
+}
 
+::ng-deep .mat-sort-header-sorted .mat-sort-header-arrow {
+  color: white !important;
+}
+
+::ng-deep .mat-sort-header:hover .mat-sort-header-arrow {
+  color: white !important;
+}
+.border-theme {
+  border: 5px solid #833AB4 !important;
+}
+.common-border {
+  border: 2px solid #833AB4 !important;
+}
 @media (max-width: 768px) {
   .compform-table,
   .compform-table thead,
@@ -230,8 +291,18 @@
   color: #999;
   font-style: italic;
 }
-.large-dialog .mat-dialog-container {
-  padding: 0;
-  overflow: auto;
+::ng-deep .mat-mdc-dialog-panel {
+  overflow: unset !important;
 }
-
+.success {
+  background-color: 	#d1e7dd;
+}
+.error-danger {
+  background-color: #f8d7da;
+}
+.fnw-bold{
+  font-weight: 600 !important;
+}
+.text-black-shade {
+  color: rgb(70, 69, 69);
+}

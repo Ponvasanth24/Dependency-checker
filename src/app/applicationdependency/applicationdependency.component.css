@@ -1,3 +1,39 @@
+*{
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+.material-icons {
+  font-family: 'Material Icons' !important;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important; 
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 .error-field {
     padding-left: 10px;
     color: red;
@@ -26,11 +62,9 @@
     padding-left: 4px;
 }
 .dash-theme{
-    background-color: rgba(3, 3, 48, 0.945) !important;   
+    background-color: #833AB4 !important;   
 }
-#dep-detail-table thead{
-    background-color: rgba(3, 3, 48, 0.945) !important;
-}
+
 #dep-detail-table thead th {
     padding: 10px 0 10px 5px;
     font-weight: 500;
@@ -57,7 +91,7 @@
 }
 ::ng-deep .custom-dialog-container {
   background-color: #f9f9f9;
-  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 5px 20px #833AB4 !important;
   max-height: 90vh;
 }
 
@@ -66,7 +100,7 @@
 }
 ::ng-deep .dialog-title {
     color: white;
-    background-color: rgba(3, 3, 48, 0.945) !important;
+    background-color: #833AB4 !important;
 }
 .material-symbols-outlined {
   font-variation-settings:
@@ -84,7 +118,7 @@
 }
 
 table.mat-table thead {
-  background-color: rgba(3, 3, 48, 0.945) !important;
+  background-color: #833AB4 !important;
   width: 100%;
   color: white;
   border-collapse: collapse;
@@ -196,8 +230,32 @@ table.mat-table td {
   color: #999;
   font-style: italic;
 }
-.large-dialog .mat-dialog-container {
-  padding: 0;
-  overflow: auto;
+::ng-deep .mat-mdc-dialog-panel {
+  overflow: unset !important;
+}
+.border-theme {
+  border: 5px solid #833AB4 !important;
+}
+.success {
+  background-color: 	#d1e7dd;
+}
+.error-danger {
+  background-color: #f8d7da;
+}
+.common-border {
+  border: 2px solid #833AB4 !important;
+}
+.mat-mdc-row:nth-child(odd) {
+  background-color: #f2f2f2;
 }
 
+.mat-mdc-row:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.mat-mdc-row:hover {
+  background-color: #e0e0e0;
+}
+.text-black-shade {
+  color: rgb(70, 69, 69);
+}

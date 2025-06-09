@@ -7,6 +7,7 @@ import {
   OnInit,
   ViewChild,
   Inject,
+  AfterViewInit,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -34,6 +35,11 @@ import { UpdateComputerDialogComponent } from './update-computer-dialog.computer
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ViewComputerDialogComponent } from './view-computer.component';
+import { MatSortModule } from '@angular/material/sort';
+import { Sort } from '@angular/material/sort';
+import { NgZone } from '@angular/core';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-computer',
@@ -50,13 +56,13 @@ import { ViewComputerDialogComponent } from './view-computer.component';
     MatDialogModule,
     MatTableModule,
     MatTooltipModule,
-    MatProgressSpinnerModule,
+    MatProgressSpinnerModule, MatSortModule
   ],
   templateUrl: './computer.component.html',
   styleUrl: './computer.component.css',
 })
-export class ComputerComponent implements OnInit, OnDestroy {
-  isLoading: boolean = false;
+export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
+  isTableLoading: boolean = false;
   computerForm!: FormGroup;
   updateComputerForm!: FormGroup;
   successMessage: string = '';
@@ -79,6 +85,7 @@ export class ComputerComponent implements OnInit, OnDestroy {
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
   @ViewChild('updateDialog') updateDialog!: TemplateRef<any>;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
+
   dialogRef!: MatDialogRef<any>;
   displayedColumns: string[] = [
     'ipAddress',
@@ -102,9 +109,11 @@ export class ComputerComponent implements OnInit, OnDestroy {
     private destroyRef: DestroyRef,
     private dialog: MatDialog,
     snackBar: MatSnackBar,
-    private router: Router,
-    private vulnSyncService: VulnerabilitySyncService
+    private router: Router, matIconRegistry: MatIconRegistry, sanitizer: DomSanitizer,
+    private vulnSyncService: VulnerabilitySyncService, private ngZone: NgZone
   ) {
+    matIconRegistry.registerFontClassAlias('material-symbols-outlined');
+    matIconRegistry.setDefaultFontSetClass('material-icons');
     this.snackBar = snackBar;
     this.computerForm = this.fb.group({
       ipAddress: [
@@ -124,20 +133,26 @@ export class ComputerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.vulnSyncService.setLoading(true);
     this.fetchComputerData();
   }
+  ngAfterViewInit(): void {
+    document.querySelectorAll('.menu-item')[0].classList.add('active-link');
+    this.vulnSyncService.setLoading(false);
+  }
+  
   fetchComputerData() {
-    this.isLoading = true;
+    this.isTableLoading = true;
     this.http.get<Computer[]>(vulnSyncEnvironments.getComputers).subscribe({
       next: (response) => {
         console.log(response);
         this.storedComputerData = response || [];
         this.updatePagedData(this.pageIndex);
-        this.isLoading = false;
+        this.isTableLoading = false;
         this.cd.detectChanges();
       },
       error: (error) => {
-        this.isLoading = false;
+        this.isTableLoading = false;
         this.cd.detectChanges();
         console.log(error);
       },
@@ -171,6 +186,30 @@ export class ComputerComponent implements OnInit, OnDestroy {
         },
       });
   }
+  sortData(sort: Sort) {
+  const { active, direction } = sort;
+  if (!active || direction === '') {
+    this.updatePagedData(this.pageIndex);
+    return;
+  }
+
+  this.storedComputerData.sort((a, b) => {
+    let valueA = (a as any)[active];
+    let valueB = (b as any)[active];
+    console.log(valueA,valueB)
+
+    if (active === 'active') {
+      valueA = a.active ? 'Active' : 'No';
+      valueB = b.active ? 'Active' : 'No';
+    }
+
+    const comparison = valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+    return direction === 'asc' ? comparison : -comparison;
+  });
+
+  this.updatePagedData(this.pageIndex);
+}
+
   showToast(message: string, type: 'success' | 'error'): void {
     if (type === 'success') {
       this.successMessage = message;
@@ -300,27 +339,29 @@ export class ComputerComponent implements OnInit, OnDestroy {
       data: { computerUuid: uuid },
       hasBackdrop: true,
       width: '90vw',
-      maxHeight: '90vh',
-      panelClass: 'large-dialog',
+      maxHeight: '90vh'
     });
+    dialogRef.afterOpened().subscribe(() => {
+    setTimeout(() => {
+    const container = document.querySelector('.mat-mdc-dialog-panel');
+    const conatinerHeight = container?.getBoundingClientRect().height;
+    if (container) {
+      const viewTable = document.querySelector<HTMLElement>('.view-table');
+      console.log(viewTable)
+      if (viewTable && typeof conatinerHeight === 'number') {
+        viewTable.style.height = `${conatinerHeight -20}px`;
+      }
+    }
+    }, 0);
+   });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        console.log('Updated computer data:', result);
-        this.showToast('Computer data updated successfully', 'success');
-      } else if (result === 0) {
-        this.showToast('UUID not provided for update', 'error');
-      } else {
-        result === false
-          ? this.showToast(
-              'An error occurred while updating the computer',
-              'error'
-            )
-          : '';
-        console.log('Update dialog was closed without saving.');
+     if (result === 2004) {
+        this.showToast('Computer not found', 'error');
       }
     });
   }
+  
   async deleteComputerData(computerId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());

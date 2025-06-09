@@ -71,14 +71,14 @@
           class="border-0 col-4 rounded-end-3 h-100 d-flex align-items-center"
         >
           <mat-icon [ngClass]="{'search-button': searchType !== 0, 'text-white': darkMode, 'text-dark': darkMode, 'bg-dark': darkMode, 'bg-white': !darkMode, 'no-hover': searchField === 0}"
-            class="w-100 fs-3 py-3 rounded-3 d-flex justify-content-center align-items-center"
+            class="w-100 fs-3 py-3 rounded-3 d-flex justify-content-center align-items-center material-symbols-outlined"
           >
             arrow_forward
           </mat-icon>
         </button>
       </div>
-      </div>
       <span *ngIf="searchField === 5" class="ps-3 text-red fs-sm fw-bold">e.g: cpe:2.3:a:vmware:framework:5.3.20:*:*:*:*:*:*:*</span>
+      </div>
       
         <div class="w-100 mt-3 d-flex justify-content-end">
         <div class="form-check form-switch show-lg">

@@ -18,6 +18,7 @@ import { Renderer2 } from '@angular/core';
 import { HighlightPipe } from '../../shared/HighlightSearch';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 import { filter } from 'rxjs';
+import { AppRoutes } from '../../shared/AppRoutes';
 @Component({
   selector: 'app-dependencies',
   imports: [CommonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
@@ -106,12 +107,12 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
           console.log(vulnerabilityData);
           this.vulnService.setDarkMode(this.darkMode);
           this.vulnService.setTempVulnerability(false);
-          this.router.navigate(['/vulnerabilityList']);
+          this.router.navigate([AppRoutes.VULNERABILITY_LIST]);
           this.vulnService.setVulnerabilityData(vulnerabilityData);
    }
    viewCPEs(CPEs: any) {
         this.vulnService.setCpeData(CPEs);
-          this.router.navigate(['/cpeSearchResults']);
+          this.router.navigate([AppRoutes.CPE_SEARCH]);
    }
    nextPage(): void {
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {

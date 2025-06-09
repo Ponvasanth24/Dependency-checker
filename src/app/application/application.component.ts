@@ -1,4 +1,4 @@
-import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,8 +38,8 @@ import { ViewApplicationDialogComponent } from './view-application.component';
   templateUrl: './application.component.html',
   styleUrl: './application.component.css'
 })
-export class ApplicationComponent implements OnInit, OnDestroy {
-  isLoading: boolean = false;
+export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
+  isLoading: boolean = true;
   applicationForm!: FormGroup;
   updateApplicationForm!: FormGroup;
   successMessage = '';
@@ -95,9 +95,13 @@ export class ApplicationComponent implements OnInit, OnDestroy {
     this.computerUuid = this.computer?.uuid;
     if(!this.isExistComputrtId()) return;
     this.storedApplicationData = this.computer.applications;
+    // this.vulnSyncService.setLoading(true);
     this.fetchApplicationData();
   }
-
+ ngAfterViewInit(): void {
+   this.vulnSyncService.setLoading(false);
+   this.cd.detectChanges();
+ }
   ngOnDestroy(): void {
     clearInterval(this.successInterval);
   }
@@ -203,13 +207,26 @@ export class ApplicationComponent implements OnInit, OnDestroy {
     })
   }
   openViewApplicationDialog(uuid: string){
-      this.dialog.open(ViewApplicationDialogComponent, {
+    const dialogRef = this.dialog.open(ViewApplicationDialogComponent, {
       hasBackdrop: true,
       width: '90vw',
       maxHeight: '90vh',
-      panelClass: 'large-dialog',
       data:{ applicationUuid: uuid}
     });
+
+    dialogRef.afterOpened().subscribe(() => {
+    setTimeout(() => {
+    const container = document.querySelector('.mat-mdc-dialog-panel');
+    const conatinerHeight = container?.getBoundingClientRect().height;
+    if (container) {
+      const viewTable = document.querySelector<HTMLElement>('.view-table');
+      console.log(viewTable)
+      if (viewTable && typeof conatinerHeight === 'number') {
+        viewTable.style.height = `${conatinerHeight -20}px`;
+      }
+    }
+    }, 0);
+   });
   }
 
   async deleteApplicationData(applicationId: number): Promise<void> {
@@ -236,7 +253,7 @@ export class ApplicationComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        if(error.error.errorCode === 2008) {
+        if(error.error.errorCode === 2009) {
          let errorMessage = error.error.errorMessage;
          this.showToast(errorMessage, 'error');
         } else{

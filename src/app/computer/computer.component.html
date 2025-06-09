@@ -1,7 +1,7 @@
 <div>
   <span class="h5 text-secondary">Add Computer Details</span>
-  <form [formGroup]="computerForm" class="responsive-form mt-2">
-    <div class="table-wrapper mat-elevation-z1">
+  <form [formGroup]="computerForm" class="responsive-form mt-2 mat-elevation-z1 common-border">
+    <div class="table-wrapper">
       <table class="compform-table bg-white">
         <thead>
           <tr>
@@ -98,51 +98,57 @@
 
   <div class="overflow-auto">
 
-    <table mat-table [dataSource]="pagedComputerData" class="mat-elevation-z1 w-100 border" id="comp-detail-table">
+    <table mat-table [dataSource]="pagedComputerData" matSort (matSortChange)="sortData($event)" class="mat-elevation-z1 w-100 border common-border" id="comp-detail-table">
 
       <ng-container matColumnDef="ipAddress">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Ip Address</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.ipAddress}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.ipAddress}}</td>
       </ng-container>
 
       <ng-container matColumnDef="hostname">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Host Name</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.hostName}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.hostName}}</td>
       </ng-container>
 
       <ng-container matColumnDef="osName">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Name</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.osName}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.osName}}</td>
       </ng-container>
 
       <ng-container matColumnDef="osVersion">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Version</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.osVersion}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.osVersion}}</td>
       </ng-container>
 
       <ng-container matColumnDef="location">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Location</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.location}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.location}}</td>
       </ng-container>
 
       <ng-container matColumnDef="createdAt">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created At</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.createdAt}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.createdAt}}</td>
       </ng-container>
 
       <ng-container matColumnDef="updatedAt">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Updated At</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.updatedAt}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.updatedAt}}</td>
       </ng-container>
 
       <ng-container matColumnDef="active">
-        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Status</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">{{computer.active ? 'Active' : 'No'}}</td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="active" class="text-white text-nowrap">Status</th>
+        <td mat-cell *matCellDef="let computer">
+         @if(computer.active) {
+          <span class='text-success fnw-bold'>Active</span>
+         } @else{
+          <span class='text-danger fnw-bold'>No</span>
+         } 
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Action</th>
-        <td mat-cell *matCellDef="let computer" class="text-dark">
+        <td mat-cell *matCellDef="let computer" class="text-black-shade">
           <div class="d-flex">
             <span (click)="openUpdateDialog($event, computer)" matTooltip="Edit Computer"
               class="material-symbols-outlined cursor-pointer">edit_square</span>
@@ -160,7 +166,7 @@
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns" class="comp-table-header"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      <tr *ngIf="isLoading">
+      <tr *ngIf="isTableLoading">
         <td [attr.colspan]="displayedColumns.length" class="text-center">
           <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
         </td>
@@ -169,10 +175,10 @@
 
 
     </table>
-    <div *ngIf="isLoading" class="d-flex justify-content-center py-3">
+    <div *ngIf="isTableLoading" class="d-flex justify-content-center py-3">
       <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
     </div>
-    <div *ngIf="storedComputerData.length === 0 && !isLoading" class="text-center text-muted py-3">
+    <div *ngIf="storedComputerData.length === 0 && !isTableLoading" class="text-center text-muted py-3">
       No data found.
     </div>
     <!------------------------------pagination-start----------------------------------------->
@@ -210,7 +216,7 @@
 
 <!---------------------------------------------success-toast-start-------------------------------------------------->
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
-  <div #successToast class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+  <div #successToast class="toast success border border-success border-3" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <strong class="me-auto text-success">Success !</strong>
       <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -225,7 +231,7 @@
 
 <!---------------------------------------------error-toast-start-------------------------------------------------->
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
-  <div #errorToast class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+  <div #errorToast class="toast error-danger border border-danger border-3" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <strong class="me-auto text-danger">Error</strong>
       <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>

@@ -1,4 +1,4 @@
-import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { TemplateRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,8 +31,8 @@ import { ViewDependencyDialogComponent } from './view-dependency.component';
   templateUrl: './applicationdependency.component.html',
   styleUrl: './applicationdependency.component.css'
 })
-export class ApplicationdependencyComponent {
-  isLoading: boolean = false;
+export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
+  isLoading: boolean = true;
   dependencyForm!: FormGroup;
   successMessage: string = '';
   errorMessage: string = '';
@@ -89,6 +89,9 @@ export class ApplicationdependencyComponent {
     console.log(this.application)
     this.storedDependencyData = this.application?.dependencies ?? [];
     this.fetchDependencyData();
+  }
+  ngAfterViewInit(): void {
+    this.vulnSyncService.setLoading(false);
   }
   fetchDependencyData() {
     if (!this.isExistApplicationId()) return;
@@ -219,13 +222,25 @@ export class ApplicationdependencyComponent {
     });
   }
   openViewDependencyDialog(uuid: string) {
-    this.dialog.open(ViewDependencyDialogComponent, {
+    const dialogRef =  this.dialog.open(ViewDependencyDialogComponent, {
       hasBackdrop: true,
       width: '90vw',
       maxHeight: '90vh',
-      panelClass: 'large-dialog',
       data: { dependencyUuid: uuid }
     });
+    dialogRef.afterOpened().subscribe(() => {
+    setTimeout(() => {
+    const container = document.querySelector('.mat-mdc-dialog-panel');
+    const conatinerHeight = container?.getBoundingClientRect().height;
+    if (container) {
+      const viewTable = document.querySelector<HTMLElement>('.view-table');
+      console.log(viewTable)
+      if (viewTable && typeof conatinerHeight === 'number') {
+        viewTable.style.height = `${conatinerHeight -20}px`;
+      }
+    }
+    }, 0);
+   });
   }
   async deleteDependencyData(dependencyId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
