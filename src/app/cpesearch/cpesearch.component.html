@@ -8,17 +8,18 @@
 class="table table-responsive-lg table-borderless table-striped mt-2">
     <thead>
         <tr>
-            <th>CPE Name</th> 
+            <th [attr.colspan]="searchVariant ? 1 : 2">CPE Name</th> 
         </tr>
     </thead>
      <tbody>
         <tr *ngFor="let data of pagedCpeData; let i = index" #cpeRow [attr.data-id]="i">
-            <td><a [innerHTML]="data.cpe23Uri | highlight:searchTerm" (click)="searchCpeName(data.cpe23Uri, i)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer"></a></td>
+            <td class="w-50"><a [innerHTML]="data.cpe23Uri | highlight:searchTerm" (click)="searchCpeName(data.cpe23Uri, i)" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="text-white cursor-pointer"></a></td>
+            <td *ngIf="!searchVariant" class="w-50"><mat-icon matTooltip="Add Hint" (click)="addDependencyHint(data.cpe23Uri)" class="material-symbols-outlined cursor-pointer text-success fs-3">post_add</mat-icon></td>
         </tr>
      </tbody>
      <tfoot>
       <tr>
-        <td>
+        <td colspan="2">
           <!---------------------------------pagination-start----------------------------------------------->
 <div *ngIf="cpeData.length > 0;" class="row justify-content-center height-fit-content">
 <div class="col-lg-5 d-flex justify-content-evenly align-items-center height-fit-content">
@@ -61,3 +62,16 @@ arrow_forward_ios
     <div id="progress-bar" class="loader" style="--n: 16; --f: 0.2">
     </div>
 </div>    
+
+<!-- Dialog Template -->
+<ng-template #confirmDialog>
+  <h6 class="bg-danger text-white ps-2 py-3">Add Hint</h6>
+  <mat-dialog-content>Are you sure you want to add this to dependency hint?</mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button class="btn btn-danger" (click)="dialogRef.close(false)">Cancel</button>
+    &nbsp;
+    <button class="btn btn-danger" (click)="dialogRef.close(true)">Confirm</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<!---------------------------------------delete-confirm-toast-end-------------------------------->

@@ -1,7 +1,7 @@
 <div>
   <h5 class="text-secondary">Application Details</h5>
 
-  <div class="table-wrapper bg-white mat-elevation-z1 common-border">
+  <div class="table-wrapper bg-white rounded-2 table-shadow">
     <table mat-table [dataSource]="[application]" class="full-width">
 
       <!-- Name Column -->
@@ -31,8 +31,8 @@
 
 <div class="mt-3">
   <h5 class="text-secondary">Add Dependency</h5>
-  <form [formGroup]="dependencyForm" class="mat-elevation-z1 common-border bg-white">
-    <div class="table-wrapper">
+  <form [formGroup]="dependencyForm" class="rounded-2 table-shadow bg-white">
+    <div class="table-wrapper rounded-2">
       <table class="mat-table bg-white full-width">
 
         <!-- Header -->
@@ -46,8 +46,7 @@
           </tr>
         </thead>
 
-        <!-- Form Input Row -->
-        <tbody>
+        <tbody class="border border-top-0 border-start-0 border-end-0 border-bottom">
           <tr>
             <td>
               <mat-form-field appearance="fill" class="full-width">
@@ -119,51 +118,53 @@
 </div>
 
 <div class="mt-3">
-  <h5 class="text-secondary">Dependency Details</h5>
-
-  <div class="overflow-auto">
-    <table mat-table [dataSource]="pagedDependencyData" class="mat-elevation-z1 common-border border w-100" id="dep-detail-table">
+  <div class="d-flex justify-content-between">
+  <span class="text-secondary h5">Dependency Details</span>
+  <div class="text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedDependencyData.length}}</div>
+  </div>
+  <div class="overflow-auto rounded-2 table-shadow">
+    <table mat-table [dataSource]="pagedDependencyData" class="w-100" id="dep-detail-table">
 
       <!-- Dependency Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Dependency Name</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.name }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-theme-color fw-bold">{{ dependency.name }}</td>
       </ng-container>
 
       <!-- Version Column -->
       <ng-container matColumnDef="version">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Version</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.version }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-muted">{{ dependency.version }}</td>
       </ng-container>
 
       <!-- Group Id Column -->
       <ng-container matColumnDef="groupId">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Group Id</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.groupId }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-muted">{{ dependency.groupId }}</td>
       </ng-container>
 
       <!-- Artifact Id Column -->
       <ng-container matColumnDef="artifactId">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Artifact Id</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.artifactId }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-muted">{{ dependency.artifactId }}</td>
       </ng-container>
 
       <!-- Location Column -->
       <ng-container matColumnDef="location">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Location</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.location }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-muted">{{ dependency.location }}</td>
       </ng-container>
 
       <!-- Created At Column -->
       <ng-container matColumnDef="createdAt">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created At</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.createdAt }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-muted">{{ dependency.createdAt }}</td>
       </ng-container>
 
       <!-- Updated At Column -->
       <ng-container matColumnDef="updatedAt">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Updated At</th>
-        <td mat-cell *matCellDef="let dependency" class="text-dark">{{ dependency.updatedAt }}</td>
+        <td mat-cell *matCellDef="let dependency" class="text-muted">{{ dependency.updatedAt }}</td>
       </ng-container>
 
       <!-- Action Column -->
@@ -189,19 +190,15 @@
       <!-- Table Header and Rows -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns" class="dash-theme"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-footer-row *matFooterRowDef="['footerRow']"></tr>
 
-    </table>
-    <div *ngIf="isLoading" class="d-flex justify-content-center py-3">
-      <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
-    </div>
-    <div *ngIf="storedDependencyData.length === 0 && !isLoading" class="text-center text-muted py-3">
-      No data found.
-    </div>
-    <!------------------------------pagination-start----------------------------------------->
+    <ng-container matColumnDef="footerRow"> 
+      <td mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length" class="pb-2"> 
+       <!------------------------------pagination-start----------------------------------------->
     <div *ngIf="storedDependencyData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
       <div class="col-lg-6 d-flex justify-content-evenly align-items-center height-fit-content">
         <mat-label class="text-nowrap custom-fw-1">Page Size</mat-label>&nbsp;&nbsp;
-        <mat-select class="border rounded page-size-width p-2 bg-gray-shade"
+        <mat-select class="border rounded page-size-width p-2 bg-white"
           (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
           <mat-option class="bg-gray-shade" *ngFor="let size of pageSizes" [value]="size">
             {{ size }}
@@ -227,6 +224,16 @@
       </div>
     </div>
     <!--------------------------------------------pagination-end------------------------------------------------>
+    </td>
+    </ng-container>
+    </table>
+    <div *ngIf="isLoading" class="d-flex justify-content-center py-3">
+      <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+    </div>
+    <div *ngIf="storedDependencyData.length === 0 && !isLoading" class="text-center text-muted py-3">
+      No data found.
+    </div>
+   
   </div>
 </div>
 

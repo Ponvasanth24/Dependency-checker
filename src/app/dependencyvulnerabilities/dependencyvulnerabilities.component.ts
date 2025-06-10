@@ -158,10 +158,7 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
         }
       });
     }
-    // addVulnerability(application: Application) {
-    //   this.vulnSyncService.setApplicationData(application);
-    //   this.router.navigate(['/vulnerabilitySync/application', application.uuid], {state: {application:application}});
-    // }
+   
     updatePagedData(initialIndex: number): void {
       const totalItems = this.storedVulnerabilityData.length;
       this.totalPages = Math.ceil(totalItems / this.pageSize);

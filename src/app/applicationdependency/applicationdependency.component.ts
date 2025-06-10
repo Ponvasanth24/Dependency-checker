@@ -86,7 +86,6 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
     this.application = this.vulnSyncService.getApplicationData();
     this.applicationId = this.application?.uuid ?? null;
     if (!this.isExistApplicationId()) return;
-    console.log(this.application)
     this.storedDependencyData = this.application?.dependencies ?? [];
     this.fetchDependencyData();
   }

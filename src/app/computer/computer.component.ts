@@ -80,6 +80,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   end: number = 0;
   pagedComputerData: any[] = [];
   selectedComputerId: number | null = null;
+  
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
@@ -138,6 +139,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     document.querySelectorAll('.menu-item')[0].classList.add('active-link');
+    document.querySelectorAll('.icon')[0].classList.remove('icon-shadow');
     this.vulnSyncService.setLoading(false);
   }
   

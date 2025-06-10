@@ -59,6 +59,8 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedApplicationId: number | null = null;
   computerUuid: string | null = null;
   computer: any = {};
+  footerColumns = ['pagination'];
+
   computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location', 'status', 'action'];
   displayedColumns: string[] = ['name', 'version', 'vendor', 'installDate', 'createdAt', 'action'];
   @ViewChild('successToast') successToast!: ElementRef;
@@ -95,7 +97,6 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.computerUuid = this.computer?.uuid;
     if(!this.isExistComputrtId()) return;
     this.storedApplicationData = this.computer.applications;
-    // this.vulnSyncService.setLoading(true);
     this.fetchApplicationData();
   }
  ngAfterViewInit(): void {
@@ -220,9 +221,8 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     const conatinerHeight = container?.getBoundingClientRect().height;
     if (container) {
       const viewTable = document.querySelector<HTMLElement>('.view-table');
-      console.log(viewTable)
       if (viewTable && typeof conatinerHeight === 'number') {
-        viewTable.style.height = `${conatinerHeight -20}px`;
+        viewTable.style.height = `${conatinerHeight - 20}px`;
       }
     }
     }, 0);

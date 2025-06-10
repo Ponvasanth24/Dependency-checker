@@ -1,8 +1,8 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
 import { environment } from '../../environments/environments';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatSelectChange } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -14,9 +14,13 @@ import { Location } from '@angular/common';
 import { HighlightPipe } from '../../shared/HighlightSearch';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 import { AppRoutes } from '../../shared/AppRoutes';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { DependencyData } from '../../CVSS_Models/CvssModels';
+import { catchError, finalize, firstValueFrom, throwError } from 'rxjs';
+import { MatDialog, MatDialogRef,MatDialogModule} from '@angular/material/dialog';
 @Component({
   selector: 'app-cpesearch',
-  imports: [CommonModule, FormsModule, MatSelectModule, MatIcon, HighlightPipe],
+  imports: [CommonModule, FormsModule, MatSelectModule, MatIcon, HighlightPipe, MatTooltipModule, MatDialogModule],
   templateUrl: './cpesearch.component.html',
   styleUrls: ['./cpesearch.component.css','./cpesearch.component.scss'],
 })
@@ -34,17 +38,35 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   pagedCpeData: any = [];
   portNumber:number = 8080;
   cd: any;
+  searchVariant: boolean = false;
+  saveDependencyHintEndpoint: string;
+  baseUrl: string = '';
+  dialogRef!: MatDialogRef<any>;
+  dependencyData: DependencyData = {
+    dependencyName: '',
+    artifact: undefined,
+    vendorEvidences: [],
+    productEvidences: [],
+    versionEvidences: [],
+    cpeEnumeration: undefined,
+    vulnerabilities: [],
+    likelyCPEs: []
+  };
   searchTerm: string = '';
   @ViewChild('noCpeData') noCpeData!: ElementRef;
   @ViewChildren('cpeRow') cpeRows!: QueryList<ElementRef>;
   @ViewChild('table') table!: ElementRef;
   @ViewChild('cpeList') cpeList!: ElementRef;
+  @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
   constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
-    private snackBar: MatSnackBar, private location: Location, private paginationService: CVSSPaginationService
+    private snackBar: MatSnackBar, private location: Location, private paginationService: CVSSPaginationService,
+    private dialog: MatDialog
   ) {
     this.vulnService.getDarkMode().subscribe((mode: boolean) => {
       this.darkMode = mode;
     });
+    this.baseUrl = `${environment.baseLocaUrl}${this.portNumber}`;
+    this.saveDependencyHintEndpoint = `${this.baseUrl}${environment.saveDependencyHint}`;
   }
   ngOnInit(): void {
      this.vulnService.getDarkMode().subscribe((mode:boolean) => {
@@ -61,6 +83,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.vulnService.portNumber$.subscribe((portNumber:number)=>{
        this.portNumber = portNumber;
     });
+    this.searchVariant = this.vulnService.getSearchVariant();
   }
   ngAfterViewInit(): void {
        this.vulnService.navBarHeight$.subscribe((height: number) => {
@@ -170,6 +193,65 @@ previousPage(): void {
    this.paginationService.setCpePageSize(this.pageSize);
    this.updatePagedData(this.pageIndex);
    }
+ async addDependencyHint(cpeName: string): Promise<void> {
+    this.dialogRef = this.dialog.open(this.confirmDialog);
+      const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
+      if (!confirmed) return;
+    if (!cpeName || cpeName.trim() === '') {
+      this.snackBar.open('CPE Name cannot be empty.', 'Dismiss', { duration: 5000, panelClass: ['snackbar-warning'] });
+      console.warn('Attempted to add dependency hint with empty CPE name.');
+      return;
+    }
+    const dependencyHintPayload: DependencyData | null = this.vulnService.getDependencyHint();
+    console.log('Dependency Hint Payload:', dependencyHintPayload);
+    if (!dependencyHintPayload) {
+      this.snackBar.open('No dependency hint data found to send.', 'Dismiss', { duration: 5000, panelClass: ['snackbar-warning'] });
+      console.warn('Aborting request: No dependency hint data available.');
+      return;
+    }
+    this.isLoading = true;
+    const params = new HttpParams().set('cpeName', cpeName);
+    this.http.post<any>(
+      this.saveDependencyHintEndpoint,
+      dependencyHintPayload,       
+      { params: params }     
+    ).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error occurred while adding dependency hint:', error);
+        let userMessage = 'An unexpected error occurred.';
+        if (error.error instanceof ErrorEvent) {
+          userMessage = `Network Error: ${error.error.message}`;
+          console.error('Client-side or network error:', error.error.message);
+        } else {
+          console.error(`Backend returned code ${error.status}, body was: `, error.error);
+          if (error.status >= 400 && error.status < 500) {
+            userMessage = `Failed to add dependency hint: ${error.statusText || 'Bad Request'}`;
+            if (error.error && error.error.message) {
+              userMessage = `Failed to add dependency hint: ${error.error.message}`;
+            }
+          } else if (error.status >= 500) {
+            userMessage = `Server Error: Please try again later.`;
+          }
+        }
+        this.snackBar.open(userMessage, 'Dismiss', { duration: 5000 });
+        return throwError(() => new Error(userMessage));
+      }),
+      finalize(() => {
+        this.isLoading = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        console.log('Dependency hint added successfully:', response);
+        this.snackBar.open('Dependency hint added successfully!', 'Dismiss', { duration: 5000 });
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Subscription error (already handled by catchError):', err);
+      }
+    });
+  }
+
    goBack() {
     this.location.back()
    }

@@ -114,17 +114,17 @@ private searchTerms = new Subject<string>();
     sessionStorage.removeItem('selectedCpeIndex');
     sessionStorage.removeItem('selectedDependencyIndex');
     this.searchTerms.pipe(
-    debounceTime(300), // Wait for 300ms pause in typing
-    distinctUntilChanged(), // Only emit if the search term changes
-    switchMap(term => { // switchMap automatically cancels previous inner observable
+    debounceTime(300), 
+    distinctUntilChanged(),
+    switchMap(term => { 
       this.isLoading = true;
       this.searchResults = [];
       if (!term.trim()) {
         this.isLoading = false;
-        return of([]); // Return empty if no search term
+        return of([]); 
       }
       return this.fetchData(term).pipe(
-        takeUntil(this.cancelRequest$), // Still good to have for explicit cancellation button
+        takeUntil(this.cancelRequest$),
         catchError(error => {
           if (error.name === 'HttpErrorResponse' && error.statusText === 'unknown') {
             console.log('Request was cancelled by new search or explicit cancel.');
@@ -137,13 +137,14 @@ private searchTerms = new Subject<string>();
         })
       );
     }),
-    takeUntil(this.destroy$) // Ensure the whole stream is unsubscribed on component destroy
+    takeUntil(this.destroy$) 
   ).subscribe(data => {
     this.searchResults = data;
     this.isLoading = false;
     this.showFeedback('Search results loaded.');
   });
   }
+
   ngAfterViewInit(): void {
     this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
     this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
@@ -160,6 +161,7 @@ private searchTerms = new Subject<string>();
       }, 50);
       });}
   }
+
   ngOnDestroy(): void {
     clearInterval(this.progressInterval);
     this.eventSource?.close();
@@ -171,10 +173,10 @@ private searchTerms = new Subject<string>();
     this.vulnService.setPortNumber(this.portNumber);
     this.vulnService.setPortNumberStatus(true);
   }
-fetchData(term: string): Observable<any[]> { // <-- Changed to accept 'term'
-    const url = `${this.searchUrl}${term}`; //
+fetchData(term: string): Observable<any[]> { 
+    const url = `${this.searchUrl}${term}`;
     console.log('Fetching data for term:', term);
-    return this.http.get<any[]>(url); // Simulate a slow network request
+    return this.http.get<any[]>(url);
   }
   onSearchChange(term: string): void {
   this.searchTerms.next(term);

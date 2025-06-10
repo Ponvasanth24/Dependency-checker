@@ -96,6 +96,8 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
         }  
   }
   handleDependency(dependency: any, index:number) {
+    this.vulnService.setSearchVariant(false);
+    this.vulnService.setDependencyHint(dependency);
     if(dependency.vulnerabilities?.length > 0){
       this.viewDependency(dependency.vulnerabilities);
     } else{
