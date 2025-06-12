@@ -126,6 +126,7 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
       this.showToast("Make sure all fields are filled correctly", 'error');
       return;
     }
+    this.vulnSyncService.setLoading(true);
     if (!this.isExistApplicationId()) return;
     let params = { applicationUuid: this.applicationId! };
     this.http.post<any>(vulnSyncEnvironments.dependenciesCommonUrl, this.dependencyForm.value, { params }).subscribe({
@@ -135,38 +136,54 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
         this.dependencyForm.reset({ applicationId: this.dependencyForm.get('applicationId')?.value });
         this.showToast(successMessage, 'success');
         this.fetchDependencyData();
+        this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
         let errorMessage = "Make sure all fields are filled correctly";
         this.showToast(errorMessage, 'error');
         console.log(error);
+        this.vulnSyncService.setLoading(false);
       }
     });
   }
-  showToast(message: string, type: 'success' | 'error'): void {
-    if (type === 'success') {
-      this.successMessage = message;
-      if (this.successToast) {
-        const toast = new this.bootstrap.Toast(this.successToast.nativeElement, {
-          delay: 4000, autohide: true
-        });
-        toast.show();
-      } else {
-        window.alert(this.successMessage);
-      }
-    } else if (type === 'error') {
-      this.errorMessage = message;
-      if (this.errorToast) {
-        const toast = new this.bootstrap.Toast(this.errorToast.nativeElement, {
-          delay: 4000, autohide: true
-        });
-        toast.show();
-      } else {
-        window.alert(this.errorMessage);
-      }
-    }
+showToast(message: string, type: 'success' | 'error'): void {
+  if (type === 'success') {
+    this.successMessage = message;
+    if (this.successToast) {
+      const toastEl = this.successToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
 
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.successMessage);
+    }
+  } else if (type === 'error') {
+    this.errorMessage = message;
+    if (this.errorToast) {
+      const toastEl = this.errorToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.errorMessage);
+    }
   }
+}
+
   nextPage(): void {
     if (this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
       this.pageIndex++;

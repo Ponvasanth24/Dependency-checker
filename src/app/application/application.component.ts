@@ -26,12 +26,16 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
 import { ViewApplicationDialogComponent } from './view-application.component';
+import { MatSort } from '@angular/material/sort';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+
 @Component({
   selector: 'app-application',
   standalone: true,
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
   FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatCardModule,
-  MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule],
+  MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule, MatSortModule],
   providers: [
     provideNativeDateAdapter()
   ],
@@ -55,19 +59,22 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSizes: Array<number> = [];
   start: number = 0;
   end: number = 0;
-  pagedApplicationData: any[] = [];
+  pagedApplicationData!: MatTableDataSource<any>;
   selectedApplicationId: number | null = null;
   computerUuid: string | null = null;
   computer: any = {};
   footerColumns = ['pagination'];
+  sortActive = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location', 'status', 'action'];
-  displayedColumns: string[] = ['name', 'version', 'vendor', 'installDate', 'createdAt', 'action'];
+  displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate', 'createdAt', 'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
   @ViewChild('updateDialog') updateDialog!: TemplateRef<any>;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
+  @ViewChild(MatSort) sort!: MatSort;
   dialogRef!: MatDialogRef<any>;
   private bootstrap = (window as any).bootstrap;
 
@@ -99,7 +106,12 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.storedApplicationData = this.computer.applications;
     this.fetchApplicationData();
   }
- ngAfterViewInit(): void {
+ngAfterViewInit(): void {
+this.sort.sortChange.subscribe(sort => {
+    this.sortActive = sort.active;
+    this.sortDirection = sort.direction as 'asc' | 'desc';
+    this.updatePagedData(this.pageIndex);
+  });
    this.vulnSyncService.setLoading(false);
    this.cd.detectChanges();
  }
@@ -137,6 +149,7 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showToast("Make sure all fields are filled correctly", 'error');
       return;
     }
+    this.vulnSyncService.setLoading(true);
     if(!this.isExistComputrtId()) return;
     let params = {computerUuid:this.computer.uuid};
     this.http.post<any>(vulnSyncEnvironments.applicationCommonUrl, this.applicationForm.value, {params}).subscribe({
@@ -144,9 +157,11 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.applicationForm.reset({computerUuid: this.applicationForm.get('computerUuid')?.value});
         this.showToast("Application data added successfully", 'success');
         this.fetchApplicationData();
+        this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
-        let errorMessage = error.error.errorMessage;
+        this.vulnSyncService.setLoading(false);
+        let errorMessage = error.error.errorMessage || 'Check your internet connection';
         this.showToast(errorMessage, 'error');
         console.error(error);
       }
@@ -157,17 +172,38 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/vulnerabilitySync/application', application.uuid]);
   }
   updatePagedData(initialIndex: number): void {
-    const totalItems = this.storedApplicationData.length;
-    this.totalPages = Math.ceil(totalItems / this.pageSize);
-    this.start = initialIndex * this.pageSize;
-    this.end = this.start + this.pageSize;
-    this.pageSizes = totalItems >= 100 ? [10, 25, 50, 100] :
-      totalItems >= 50 ? [10, 25, 50] :
-      totalItems >= 25 ? [10, 25] :
-      totalItems >= 10 ? [10] : [5];
+  this.pageIndex = initialIndex;
+  const totalItems = this.storedApplicationData.length;
+  this.totalPages = Math.ceil(totalItems / this.pageSize);
+  this.start = initialIndex * this.pageSize;
+  this.end = this.start + this.pageSize;
 
-    this.pagedApplicationData = this.storedApplicationData.slice(this.start, this.end);
+  this.pageSizes = totalItems >= 100 ? [10, 25, 50, 100] :
+    totalItems >= 50 ? [10, 25, 50] :
+    totalItems >= 25 ? [10, 25] :
+    totalItems >= 10 ? [10] : [5];
+
+  let sortedData = [...this.storedApplicationData];
+
+  if (this.sortActive) {
+    sortedData.sort((a, b) => {
+      let aValue = a[this.sortActive];
+      let bValue = b[this.sortActive];
+
+      if (this.sortActive === 'installedDate') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+
+      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
+
+  this.pagedApplicationData = new MatTableDataSource(sortedData.slice(this.start, this.end));
+}
+
 
   nextPage(): void {
     if (this.pageIndex < this.totalPages - 1) {
@@ -244,22 +280,25 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   activateComputer(uuid: string) {
-     const params = {computerUuid: uuid}
+     const params = {computerUuid: uuid};
+     this.vulnSyncService.setLoading(true);
      this.http.patch<any>(vulnSyncEnvironments.activateComputer, null, {headers: new HttpHeaders({ 'Content-Type': 'application/json' }), params}).subscribe({
       next: (response) => {
         console.log(response)
         if(response.statusCode === 5014) {
           this.showToast("computer activated successfully", 'success');
         }
+        this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
         if(error.error.errorCode === 2009) {
-         let errorMessage = error.error.errorMessage;
+         let errorMessage = error.error.errorMessage || 'Check your internet connection';
          this.showToast(errorMessage, 'error');
         } else{
          this.showToast('Unexpected error occured', 'error');
         }
         console.error(error);
+        this.vulnSyncService.setLoading(false);
       }
     });
   }
@@ -284,26 +323,41 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
   showToast(message: string, type: 'success' | 'error'): void {
-    if (type === 'success') {
-      this.successMessage = message;
-      if (this.successToast) {
-        const toast = new this.bootstrap.Toast(this.successToast.nativeElement, {
-          delay: 4000, autohide: true
-        });
-        toast.show();
-      } else {
-        window.alert(this.successMessage);
-      }
+  if (type === 'success') {
+    this.successMessage = message;
+    if (this.successToast) {
+      const toastEl = this.successToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
     } else {
-      this.errorMessage = message;
-      if (this.errorToast) {
-        const toast = new this.bootstrap.Toast(this.errorToast.nativeElement, {
-          delay: 4000, autohide: true
-        });
-        toast.show();
-      } else {
-        window.alert(this.errorMessage);
-      }
+      window.alert(this.successMessage);
+    }
+  } else if (type === 'error') {
+    this.errorMessage = message;
+    if (this.errorToast) {
+      const toastEl = this.errorToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.errorMessage);
     }
   }
+}
+
 }

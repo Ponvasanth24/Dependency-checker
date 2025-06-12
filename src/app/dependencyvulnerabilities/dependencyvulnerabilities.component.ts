@@ -133,7 +133,7 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
         this.showToast("Make sure all fields are completed correctly", 'error');
         return;
       }
-      
+      this.vulnSyncService.setLoading(true);
       if(!this.isExistDependencyId()) return;
       const params = {dependencyUuid: this.dependency.uuid!};
       const formValue = { ...this.vulnerabilityForm.value };
@@ -151,10 +151,12 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
           this.vulnerabilityForm.reset({dependencyId: this.vulnerabilityForm.get('dependencyId')?.value});
           this.showToast("Vulnerability data added successfully", 'success');
           this.fetchVulnerabilityData();
+          this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
           this.showToast("Make sure all fields are filled correctly", 'error');
           console.error(error);
+          this.vulnSyncService.setLoading(false);
         }
       });
     }
@@ -226,27 +228,42 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
       }
     }
   
-    showToast(message: string, type: 'success' | 'error'): void {
-      if (type === 'success') {
-        this.successMessage = message;
-        if (this.successToast) {
-          const toast = new this.bootstrap.Toast(this.successToast.nativeElement, {
-            delay: 4000, autohide: true
-          });
-          toast.show();
-        } else {
-          window.alert(this.successMessage);
-        }
-      } else {
-        this.errorMessage = message;
-        if (this.errorToast) {
-          const toast = new this.bootstrap.Toast(this.errorToast.nativeElement, {
-            delay: 4000, autohide: true
-          });
-          toast.show();
-        } else {
-          window.alert(this.errorMessage);
-        }
-      }
+showToast(message: string, type: 'success' | 'error'): void {
+  if (type === 'success') {
+    this.successMessage = message;
+    if (this.successToast) {
+      const toastEl = this.successToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.successMessage);
     }
+  } else if (type === 'error') {
+    this.errorMessage = message;
+    if (this.errorToast) {
+      const toastEl = this.errorToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.errorMessage);
+    }
+  }
+}
+
 }

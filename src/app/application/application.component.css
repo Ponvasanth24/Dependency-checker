@@ -302,3 +302,20 @@
 .h5.text-secondary {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
+::ng-deep .mat-sort-header-arrow {
+  font-weight: 500 !important;
+  opacity: 1 !important;   
+  color: white !important;   
+}
+::ng-deep .mat-sort-header-sorted .mat-sort-header-arrow {
+  color: white !important;
+}
+
+::ng-deep .mat-sort-header:hover .mat-sort-header-arrow {
+  color: white !important;
+}
+
+.mat-sort-header-sorted .mat-sort-header-content {
+  font-weight: 700 !important;
+}
+

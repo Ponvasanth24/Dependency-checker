@@ -80,12 +80,14 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   end: number = 0;
   pagedComputerData: any[] = [];
   selectedComputerId: number | null = null;
+  computerData: string = '';
   
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
   @ViewChild('updateDialog') updateDialog!: TemplateRef<any>;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
+  @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
 
   dialogRef!: MatDialogRef<any>;
   displayedColumns: string[] = [
@@ -162,12 +164,37 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {}
+openDialog() {
+    this.dialogRef = this.dialog.open(this.dialogTemplate,{
+      hasBackdrop: true,
+      width: '50vw',
+      maxHeight: '50vh'
+    });
+  }
 
+  closeDialog() {
+    this.dialogRef.close();
+  }
+
+  submit() {
+    const body = JSON.parse(this.computerData);
+
+    this.http.post('http://localhost:8081/api/computers', body).subscribe({
+      next: (res) => {
+        console.log('Success', res);
+        this.closeDialog();
+      },
+      error: (err) => {
+        console.error('Error', err);
+      }
+    });
+  }
   addComputerData() {
     if (this.computerForm.invalid) {
       this.showToast('Make sure all fields are filled correctly', 'error');
       return;
     }
+    this.vulnSyncService.setLoading(true);
     this.http
       .post<any>(
         vulnSyncEnvironments.computerCommonUrl,
@@ -180,9 +207,11 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.computerForm.reset();
           this.showToast(successMessage, 'success');
           this.fetchComputerData();
+          this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
-          let errorMessage = error.error.errorMessage;
+          this.vulnSyncService.setLoading(false);
+          let errorMessage = error.error.errorMessage || 'Check your internet connection';
           this.showToast(errorMessage, 'error');
           console.log(error);
         },
@@ -213,33 +242,43 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
 }
 
   showToast(message: string, type: 'success' | 'error'): void {
-    if (type === 'success') {
-      this.successMessage = message;
-      if (this.successToast) {
-        const toast = new this.bootstrap.Toast(
-          this.successToast.nativeElement,
-          {
-            delay: 4000,
-            autohide: true,
-          }
-        );
-        toast.show();
-      } else {
-        window.alert(this.successMessage);
-      }
-    } else if (type === 'error') {
-      this.errorMessage = message;
-      if (this.errorToast) {
-        const toast = new this.bootstrap.Toast(this.errorToast.nativeElement, {
-          delay: 4000,
-          autohide: true,
-        });
-        toast.show();
-      } else {
-        window.alert(this.errorMessage);
-      }
+  if (type === 'success') {
+    this.successMessage = message;
+    if (this.successToast) {
+      const toastEl = this.successToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.successMessage);
+    }
+  } else if (type === 'error') {
+    this.errorMessage = message;
+    if (this.errorToast) {
+      const toastEl = this.errorToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.errorMessage);
     }
   }
+}
+
   nextPage(): void {
     if (
       this.pageIndex >= 0 &&
@@ -314,7 +353,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
       disableClose: true,
     });
     dialogRef.backdropClick().subscribe(() => {
-      dialogRef.componentInstance.startCloseAnimation();
+      dialogRef.close();
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {

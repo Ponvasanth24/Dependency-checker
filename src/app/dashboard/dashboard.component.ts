@@ -29,7 +29,7 @@ import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 import { Subject, Subscription } from 'rxjs';
 import { AppRoutes } from '../../shared/AppRoutes';
 import { Observable, of } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -42,7 +42,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
     RouterOutlet,
     MatFormFieldModule,
     MatSelectModule,
-    MatRadioModule, RouterModule
+    MatRadioModule, RouterModule ,MatInputModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -113,36 +113,6 @@ private searchTerms = new Subject<string>();
     });
     sessionStorage.removeItem('selectedCpeIndex');
     sessionStorage.removeItem('selectedDependencyIndex');
-    this.searchTerms.pipe(
-    debounceTime(300), 
-    distinctUntilChanged(),
-    switchMap(term => { 
-      this.isLoading = true;
-      this.searchResults = [];
-      if (!term.trim()) {
-        this.isLoading = false;
-        return of([]); 
-      }
-      return this.fetchData(term).pipe(
-        takeUntil(this.cancelRequest$),
-        catchError(error => {
-          if (error.name === 'HttpErrorResponse' && error.statusText === 'unknown') {
-            console.log('Request was cancelled by new search or explicit cancel.');
-          } else {
-            console.error('Search error:', error);
-            this.showFeedback('Search failed.');
-          }
-          this.isLoading = false;
-          return of([]);
-        })
-      );
-    }),
-    takeUntil(this.destroy$) 
-  ).subscribe(data => {
-    this.searchResults = data;
-    this.isLoading = false;
-    this.showFeedback('Search results loaded.');
-  });
   }
 
   ngAfterViewInit(): void {
@@ -285,7 +255,13 @@ private showError(message: string): void {
     duration: 5000
   });
 }
-
+changeTheme(event: any) {
+    if (event.checked) {
+      this.renderer.addClass(document.body, 'dark-mode');
+    } else {
+      this.renderer.removeClass(document.body, 'dark-mode');
+    }
+  }
 private showFeedback(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
@@ -444,9 +420,9 @@ updateProgress(fetched: number, total: number) {
   }, 2100);
 }
 
-  changeTheme(event: any): void {
-    this.vulnService.setDarkMode(event.target.checked);
-  }
+  // changeTheme(event: any): void {
+  //   this.vulnService.setDarkMode(event.target.checked);
+  // }
   openScanModal() {
     let dependencies: any[] = [];
     const bootstrap = (window as any).bootstrap;

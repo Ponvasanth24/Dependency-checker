@@ -131,7 +131,7 @@
   <div class="text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedApplicationData.length}}</div>
   </div>
 <div class="overflow-auto rounded-2 table-shadow">
-   <table mat-table [dataSource]="pagedApplicationData" id="app-detail-table">
+   <table mat-table [dataSource]="pagedApplicationData" matSort id="app-detail-table">
     <!-- Name Column -->
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Name</th>
@@ -148,9 +148,9 @@
       <td mat-cell *matCellDef="let application" class="text-muted">{{ application.vendor }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="installDate">
-      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Installed Date</th>
-      <td mat-cell *matCellDef="let application" class="text-muted">{{ application.installedDate }}</td>
+    <ng-container matColumnDef="installedDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-white text-nowrap header-bold">Installed Date</th>
+      <td mat-cell *matCellDef="let application" class="text-muted">{{ application.installedDate | date: 'shortDate' }}</td>
     </ng-container>
 
     <ng-container matColumnDef="createdAt">

@@ -156,3 +156,13 @@ border-bottom: 4px solid rgb(0, 119, 255);
     width: 24.99%;
 }
 }
+
+/* In your CSS file (e.g., .scss) */
+.full-width-material-field {
+  width: 100%; /* Makes the Material select fill its parent container */
+}
+
+/* Optional: Adjust height of the select field if needed */
+.full-width-material-field .mat-mdc-text-field-wrapper {
+    height: 50px; /* Example height */
+}
