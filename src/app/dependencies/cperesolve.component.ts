@@ -16,13 +16,14 @@ import { LikelyCPE } from "../../CVSS_Models/CvssModels";
 import { environment } from "../../environments/environments";
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatTooltipModule } from "@angular/material/tooltip";
 @Component({
     selector: 'app-cperesolve',
     standalone: true,
     templateUrl: './cperesolve.component.html',
     styleUrls: ['./dependencies.component.css'],
     imports: [CommonModule, MatSelectModule, MatFormFieldModule, MatInputModule, 
-    MatSelectModule, FormsModule, MatIconModule, MatDialogModule],
+    MatSelectModule, FormsModule, MatIconModule, MatDialogModule, MatTooltipModule],
     encapsulation: ViewEncapsulation.None
 })
 
@@ -42,11 +43,12 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     baseUrl: string = '';
     portNumber: number = 8080;
     saveDependencyHintEndpoint: string = '';
-    cpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+:(\*|[^:]+)(:\*){6}$/;
+    cpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]*(:(\*|[^:]*)){6,9}$/;
+    cpeNameError = false;
     
     @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
 
-    constructor(public dialogRef: MatDialogRef<CpeResolveComponent>,
+    constructor(public dialogRef: MatDialogRef<CpeResolveComponent>, public cpeResolveRef: MatDialogRef<CpeResolveComponent>,
                 @Inject(MAT_DIALOG_DATA) public data: any, private vulnService: VulnerabilityService,
             private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient, private snackBar: MatSnackBar) {
         this.dependencies = data.dependencies || [];
@@ -55,7 +57,6 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
           }
 
     ngOnInit(): void {
-    
       this.vulnService.darkMode$.subscribe((mode: boolean) => {
       this.darkMode = mode;
     });
@@ -126,8 +127,8 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
   async addDependencyHint(cpeName: string, dependency: any): Promise<void> {
     console.log('Adding dependency hint for CPE:', dependency);
     this.dialogRef = this.dialog.open(this.confirmDialog);
-      const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
-      if (!confirmed) return;
+    const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
+    if (!confirmed) return;
     if(!this.cpeRegex.test(cpeName)){
        this.showFeedback('Cpe Name Not valid.');
        return;
@@ -149,15 +150,25 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
           }
           return dep;
       });
+      let resolvedCount = 0;
       let resolvedCpe = this.dependencies.map((dep: any, index: number)=> {
           if(dep.dependencyName === dependency.dependencyName) {
             console.log(dep)
             dep.cpeResolved = true;
+            this.showFeedback('Cpe Name Resolved successfully!');
+          }
+          if(dep.cpeResolved) {
+            resolvedCount += 1;
           }
           return dep;
       });
+      console.log(resolvedCount, this.dependencies.length)
       sessionStorage.setItem('dependencies', JSON.stringify(depWithResolvedKey));
       this.dependencies = resolvedCpe;
+      if(this.dependencies.length === resolvedCount) {
+        this.cpeResolveRef.close();
+        return;
+      }
       this.updatePagedData(this.initialIndex);
       this.cd.detectChanges();
       console.log(depWithResolvedKey)
@@ -170,39 +181,71 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
   }
 
   showManualInput(i: number): void {
+    const cpeElem = document.getElementById('cpe_div' + i);
+    if(cpeElem?.children.length !== 0) {
+         return;
+    }
     console.log('Showing manual input for CPE at index:', i);
     const manualCpeParent = document.createElement('div');
     const manualInput = document.createElement('input');
     const submitButton = document.createElement('button');
+    const closeButton = document.createElement('button');
+    const cpeError = document.createElement('span');
     manualCpeParent.id = `parent_${i}`;
     manualCpeParent.className = 'manual-cpe d-flex justify-content-between';
     manualInput.type = 'text';
     manualInput.placeholder = 'Enter CPE Manually';
     manualInput.className = 'form-control';
+    manualInput.onkeyup = () => this.isValidCpe(manualInput.value, i);
     submitButton.innerText = 'Add';
     submitButton.onclick = () => this.addDependencyHint(manualInput.value.trim(), this.pagedDependencies[i]);
     submitButton.className = 'btn btn-danger ms-2';
-
+    closeButton.id = `closeBtn_${i}`;
+    closeButton.className = 'btn btn-close float-end mb-1';
+    closeButton.onclick = () => this.hideManualInput(i);
+    cpeError.className = 'cpe-error text-danger d-none';
+    cpeError.innerText = 'Please enter valid CPE Name';
+    cpeError.id = `cpeError_${i}`
     const cpeTable = document.getElementById('cpe_div' + i);
     console.log(cpeTable?.classList)
     cpeTable?.classList.remove('start-50');
     cpeTable?.classList.add('w-75');
-    if (cpeTable?.children.length! === 1) {
+    if (cpeTable?.children.length! === 0) {
+      cpeTable?.appendChild(closeButton);
       manualCpeParent.appendChild(manualInput);
       manualCpeParent.appendChild(submitButton);
-
       cpeTable?.appendChild(manualCpeParent);
+      cpeTable?.appendChild(cpeError);
       document.querySelector('.manual-cpe')?.classList.add('manual-cpe-box');
     }
+    
   }
 
   hideManualInput(i: number): void {
     const cpeTable = document.getElementById('cpe_div' + i);
     const manualCpeParent = document.getElementById(`parent_${i}`);
-    if (cpeTable && manualCpeParent) {
+    const closeBtn = document.getElementById(`closeBtn_${i}`);
+    const cpeError = document.getElementById(`cpeError_${i}`);
+    if (cpeTable && manualCpeParent && closeBtn) {
       cpeTable?.classList.add('start-50');
       cpeTable?.classList.remove('w-75');
+      cpeTable.removeChild(closeBtn);
       cpeTable.removeChild(manualCpeParent);
+      cpeTable.removeChild(cpeError!);
+    }
+  }
+
+  isValidCpe(cpeName: any, index: number) {
+    console.log("typed")
+    const cpeError = document?.getElementById(`cpeError_${index}`);
+    if(!this.cpeRegex.test(cpeName)) {
+      this.cpeNameError = true;
+      cpeError?.classList.remove('d-none');
+      cpeError?.classList.add('d-block');
+    } else {
+      this.cpeNameError = false;
+      cpeError?.classList.add('d-none');
+      cpeError?.classList.remove('d-block');
     }
   }
 

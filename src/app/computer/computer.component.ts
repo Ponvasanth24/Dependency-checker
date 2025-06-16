@@ -347,7 +347,6 @@ openDialog() {
     const conatinerHeight = container?.getBoundingClientRect().height;
     if (container) {
       const viewTable = document.querySelector<HTMLElement>('.view-table');
-      console.log(viewTable)
       if (viewTable && typeof conatinerHeight === 'number') {
         viewTable.style.height = `${conatinerHeight -20}px`;
       }

@@ -21,10 +21,11 @@ import { filter } from 'rxjs';
 import { AppRoutes } from '../../shared/AppRoutes';
 import { CpeResolveComponent } from './cperesolve.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-dependencies',
   imports: [CommonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
-    MatSelectModule, FormsModule, MatIconModule, MatButtonModule, HighlightPipe
+    MatSelectModule, FormsModule, MatIconModule, MatButtonModule, HighlightPipe, MatTooltipModule
   ],
   templateUrl: './dependencies.component.html',
   styleUrl: './dependencies.component.css'
@@ -69,14 +70,18 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
          dependenciesFromService = dependencies;
       });
       this.dependencies = depsFromSession.length > 0 ? depsFromSession : dependenciesFromService.length > 0 ? dependenciesFromService : [];
+      let resolvedCount = 0;
       let LikelyCPEs = this.dependencies.reduce((acc: any, dep: any) => {
           if(dep.likelyCPEs && dep.likelyCPEs.length > 0) {
             acc.push(dep);
           }
+          if(dep.cpeResolved) {
+            resolvedCount += 1;
+          }
           return acc;
       }, []);
-      console.log(LikelyCPEs);
-       if(LikelyCPEs.length > 0 ) {
+      console.log(resolvedCount);
+       if(LikelyCPEs.length > 0 && LikelyCPEs.length !== resolvedCount) {
           this.dialog.open(CpeResolveComponent, {
             width: '95vw',
             height: '90vh',

@@ -208,17 +208,16 @@
       </div>
     </div>
     <!--------------------------------------------pagination-end------------------------------------------------>
-        </td>
+  <div *ngIf="storedComputerData.length === 0 && !isTableLoading" class="text-center text-muted py-3">
+      No data found.
+  </div>  
+  <div *ngIf="isTableLoading" class="d-flex justify-content-center py-3">
+    <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+  </div>    
+  </td>
     </ng-container>
 
     </table>
-    <div *ngIf="isTableLoading" class="d-flex justify-content-center py-3">
-      <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
-    </div>
-    <div *ngIf="storedComputerData.length === 0 && !isTableLoading" class="text-center text-muted py-3">
-      No data found.
-    </div>
-   
   </div>
 </div>
 

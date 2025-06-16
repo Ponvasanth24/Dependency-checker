@@ -1,14 +1,5 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  NgZone,
-  ChangeDetectorRef,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  AfterViewChecked,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef, ViewChild, ElementRef,
+  AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environments';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,10 +14,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { finalize, takeUntil, switchMap, tap, catchError, debounceTime } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { Renderer2 } from '@angular/core';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AppRoutes } from '../../shared/AppRoutes';
 import { Observable, of } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
@@ -39,21 +30,9 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    MatIconModule,
-    CommonModule,
-    FormsModule,
-    VulnerabilitylistComponent,
-    DependenciesComponent,
-    RouterOutlet,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatRadioModule, RouterModule ,MatInputModule, MatToolbarModule,
-    MatButtonModule,
-    MatSlideToggleModule,
-    MatMenuModule,
-    MatSidenavModule,
-    FlexLayoutModule,
+  imports: [ MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent,
+    RouterOutlet, MatFormFieldModule, MatSelectModule, MatRadioModule, RouterModule ,MatInputModule, MatToolbarModule,
+    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatSidenavModule, FlexLayoutModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -98,14 +77,8 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('navBar') navBar!: ElementRef;
   @ViewChild('dashBoard') dashBoard!: ElementRef;
   @ViewChild('navBarParent') navBarParent: ElementRef | undefined;
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    private vulnService: VulnerabilityService,
-    private ngZone: NgZone,
-    private cd: ChangeDetectorRef,
-    private snackBar: MatSnackBar,
-    private renderer: Renderer2, private paginationService: CVSSPaginationService
+  constructor( private http: HttpClient, private router: Router, private vulnService: VulnerabilityService,
+    private ngZone: NgZone, private cd: ChangeDetectorRef, private snackBar: MatSnackBar, private renderer: Renderer2, private paginationService: CVSSPaginationService
   ) {}
 
   ngOnInit(): void {
@@ -128,7 +101,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
       if(condition) {
       this.navBarParent?.nativeElement.classList.remove('sticky-top');
       }
-    })
+    });
     sessionStorage.removeItem('selectedCpeIndex');
     sessionStorage.removeItem('selectedDependencyIndex');
   }
@@ -142,9 +115,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     if (bootstrap && bootstrap.Modal && !this.portNumberSetStatus) {
       this.ngZone.run(()=>{
       setTimeout(()=> {
-      const scanModal = new bootstrap.Modal(
-      this.getPortNumberSearch.nativeElement
-      );
+      const scanModal = new bootstrap.Modal(this.getPortNumberSearch.nativeElement);
       scanModal.show();
       }, 50);
       });}
@@ -158,7 +129,6 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.destroy$.complete();
   }
   setPortNumber(){
-    console.log(this.portNumber)
     this.vulnService.setPortNumber(this.portNumber);
     this.vulnService.setPortNumberStatus(true);
   }
@@ -167,9 +137,11 @@ fetchData(term: string): Observable<any[]> {
     console.log('Fetching data for term:', term);
     return this.http.get<any[]>(url);
   }
+  
   onSearchChange(term: string): void {
   this.searchTerms.next(term);
-}
+  }
+
   setSearchUrl() {
     this.dependencies = [];
 
@@ -480,8 +452,6 @@ updateProgress(fetched: number, total: number) {
     let element = this.portNumberModal.nativeElement;
     const bootstrap = (window as any).bootstrap;
     const existingModal = bootstrap.Modal.getInstance(element);
-    console.log(existingModal)
-    console.log(this.portNumberModal.nativeElement)
     if (existingModal) {
     existingModal.dispose();
     }
