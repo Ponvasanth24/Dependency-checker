@@ -57,6 +57,11 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       this.vulnService.getDarkMode().subscribe((mode: boolean) => {
         this.darkMode = mode;
       });
+      this.vulnService.portNumber$.subscribe((port:number)=>{
+             let portNumber = port;
+             console.log(port);
+            //  this.baseUrl = `${environment.baseLocaUrl}${portNumber}`;
+          });
       const deps = sessionStorage.getItem('dependencies');
       const depsFromSession = deps ? JSON.parse(deps) : [];
       let dependenciesFromService:any[] = [];

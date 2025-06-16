@@ -84,7 +84,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   searchResults: any[] = [];
   private searchTerms = new Subject<string>();
   
-  cpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
+  cpeRegex = /^cpe:\d+\.\d+:[aho]:([^:]+):([^:]+):([0-9]+\.[0-9]+(?:\.[0-9]+)(?:[-_a-zA-Z0-9.]+)?):([^:]):([^:]):([^:]):([^:]):([^:]):([^:]):([^:])$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
   searchTypes = [
@@ -158,6 +158,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.destroy$.complete();
   }
   setPortNumber(){
+    console.log(this.portNumber)
     this.vulnService.setPortNumber(this.portNumber);
     this.vulnService.setPortNumberStatus(true);
   }

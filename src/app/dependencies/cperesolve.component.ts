@@ -52,8 +52,6 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
         this.dependencies = data.dependencies || [];
         console.log(data)
         this.updatePagedData(this.initialIndex);
-        this.baseUrl = `${environment.baseLocaUrl}${this.portNumber}`;
-        this.saveDependencyHintEndpoint = `${this.baseUrl}${environment.saveDependencyHint}`;
           }
 
     ngOnInit(): void {
@@ -61,10 +59,14 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
       this.vulnService.darkMode$.subscribe((mode: boolean) => {
       this.darkMode = mode;
     });
-    this.vulnService.portNumber$.subscribe((portNumber:number)=>{
-       this.portNumber = portNumber;
+    this.vulnService.portNumber$.subscribe((port:number)=>{
+       let portNumber = port;
+       console.log(port);
+       this.baseUrl = `${environment.baseLocaUrl}${portNumber}`;
+       this.saveDependencyHintEndpoint = `${this.baseUrl}${environment.saveDependencyHint}`;
     });
-     const deps = sessionStorage.getItem('dependencies');
+    console.log(this.saveDependencyHintEndpoint)
+    const deps = sessionStorage.getItem('dependencies');
         const depsFromSession = deps ? JSON.parse(deps) : [];
         let dependenciesFromService:any[] = [];
         this.vulnService.dependencies$.subscribe((dependencies:any[]) => {
@@ -130,6 +132,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
        this.showFeedback('Cpe Name Not valid.');
        return;
     }
+    console.log(this.saveDependencyHintEndpoint)
     const params = new HttpParams().set('cpeName', cpeName);
     this.http.post<any>(
       this.saveDependencyHintEndpoint,
