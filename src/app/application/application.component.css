@@ -63,12 +63,6 @@
     max-height: 25px;
     padding-left: 4px;
 }
-.dash-theme{
-    background-color: #833AB4 !important;   
-}
-#app-detail-table thead{
-    background-color: #833AB4 !important;
-}
 #app-detail-table thead th {
     padding: 10px 0 10px 5px;
     font-weight: 500;
@@ -102,18 +96,12 @@
   width: 42px;
   height: 40px;
 }
-.dash-theme{
-    background-color: #833AB4 !important;   
-}
 .full-width {
   width: 100%;
 }
 
 .table-wrapper {
   overflow-x: auto;
-}
-.border-theme {
-  border: 5px solid #833AB4 !important;
 }
 @media (max-width: 768px) {
   .mat-table,
@@ -156,10 +144,6 @@
 ::ng-deep .custom-dialog-backdrop {
   background-color: rgba(0, 0, 0, 0.4);
 }
-::ng-deep .dialog-title {
-    color: white;
-    background-color: #833AB4 !important;
-}
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
@@ -174,10 +158,6 @@
 .appform-table {
   width: 100%;
   border-collapse: collapse;
-}
-.appform-table th{
-    color: white;
-    background-color: #833AB4 !important;
 }
 .appform-table th,
 .appform-table td {

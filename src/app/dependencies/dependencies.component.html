@@ -11,7 +11,7 @@
   </div>
 </div>
 <table #table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
-class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
+class="dep-table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
     <thead>
         <tr>
             <th>Dependency Name</th> 
@@ -25,9 +25,6 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
             <td><a  [innerHTML]="dependency.dependencyName | highlight:searchTerm" [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="cursor-pointer" (click)="handleDependency(dependency, i)"></a>
             &nbsp;&nbsp;<span *ngIf="dependency.vulnerabilities?.length > 0" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
             <span *ngIf="dependency.likelyCPEs?.length > 0" class="text-primary fw-bold">[{{dependency.likelyCPEs?.length}}]</span></td>
-            <!-- <td>{{dependency.cpeEnumeration?.vendor | highlight:searchTerm}}</td>
-            <td>{{dependency.cpeEnumeration?.product | highlight:searchTerm}}</td>
-            <td>{{dependency.cpeEnumeration?.version | highlight:searchTerm}}</td> -->
             <td [innerHTML]="dependency.cpeEnumeration?.vendor | highlight:searchTerm"></td>
             <td [innerHTML]="dependency.cpeEnumeration?.product | highlight:searchTerm"></td>
             <td [innerHTML]="dependency.cpeEnumeration?.version | highlight:searchTerm"></td>

@@ -193,64 +193,6 @@ previousPage(): void {
    this.paginationService.setCpePageSize(this.pageSize);
    this.updatePagedData(this.pageIndex);
    }
- async addDependencyHint(cpeName: string): Promise<void> {
-    this.dialogRef = this.dialog.open(this.confirmDialog);
-      const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
-      if (!confirmed) return;
-    if (!cpeName || cpeName.trim() === '') {
-      this.snackBar.open('CPE Name cannot be empty.', 'Dismiss', { duration: 5000, panelClass: ['snackbar-warning'] });
-      console.warn('Attempted to add dependency hint with empty CPE name.');
-      return;
-    }
-    const dependencyHintPayload: DependencyData | null = this.vulnService.getDependencyHint();
-    console.log('Dependency Hint Payload:', dependencyHintPayload);
-    if (!dependencyHintPayload) {
-      this.snackBar.open('No dependency hint data found to send.', 'Dismiss', { duration: 5000, panelClass: ['snackbar-warning'] });
-      console.warn('Aborting request: No dependency hint data available.');
-      return;
-    }
-    this.isLoading = true;
-    const params = new HttpParams().set('cpeName', cpeName);
-    this.http.post<any>(
-      this.saveDependencyHintEndpoint,
-      dependencyHintPayload,       
-      { params: params }     
-    ).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.error('Error occurred while adding dependency hint:', error);
-        let userMessage = 'An unexpected error occurred.';
-        if (error.error instanceof ErrorEvent) {
-          userMessage = `Network Error: ${error.error.message}`;
-          console.error('Client-side or network error:', error.error.message);
-        } else {
-          console.error(`Backend returned code ${error.status}, body was: `, error.error);
-          if (error.status >= 400 && error.status < 500) {
-            userMessage = `Failed to add dependency hint: ${error.statusText || 'Bad Request'}`;
-            if (error.error && error.error.message) {
-              userMessage = `Failed to add dependency hint: ${error.error.message}`;
-            }
-          } else if (error.status >= 500) {
-            userMessage = `Server Error: Please try again later.`;
-          }
-        }
-        this.snackBar.open(userMessage, 'Dismiss', { duration: 5000 });
-        return throwError(() => new Error(userMessage));
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
-    ).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        console.log('Dependency hint added successfully:', response);
-        this.snackBar.open('Dependency hint added successfully!', 'Dismiss', { duration: 5000 });
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Subscription error (already handled by catchError):', err);
-      }
-    });
-  }
 
    goBack() {
     this.location.back()

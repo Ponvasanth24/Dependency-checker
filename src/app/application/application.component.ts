@@ -98,14 +98,15 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
+ngOnInit(): void {
     this.computer = this.vulnSyncService.getComputerData();
     console.log(this.computer);
     this.computerUuid = this.computer?.uuid;
     if(!this.isExistComputrtId()) return;
     this.storedApplicationData = this.computer.applications;
     this.fetchApplicationData();
-  }
+}
+
 ngAfterViewInit(): void {
 this.sort.sortChange.subscribe(sort => {
     this.sortActive = sort.active;
@@ -114,12 +115,13 @@ this.sort.sortChange.subscribe(sort => {
   });
    this.vulnSyncService.setLoading(false);
    this.cd.detectChanges();
- }
-  ngOnDestroy(): void {
-    clearInterval(this.successInterval);
-  }
+}
 
-  fetchApplicationData(): void {
+ngOnDestroy(): void {
+    clearInterval(this.successInterval);
+}
+
+fetchApplicationData(): void {
     if(!this.isExistComputrtId()) return;
     this.isLoading = true;
     let params = {computerUuid:this.computerUuid ? this.computerUuid : ""};
@@ -173,7 +175,7 @@ this.sort.sortChange.subscribe(sort => {
   }
   updatePagedData(initialIndex: number): void {
   this.pageIndex = initialIndex;
-  const totalItems = this.storedApplicationData.length;
+  const totalItems = this.storedApplicationData?.length || 0;
   this.totalPages = Math.ceil(totalItems / this.pageSize);
   this.start = initialIndex * this.pageSize;
   this.end = this.start + this.pageSize;

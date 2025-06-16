@@ -40,7 +40,7 @@ import { Sort } from '@angular/material/sort';
 import { NgZone } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
-
+import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 @Component({
   selector: 'app-computer',
   standalone: true,
@@ -65,8 +65,6 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   isTableLoading: boolean = false;
   computerForm!: FormGroup;
   updateComputerForm!: FormGroup;
-  successMessage: string = '';
-  errorMessage: string = '';
   successInterval: any = 0;
   proggWidth = 100;
   storedComputerData: Computer[] = [];
@@ -81,10 +79,9 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   pagedComputerData: any[] = [];
   selectedComputerId: number | null = null;
   computerData: string = '';
+  successMessage: string = '';
+  errorMessage: string = '';
   
-  @ViewChild('successToast') successToast!: ElementRef;
-  @ViewChild('errorToast') errorToast!: ElementRef;
-  @ViewChild('succToastProgress') succToastProgress!: ElementRef;
   @ViewChild('updateDialog') updateDialog!: TemplateRef<any>;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
   @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
@@ -102,7 +99,6 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     'action',
   ];
 
-  private bootstrap = (window as any).bootstrap;
   snackBar: MatSnackBar;
   constructor(
     private fb: FormBuilder,
@@ -113,7 +109,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     private dialog: MatDialog,
     snackBar: MatSnackBar,
     private router: Router, matIconRegistry: MatIconRegistry, sanitizer: DomSanitizer,
-    private vulnSyncService: VulnerabilitySyncService, private ngZone: NgZone
+    private vulnSyncService: VulnerabilitySyncService, private ngZone: NgZone,
+    private vulnSyncDash: VulnerabilitysyncdashboardComponent
   ) {
     matIconRegistry.registerFontClassAlias('material-symbols-outlined');
     matIconRegistry.setDefaultFontSetClass('material-icons');
@@ -191,7 +188,7 @@ openDialog() {
   }
   addComputerData() {
     if (this.computerForm.invalid) {
-      this.showToast('Make sure all fields are filled correctly', 'error');
+      this.vulnSyncDash.showToast('Make sure all fields are filled correctly', 'error');
       return;
     }
     this.vulnSyncService.setLoading(true);
@@ -205,14 +202,14 @@ openDialog() {
           console.log(response);
           let successMessage = 'Computer data added successfully';
           this.computerForm.reset();
-          this.showToast(successMessage, 'success');
+          this.vulnSyncDash.showToast(successMessage, 'success');
           this.fetchComputerData();
           this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
           this.vulnSyncService.setLoading(false);
           let errorMessage = error.error.errorMessage || 'Check your internet connection';
-          this.showToast(errorMessage, 'error');
+          this.vulnSyncDash.showToast(errorMessage, 'error');
           console.log(error);
         },
       });
@@ -239,44 +236,6 @@ openDialog() {
   });
 
   this.updatePagedData(this.pageIndex);
-}
-
-  showToast(message: string, type: 'success' | 'error'): void {
-  if (type === 'success') {
-    this.successMessage = message;
-    if (this.successToast) {
-      const toastEl = this.successToast.nativeElement;
-      const toast = new this.bootstrap.Toast(toastEl, {
-        delay: 4000,
-        autohide: true,
-      });
-      toast.show();
-
-      toastEl.classList.add('slide-in-right');
-      toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
-      }, { once: true });
-    } else {
-      window.alert(this.successMessage);
-    }
-  } else if (type === 'error') {
-    this.errorMessage = message;
-    if (this.errorToast) {
-      const toastEl = this.errorToast.nativeElement;
-      const toast = new this.bootstrap.Toast(toastEl, {
-        delay: 4000,
-        autohide: true,
-      });
-      toast.show();
-
-      toastEl.classList.add('slide-in-right');
-      toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
-      }, { once: true });
-    } else {
-      window.alert(this.errorMessage);
-    }
-  }
 }
 
   nextPage(): void {
@@ -358,13 +317,13 @@ openDialog() {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         console.log('Updated computer data:', result);
-        this.showToast('Computer data updated successfully', 'success');
+        this.vulnSyncDash.showToast('Computer data updated successfully', 'success');
         this.fetchComputerData();
       } else if (result === 0) {
-        this.showToast('UUID not provided for update', 'error');
+        this.vulnSyncDash.showToast('UUID not provided for update', 'error');
       } else {
         result === false
-          ? this.showToast(
+          ? this.vulnSyncDash.showToast(
               'An error occurred while updating the computer',
               'error'
             )
@@ -398,7 +357,7 @@ openDialog() {
 
     dialogRef.afterClosed().subscribe((result) => {
      if (result === 2004) {
-        this.showToast('Computer not found', 'error');
+        this.vulnSyncDash.showToast('Computer not found', 'error');
       }
     });
   }
@@ -416,7 +375,7 @@ openDialog() {
       ).then((res) => {
         this.fetchComputerData();
         let successMessage = 'Computer data deleted successfully';
-        this.showToast(successMessage, 'success');
+        this.vulnSyncDash.showToast(successMessage, 'success');
       });
       console.log('Computer data deleted.');
     } catch (error) {

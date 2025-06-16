@@ -19,6 +19,8 @@ import { HighlightPipe } from '../../shared/HighlightSearch';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 import { filter } from 'rxjs';
 import { AppRoutes } from '../../shared/AppRoutes';
+import { CpeResolveComponent } from './cperesolve.component';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-dependencies',
   imports: [CommonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
@@ -47,7 +49,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     @ViewChild('depList') depList!: ElementRef;
     displayedColumns: string[] = ['dependencyName', 'vendor', 'product', 'version'];
     constructor(private vulnService:VulnerabilityService, private router: Router, private location:Location, private cd: ChangeDetectorRef,
-      private renderer: Renderer2, private paginationService: CVSSPaginationService
+      private renderer: Renderer2, private paginationService: CVSSPaginationService, private dialog: MatDialog
     ){}
 
     ngOnInit(): void {
@@ -59,12 +61,28 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       let dependenciesFromService:any[] = [];
       this.vulnService.dependencies$.subscribe((dependencies:any[]) => {
          dependenciesFromService = dependencies;
-         this.dependencies = depsFromSession.length > 0 ? depsFromSession : dependenciesFromService.length > 0 ? dependenciesFromService : [];
-         this.initialIndex = this.paginationService.getDepInitialIndex();
-         this.pageSize = this.paginationService.getDepPageSize();
-         this.initialIndex * this.pageSize < this.dependencies.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
-         this.updatePagedData(this.pageIndex);
       });
+      this.dependencies = depsFromSession.length > 0 ? depsFromSession : dependenciesFromService.length > 0 ? dependenciesFromService : [];
+      let LikelyCPEs = this.dependencies.reduce((acc: any, dep: any) => {
+          if(dep.likelyCPEs && dep.likelyCPEs.length > 0) {
+            acc.push(dep);
+          }
+          return acc;
+      }, []);
+      console.log(LikelyCPEs);
+       if(LikelyCPEs.length > 0 ) {
+          this.dialog.open(CpeResolveComponent, {
+            width: '95vw',
+            height: '90vh',
+            disableClose: true,
+            panelClass: ['cpe-resolve-dialog'],
+            data:{ dependencies: LikelyCPEs }
+          })
+        }   
+      this.initialIndex = this.paginationService.getDepInitialIndex();
+      this.pageSize = this.paginationService.getDepPageSize();
+      this.initialIndex * this.pageSize < this.dependencies.length ? this.pageIndex = this.initialIndex : this.pageIndex = 0;
+      this.updatePagedData(this.pageIndex);
       console.log(this.dependencies);
     }
     ngAfterViewInit(): void {
@@ -173,4 +191,6 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
    goBack(): void {
    this.location.back();
   }
+
+
 }

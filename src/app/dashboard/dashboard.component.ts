@@ -30,6 +30,12 @@ import { Subject, Subscription } from 'rxjs';
 import { AppRoutes } from '../../shared/AppRoutes';
 import { Observable, of } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { FlexLayoutModule } from '@angular/flex-layout';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -42,7 +48,12 @@ import { MatInputModule } from '@angular/material/input';
     RouterOutlet,
     MatFormFieldModule,
     MatSelectModule,
-    MatRadioModule, RouterModule ,MatInputModule
+    MatRadioModule, RouterModule ,MatInputModule, MatToolbarModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    MatMenuModule,
+    MatSidenavModule,
+    FlexLayoutModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -85,6 +96,7 @@ private searchTerms = new Subject<string>();
   @ViewChild('alertModal', { static: false }) alertModal!: ElementRef;
   @ViewChild('navBar') navBar!: ElementRef;
   @ViewChild('dashBoard') dashBoard!: ElementRef;
+  @ViewChild('navBarParent') navBarParent: ElementRef | undefined;
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -255,13 +267,7 @@ private showError(message: string): void {
     duration: 5000
   });
 }
-changeTheme(event: any) {
-    if (event.checked) {
-      this.renderer.addClass(document.body, 'dark-mode');
-    } else {
-      this.renderer.removeClass(document.body, 'dark-mode');
-    }
-  }
+
 private showFeedback(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
@@ -393,6 +399,8 @@ private showFeedback(message: string): void {
         this.paginationService.setCpePageSize(5);
         this.vulnService.setDependencies(data);
         sessionStorage.setItem('dependencies', JSON.stringify(data));
+        console.log(this.navBarParent)
+        this.navBarParent?.nativeElement.classList.remove('sticky-top');
         this.router.navigate([AppRoutes.DEPENDENCIES]);
         console.log('Final vulnerability data:', data);
         this.cd.detectChanges();
@@ -420,9 +428,9 @@ updateProgress(fetched: number, total: number) {
   }, 2100);
 }
 
-  // changeTheme(event: any): void {
-  //   this.vulnService.setDarkMode(event.target.checked);
-  // }
+  changeTheme(event: any): void {
+    this.vulnService.setDarkMode(event.target.checked);
+  }
   openScanModal() {
     let dependencies: any[] = [];
     const bootstrap = (window as any).bootstrap;
@@ -490,6 +498,8 @@ updateProgress(fetched: number, total: number) {
     }
   }
   viewScannedDependencies() {
+      console.log(this.navBarParent)
+        this.navBarParent?.nativeElement.classList.remove('sticky-top');
     this.router.navigate(['/dependencies']);
   }
   onFocus(event: Event) {

@@ -1,0 +1,107 @@
+<div class="border border-5 border-primary h-100">
+<div class="p-1">   
+<div class="alert alert-danger p-1">
+    <strong> Please Resolve the CPE Names:</strong> The following dependencies are missing valid CPE (Common Platform Enumeration) names.
+Please review the list below and do one of the following:
+
+1. Select the correct CPE name from the suggestions, or
+
+2. Enter the correct CPE name manually.
+
+Your input ensures accurate vulnerability analysis.
+</div>
+</div>
+<table *ngIf="dependencies.length > 0" [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}"
+class="table rounded border-secondary table-responsive-lg table-borderless table-striped mt-2">
+    <thead>
+        <tr>
+            <th>Dependency Name</th> 
+            <th class="text-nowrap">Resolved Status</th>
+            <th>Vendor</th>
+            <th>Product</th>
+            <th>Version</th>
+        </tr>
+    </thead>
+     <tbody>
+        <ng-container *ngFor="let dependency of pagedDependencies;let i = index">
+        <tr #dependencyRow [attr.data-id]="i">
+            <td>
+            <a data-bs-toggle="collapse" [attr.data-bs-target]="'#cpe_' + i" [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="text-wrap cursor-pointer">
+                {{ dependency.dependencyName }}
+            </a>
+            &nbsp;&nbsp;
+            <span *ngIf="dependency.vulnerabilities?.length > 0" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
+            <span *ngIf="dependency.likelyCPEs?.length > 0" class="text-primary fw-bold">[{{dependency.likelyCPEs?.length}}]</span>
+            </td>
+            <td class="text-success"> 
+            <div class="d-flex align-items-center fw-bold" *ngIf="dependency.cpeResolved"><span class="material-symbols-outlined text-success">add_task</span>&nbsp;&nbsp; Resolved</div></td>
+            <td>{{ dependency.cpeEnumeration?.vendor }}</td>
+            <td>{{ dependency.cpeEnumeration?.product }}</td>
+            <td>{{ dependency.cpeEnumeration?.version }}</td>
+        </tr>
+        <tr>
+        <td colspan="5">           
+        <table [id]="'cpe_' + i" *ngIf="!dependency.cpeResolved" class="table table-responsive collapse list-unstyled overflow-auto resolve-cpe-table">
+                <thead>
+                    <tr>
+                        <th>Likely CPE 
+                            <div class="fw-bold position-relative start-50 btn btn-outline-light border text-secondary h-fit-content" [id]="'cpe_div' + i" (mouseenter)="showManualInput(i)" (mouseleave)="hideManualInput(i)">Enter Manually</div></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cpe of dependency.likelyCPEs">
+                        <td>{{ cpe.cpe23Uri }}</td>
+                        <td>
+                            <mat-icon matTooltip="Add Hint" (click)="addDependencyHint(cpe.cpe23Uri, dependency)" class="material-symbols-outlined cursor-pointer text-success fs-3">post_add</mat-icon>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </td>
+            </tr> 
+        </ng-container>
+     </tbody>
+     <tfoot>
+      <tr>
+        <td colspan="4">
+        <div *ngIf="dependencies.length > 0" class="row justify-content-center height-fit-content">
+<div class="col-lg-7 d-flex justify-content-evenly align-items-center height-fit-content">
+  <mat-label class="text-nowrap custom-fw-1" [ngClass]="{'bg-dark': darkMode, 'bg-alice': darkMode, 'border-white': darkMode, 'border-dark': darkMode,'text-white': darkMode, 'text-dark': !darkMode}">Page Size</mat-label>
+  <mat-select class="border rounded page-size-width p-2" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" (selectionChange)="onPageSizeChange($event)" [(ngModel)]="pageSize">
+    <mat-option [ngClass]="{'bg-dark':darkMode, 'bg-white':!darkMode, 'text-white':darkMode, 'text-dark': !darkMode}" *ngFor="let size of pageSizes" [value]="size">
+      {{ size }}
+    </mat-option>
+  </mat-select>
+<span [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="custom-fw-1">{{start}} - {{end}} out of {{dependencies.length}} dependencies</span>
+
+<button (click)="previousPage()" [ngClass]="{'bg-white': darkMode, 'custom-app-grey': !darkMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm"> 
+<mat-icon class="material-symbols-outlined">
+arrow_back_ios
+</mat-icon>  
+</button>
+<button (click)="nextPage()" [ngClass]="{'bg-white': darkMode, 'custom-app-grey': !darkMode}" class="page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle shadow-sm">
+<mat-icon class="material-symbols-outlined">
+arrow_forward_ios
+</mat-icon>
+</button>
+</div>
+</div>
+
+
+        </td>
+      </tr>
+     </tfoot>
+</table>
+</div>
+
+<!-- Dialog Template -->
+<ng-template #confirmDialog>
+  <h6 class="bg-danger text-white ps-2 py-3">Add Hint</h6>
+  <mat-dialog-content>Are you sure you want to add this to dependency hint?</mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button class="btn btn-danger" (click)="dialogRef.close(false)">Cancel</button>
+    &nbsp;
+    <button class="btn btn-danger" (click)="dialogRef.close(true)">Confirm</button>
+  </mat-dialog-actions>
+</ng-template>

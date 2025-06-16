@@ -41,7 +41,7 @@
   <div class="table-wrapper rounded-2">
     <table class="mat-table bg-white full-width">
 
-      <thead>
+      <thead class="dash-theme text-white">
         <tr>
           <th>Dependency ID</th>
           <th>CVE ID *</th>
@@ -187,9 +187,9 @@
     <th mat-header-cell *matHeaderCellDef class="text-white">Action</th>
     <td mat-cell *matCellDef="let vulnerability" class="text-black-shade">
      <div class="d-flex">   
-      <mat-icon (click)="openUpdateDialog(vulnerability)" class="material-symbols-outlined cursor-pointer" matTooltip="Edit">edit_square</mat-icon>
+      <mat-icons (click)="openUpdateDialog(vulnerability)" class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 d-flex align-items-center" matTooltip="Edit">edit_square</mat-icons>
       &nbsp;&nbsp;&nbsp;
-      <mat-icon (click)="deleteVulnerabilityData(vulnerability.uuid)" class="material-symbols-outlined cursor-pointer" matTooltip="Delete">delete</mat-icon>
+      <mat-icons (click)="deleteVulnerabilityData(vulnerability.uuid)" class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 d-flex align-items-center" matTooltip="Delete">delete</mat-icons>
       </div>
     </td>
   </ng-container>
@@ -274,7 +274,7 @@ arrow_forward_ios
 <!---------------------------------------delete-confirm-toast------------------------------------>
 <!-- Dialog Template -->
 <ng-template #confirmDialog>
-  <h6 class="dialog-title ps-2 py-3">Delete</h6>
+  <h6 class="dash-theme text-white ps-2 py-3">Delete</h6>
   <mat-dialog-content>Are you sure you want to delete this vulnerability data?</mat-dialog-content>
   <mat-dialog-actions align="end">
     <button class="btn btn-gray-shade" (click)="dialogRef.close(false)">Cancel</button> 

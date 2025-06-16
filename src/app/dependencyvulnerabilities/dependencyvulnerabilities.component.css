@@ -58,12 +58,6 @@
     max-height: 25px;
     padding-left: 4px;
 }
-.dash-theme{
-    background-color: #833AB4 !important;   
-}
-#vul-detail-table thead{
-    background-color: rgba(3, 3, 48, 0.945) !important;
-}
 .btn-gray-shade {
     color: white;
     background-color: gray;
@@ -93,10 +87,6 @@
 ::ng-deep .custom-dialog-backdrop {
   background-color: rgba(0, 0, 0, 0.4);
 }
-::ng-deep .dialog-title {
-    color: white;
-    background-color: #833AB4 !important;
-}
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
@@ -111,11 +101,6 @@
 
 .table-wrapper {
   overflow-x: auto;
-}
-
-table.mat-table {
-  width: 100%;
-  border-collapse: collapse;
 }
 
 table.mat-table th,
@@ -157,13 +142,6 @@ table.mat-table td {
   .mat-form-field {
     width: 100%;
   }
-}
-
-
-table.mat-table thead {
-  color: white;  
-  background-color: #833AB4 !important;
-  font-weight: 600;
 }
 
 @keyframes reduceWidth {

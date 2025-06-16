@@ -1,12 +1,12 @@
 <div #dashBoard *ngIf="!isAnimate && !isLoading" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="container-flui w-100 pb-2">
 
     <!-------------------------------Top-Searchbar-start-------------------------------------->
-    <div class="container-fluid sticky-top mat-elevation-z2" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}">
+    <div #navBarParent class="container-fluid sticky-top mat-elevation-z2" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}">
     <div #navBar class="row justify-content-between red-padd p-2">
       <div class="col-lg-4">
       <div class="d-flex pt-2">  
       <img class="w-25 rounded isteer-logo" src="images/iSteer_logo.png" alt="isteer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-      <span class="h2 mt-2 dash-font" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}"><a [routerLink]="['/']" class="nav-link cursor-pointer">CVSS Dashboard</a></span>
+      <span class="h2 mt-2 dash-font" [ngClass]="{'text-warning': darkMode, 'text-primary': !darkMode}"><a [routerLink]="['/']" class="nav-link cursor-pointer fnw-bold">CVSS Dashboard</a></span>
       </div>
       </div>
 <!--------------------------------Search-section-start--------------------------------------------------->

@@ -14,6 +14,7 @@ export class DashboardcontentComponent implements OnInit{
      constructor (private vulnService: VulnerabilityService, ) {}
      ngOnInit(): void {
       this.vulnService.getDarkMode().subscribe((mode: boolean) => {
+        console.log('Dark mode status:', mode);
         this.darkMode = mode;
       }); 
      }
