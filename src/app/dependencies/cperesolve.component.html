@@ -45,7 +45,9 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
                 <thead>
                     <tr>
                         <th>Likely CPE 
-                            <div class="fw-bold position-relative start-50 btn btn-outline-light border text-secondary h-fit-content" [id]="'cpe_div' + i" (mouseenter)="showManualInput(i)" (mouseleave)="hideManualInput(i)">Enter Manually</div></th>
+                            <div class="fw-bold position-relative start-50 btn btn-outline-light border text-secondary h-fit-content p-2" [id]="'cpe_div' + i" (mouseenter)="showManualInput(i)">Enter Manually
+                                <button class="btn btn-close float-end mb-1" (click)="hideManualInput(i)"></button>
+                            </div></th>
                         <th>Action</th>
                     </tr>
                 </thead>

@@ -82,8 +82,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   private destroy$ = new Subject<void>();
   searchQuery: string = '';
   searchResults: any[] = [];
-private searchTerms = new Subject<string>();
-  regex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
+  private searchTerms = new Subject<string>();
+  
+  cpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(:\*){7}$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
   searchTypes = [
@@ -123,6 +124,11 @@ private searchTerms = new Subject<string>();
     this.vulnService.portNumber$.subscribe((port:number)=>{
       this.portNumber = port;
     });
+    this.vulnService.isNavbarSticky$.subscribe((condition: boolean)=> {
+      if(condition) {
+      this.navBarParent?.nativeElement.classList.remove('sticky-top');
+      }
+    })
     sessionStorage.removeItem('selectedCpeIndex');
     sessionStorage.removeItem('selectedDependencyIndex');
   }
@@ -192,7 +198,7 @@ fetchData(term: string): Observable<any[]> {
           }
           break;
         case 3:
-          if (this.regex.test(this.searchValue)) {
+          if (this.cpeRegex.test(this.searchValue)) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}`;
             this.navigationUrl = AppRoutes.VULNERABILITY_LIST;
             this.paginationService.setVulInitialIndex(0);
@@ -399,8 +405,6 @@ private showFeedback(message: string): void {
         this.paginationService.setCpePageSize(5);
         this.vulnService.setDependencies(data);
         sessionStorage.setItem('dependencies', JSON.stringify(data));
-        console.log(this.navBarParent)
-        this.navBarParent?.nativeElement.classList.remove('sticky-top');
         this.router.navigate([AppRoutes.DEPENDENCIES]);
         console.log('Final vulnerability data:', data);
         this.cd.detectChanges();
@@ -498,8 +502,7 @@ updateProgress(fetched: number, total: number) {
     }
   }
   viewScannedDependencies() {
-      console.log(this.navBarParent)
-        this.navBarParent?.nativeElement.classList.remove('sticky-top');
+    this.vulnService.setIsStickyNavbar(true);
     this.router.navigate(['/dependencies']);
   }
   onFocus(event: Event) {

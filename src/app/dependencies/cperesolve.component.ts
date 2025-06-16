@@ -15,7 +15,7 @@ import { HttpParams, HttpClient, HttpErrorResponse } from "@angular/common/http"
 import { LikelyCPE } from "../../CVSS_Models/CvssModels";
 import { environment } from "../../environments/environments";
 import { MatDialogModule } from '@angular/material/dialog';
-
+import { MatSnackBar } from "@angular/material/snack-bar";
 @Component({
     selector: 'app-cperesolve',
     standalone: true,
@@ -42,12 +42,13 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     baseUrl: string = '';
     portNumber: number = 8080;
     saveDependencyHintEndpoint: string = '';
-
+    cpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+:(\*|[^:]+)(:\*){6}$/;
+    
     @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
 
     constructor(public dialogRef: MatDialogRef<CpeResolveComponent>,
                 @Inject(MAT_DIALOG_DATA) public data: any, private vulnService: VulnerabilityService,
-            private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient) {
+            private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient, private snackBar: MatSnackBar) {
         this.dependencies = data.dependencies || [];
         console.log(data)
         this.updatePagedData(this.initialIndex);
@@ -56,6 +57,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
           }
 
     ngOnInit(): void {
+    
       this.vulnService.darkMode$.subscribe((mode: boolean) => {
       this.darkMode = mode;
     });
@@ -82,6 +84,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+      this.vulnService.setIsStickyNavbar(true);
     }
 
      nextPage(): void {
@@ -123,6 +126,10 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     this.dialogRef = this.dialog.open(this.confirmDialog);
       const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
       if (!confirmed) return;
+    if(!this.cpeRegex.test(cpeName)){
+       this.showFeedback('Cpe Name Not valid.');
+       return;
+    }
     const params = new HttpParams().set('cpeName', cpeName);
     this.http.post<any>(
       this.saveDependencyHintEndpoint,
@@ -169,7 +176,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     manualInput.type = 'text';
     manualInput.placeholder = 'Enter CPE Manually';
     manualInput.className = 'form-control';
-    submitButton.innerText = 'Submit';
+    submitButton.innerText = 'Add';
     submitButton.onclick = () => this.addDependencyHint(manualInput.value.trim(), this.pagedDependencies[i]);
     submitButton.className = 'btn btn-danger ms-2';
 
@@ -177,11 +184,11 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     console.log(cpeTable?.classList)
     cpeTable?.classList.remove('start-50');
     cpeTable?.classList.add('w-75');
-    if (cpeTable) {
+    if (cpeTable?.children.length! === 1) {
       manualCpeParent.appendChild(manualInput);
       manualCpeParent.appendChild(submitButton);
 
-      cpeTable.appendChild(manualCpeParent);
+      cpeTable?.appendChild(manualCpeParent);
       document.querySelector('.manual-cpe')?.classList.add('manual-cpe-box');
     }
   }
@@ -195,4 +202,10 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
       cpeTable.removeChild(manualCpeParent);
     }
   }
+
+  private showFeedback(message: string): void {
+  this.snackBar.open(message, 'Dismiss', {
+    duration: 5000
+  });
+}
 }

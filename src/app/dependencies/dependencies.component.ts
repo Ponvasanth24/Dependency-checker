@@ -42,6 +42,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
     start:number = 0;
     end:number = 0;
     searchTerm: string = '';
+    
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild('noDependency') noDependency!: ElementRef;
     @ViewChildren('dependencyRow') dependencyRows!: QueryList<ElementRef>;
@@ -191,6 +192,4 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
    goBack(): void {
    this.location.back();
   }
-
-
 }
