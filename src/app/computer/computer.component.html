@@ -1,6 +1,6 @@
 <div>
   <span class="h5 text-secondary">Add Computer Details</span>
-  <form [formGroup]="computerForm" class="mt-2 rounded-2">
+  <!-- <form [formGroup]="computerForm" class="mt-2 rounded-2">
     <div class="table-wrapper rounded-2 table-shadow">
       <table class="compform-table bg-white">
         <thead class="dash-theme text-white">
@@ -86,14 +86,180 @@
         </tfoot>
       </table>
     </div>
-  </form>
+  </form> -->
+<form [formGroup]="deviceForm" class="mt-3">
+  <div class="table-wrapper table-shadow rounded-2">
+    <table class="compform-table bg-white">
+      <thead class="dash-theme text-white">
+        <tr>
+          <th>Device ID *</th>
+          <th>Machine Name *</th>
+          <th>IP Address *</th>
+          <th>OS Version *</th>
+          <th>Antivirus Status *</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="deviceId" placeholder="Device ID" />
+              <mat-error *ngIf="deviceForm.get('deviceId')?.hasError('required')">
+                Required
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="machineName" placeholder="Machine Name" />
+              <mat-error *ngIf="deviceForm.get('machineName')?.hasError('required')">
+                Required
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="ipAddress" placeholder="IP Address" />
+              <mat-error *ngIf="deviceForm.get('ipAddress')?.hasError('required')">
+                Required
+              </mat-error>
+              <mat-error *ngIf="deviceForm.get('ipAddress')?.hasError('pattern')">
+                Invalid IP format
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="osVersion" placeholder="OS Version" />
+              <mat-error *ngIf="deviceForm.get('osVersion')?.hasError('required')">
+                Required
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput formControlName="antivirusStatus" placeholder="Antivirus Status" />
+              <mat-error *ngIf="deviceForm.get('antivirusStatus')?.hasError('required')">
+                Required
+              </mat-error>
+            </mat-form-field>
+          </td>
+        </tr>
+      </tbody>
+      <thead class="dash-theme text-white">
+        <tr>
+          <th>Firewall Status *</th>
+          <th>Last Update Check</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+            <tr>
+              <td>
+            <mat-form-field class="full-width" appearance="fill">
+              <input matInput formControlName="firewallStatus" placeholder="Firewall Status">
+              <mat-error *ngIf="deviceForm.get('firewallStatus')?.hasError('required')">
+                Required
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+            <input matInput [matDatepicker]="picker" placeholder="Last Update Check" (dateChange)="onDateChange($event.value, 'lastUpdateCheck')" formControlName="lastUpdateCheck" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="deviceForm.get('lastUpdateCheck')?.hasError('required')">
+            Required
+            </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+  <mat-form-field appearance="fill" class="full-width">
+  <input matInput [matDatepicker]="timestampPicker" readonly formControlName="timestamp"
+    placeholder="Select Timestamp" (dateChange)="onDateChange($event.value, 'timestamp')"
+    [disabled]="true" /> 
+  <mat-datepicker-toggle matSuffix [for]="timestampPicker"></mat-datepicker-toggle>
+  <mat-datepicker #timestampPicker></mat-datepicker>
+  <mat-error *ngIf="deviceForm.get('timestamp')?.hasError('required')">
+    Timestamp is required
+  </mat-error>
+</mat-form-field>
+          </td>
+            </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Installed Software Sub-table -->
+  <div class="mt-4 rounded-2">
+    <span class="mb-2 h5 text-secondary">Installed Software</span>
+    <div class="table-wrapper table-shadow rounded-2 mt-2">
+    <table class="compform-table bg-white">
+      <thead class="dash-theme text-white">
+        <tr>
+          <th>Software Name *</th>
+          <th>Version *</th>
+          <th>Installed Date *</th>
+          <th>Vendor Name *</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="installedSoftware">
+        <tr *ngFor="let software of installedSoftware.controls; let i = index; let last = last" [formGroupName]="i">
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput placeholder="Software Name" formControlName="name" />
+              <mat-error *ngIf="software.get('name')?.hasError('required')">Required</mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput placeholder="Version" formControlName="version" />
+              <mat-error *ngIf="software.get('version')?.hasError('required')">Required</mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+            <input matInput [matDatepicker]="picker" (dateChange)="onSoftwareDateChange($event.value, i)" placeholder="Installed Date" formControlName="InstalledDate" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="software.get('InstalledDate')?.touched && software.get('InstalledDate')?.hasError('required')">
+             Required
+            </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput placeholder="Vendor Name" formControlName="VendorName" />
+              <mat-error *ngIf="software.get('VendorName')?.hasError('required')">Required</mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <button mat-icon-button type="button" (click)="removeSoftware(i)">
+              <mat-icon class="material-symbols-outlined" matTooltip="Remove">delete</mat-icon>
+            </button> &nbsp;&nbsp;
+            <button *ngIf="last" mat-icon-button type="button" (click)="addSoftware()"> 
+              <mat-icon class="material-symbols-outlined" matTooltip="Add Software">add_circle</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center mt-4">
+    <button class="text-white btn btn-secondary" type="button" (click)="addComputerData()" [disabled]="deviceForm.invalid">
+      Add Machine
+    </button>
+  </div>
+  </div>
+</form>
 
 </div>
 
 <div class="mt-3">
   <div class="d-flex justify-content-between">
-    <span class="text-secondary h5">Computer Details</span>
-    <button class="btn btn-secondary me-2" (click)="openDialog()">Add Computer</button>
+    <span class="h5 text-secondary">Computer Details</span>
     <div class="text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedComputerData.length}}</div>
   </div>
 
@@ -102,39 +268,51 @@
 
       <ng-container matColumnDef="ipAddress">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Ip Address</th>
-        <td mat-cell *matCellDef="let computer" class="text-theme-color">{{computer.ipAddress}}</td>
+        <td mat-cell *matCellDef="let computer" class="fnw-bold">{{computer.ipAddress}}</td>
       </ng-container>
 
       <ng-container matColumnDef="hostname">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Host Name</th>
-        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.hostName}}</td>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.hostname}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="osName">
+      <!-- <ng-container matColumnDef="osName">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Name</th>
         <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.osName}}</td>
-      </ng-container>
+      </ng-container> -->
 
       <ng-container matColumnDef="osVersion">
         <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Version</th>
         <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.osVersion}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="location">
-        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Location</th>
-        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.location}}</td>
+      <ng-container matColumnDef="antivirusStatus">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Antivirus Status</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.antivirusStatus}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created At</th>
+      <ng-container matColumnDef="firewallStatus">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Firewall Status</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.firewallStatus}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="loggedInUser">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Loggedin User</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.loggedInUser}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastUpdateCheck">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Last Update Check</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.lastUpdateCheck}}</td>
+      </ng-container>
+      <!-- <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Time Stamp</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.lastUpdateCheck}}</td>
+      </ng-container>
+       <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created AT</th>
         <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.createdAt}}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="updatedAt">
-        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Updated At</th>
-        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.updatedAt}}</td>
-      </ng-container>
-
+      </ng-container> -->
       <ng-container matColumnDef="active">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="active" class="text-white text-nowrap">Status</th>
         <td mat-cell *matCellDef="let computer">
@@ -260,20 +438,3 @@
 </ng-template>
 
 <!---------------------------------------delete-confirm-toast-end-------------------------------->
-
-<!-- Dialog Template -->
-<ng-template #dialogTemplate>
-  <h2 mat-dialog-title>Add Computer</h2>
-
-  <mat-dialog-content>
-    <mat-form-field appearance="fill" style="width: 100%;">
-      <mat-label>Computer Data</mat-label>
-      <textarea matInput [(ngModel)]="computerData" rows="5"></textarea>
-    </mat-form-field>
-  </mat-dialog-content>
-
-  <mat-dialog-actions align="end">
-    <button mat-button (click)="closeDialog()">Cancel</button>
-    <button mat-flat-button color="accent" (click)="submit()">Submit</button>
-  </mat-dialog-actions>
-</ng-template>

@@ -1,4 +1,4 @@
-<div class="border border-5 border-primary h-100">
+<div class="border border-5 border-primary h-100 overflow-auto">
 <div class="p-1">   
 <div class="alert alert-danger p-1">
     <strong> Please Resolve the CPE Names:</strong> The following dependencies are missing valid CPE (Common Platform Enumeration) names.
@@ -26,15 +26,16 @@ class="table rounded border-secondary table-responsive-lg table-borderless table
         <ng-container *ngFor="let dependency of pagedDependencies;let i = index">
         <tr #dependencyRow [attr.data-id]="i">
             <td>
-            <a data-bs-toggle="collapse" [attr.data-bs-target]="'#cpe_' + i" [ngClass]="{'fw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0}" class="text-wrap cursor-pointer">
+            <span data-bs-toggle="collapse" [attr.data-bs-target]="'#cpe_' + i" [ngClass]="{'fnw-bold': dependency.vulnerabilities?.length > 0 || dependency.likelyCPEs?.length > 0,'text-white': darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0, 'text-dark': !darkMode && dependency.vulnerabilities?.length === 0 && dependency.likelyCPEs.length === 0 || dependency.cpeResolved,'text-danger': dependency.vulnerabilities?.length > 0 && dependency.likelyCPEs.length === 0, 'text-primary': dependency.likelyCPEs.length > 0 && !dependency.cpeResolved}" class="text-wrap cursor-pointer">
                 {{ dependency.dependencyName }}
-            </a>
+            </span>
             &nbsp;&nbsp;
-            <span *ngIf="dependency.vulnerabilities?.length > 0" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
-            <span *ngIf="dependency.likelyCPEs?.length > 0" class="text-primary fw-bold">[{{dependency.likelyCPEs?.length}}]</span>
+            <span *ngIf="dependency.vulnerabilities?.length > 0 && !dependency.cpeResolved" class="text-danger fw-bold">[{{dependency.vulnerabilities?.length }}]</span>
+            <span *ngIf="dependency.likelyCPEs?.length > 0 && !dependency.cpeResolved" [ngClass]="{'text-primary': dependency.likelyCPEs.length > 0 && !dependency.cpeResolved}" class="fw-bold">[{{dependency.likelyCPEs?.length}}]</span>
             </td>
             <td class="text-success"> 
-            <div class="d-flex align-items-center fw-bold" *ngIf="dependency.cpeResolved"><span class="material-symbols-outlined text-success">add_task</span>&nbsp;&nbsp; Resolved</div></td>
+            <div class="d-flex align-items-center fw-bold" *ngIf="dependency.cpeResolved"><span class="material-symbols-outlined">add_task</span>&nbsp;&nbsp; Resolved</div>
+            </td>
             <td>{{ dependency.cpeEnumeration?.vendor }}</td>
             <td>{{ dependency.cpeEnumeration?.product }}</td>
             <td>{{ dependency.cpeEnumeration?.version }}</td>

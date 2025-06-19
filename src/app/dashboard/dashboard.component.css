@@ -135,7 +135,10 @@ border-bottom: 4px solid rgb(0, 119, 255);
 .search-title{
     margin-top: 6px;
 }
-
+.scanFile {
+    position: relative;
+    top:0;
+}
 @media (max-width: 768px) {
     .custom-db-col {
       width: 100% !important;

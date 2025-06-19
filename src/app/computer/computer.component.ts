@@ -12,7 +12,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -41,6 +41,8 @@ import { NgZone } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 @Component({
   selector: 'app-computer',
   standalone: true,
@@ -55,15 +57,20 @@ import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboa
     MatIconModule,
     MatDialogModule,
     MatTableModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule, MatSortModule
+    MatTooltipModule, MatNativeDateModule,
+    MatProgressSpinnerModule, MatSortModule, MatDatepickerModule
   ],
   templateUrl: './computer.component.html',
   styleUrl: './computer.component.css',
+  providers: [
+  { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },  // optional
+]
+
 })
 export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   isTableLoading: boolean = false;
   computerForm!: FormGroup;
+  deviceForm!: FormGroup;
   updateComputerForm!: FormGroup;
   successInterval: any = 0;
   proggWidth = 100;
@@ -90,11 +97,11 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   displayedColumns: string[] = [
     'ipAddress',
     'hostname',
-    'osName',
     'osVersion',
-    'location',
-    'createdAt',
-    'updatedAt',
+    'antivirusStatus',
+    'firewallStatus',
+    'loggedInUser',
+    'lastUpdateCheck',
     'active',
     'action',
   ];
@@ -130,21 +137,98 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
       osVersion: ['', [Validators.required]],
       location: ['', [Validators.required]],
     });
+
   }
 
   ngOnInit(): void {
     this.vulnSyncService.setLoading(true);
     this.fetchComputerData();
+    this.initForm();
   }
   ngAfterViewInit(): void {
     document.querySelectorAll('.menu-item')[0].classList.add('active-link');
     document.querySelectorAll('.icon')[0].classList.remove('icon-shadow');
     this.vulnSyncService.setLoading(false);
   }
+  initForm() {
+  this.deviceForm = this.fb.group({
+  deviceId: ['', Validators.required],
+  machineName: ['', Validators.required],
+  ipAddress: ['', [Validators.required, Validators.pattern(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)]],
+  osVersion: ['', Validators.required],
+  antivirusStatus: ['', Validators.required],
+  firewallStatus: ['', Validators.required],
+  loggedInUser: ['Muthukumar Ramasamy'],
+  installedSoftware: this.fb.array([
+    this.createSoftwareGroup()
+  ]),
+  lastUpdateCheck: [null, Validators.required],
+  timestamp: [new Date(), Validators.required]
+});
+
+  }
+  createSoftwareGroup(): FormGroup {
+    return this.fb.group({
+      name: ['', Validators.required],
+      version: ['', Validators.required],
+      InstalledDate: [null, Validators.required],
+      VendorName: ['', Validators.required]
+    });
+  }
+  onDateChange(date: Date, controlName: string): void {
+  const formatted = this.formatUTC(date);
+  this.deviceForm.get(controlName)?.setValue(formatted); 
+  }
+ onSoftwareDateChange(selectedDate: Date, index: number): void {
+  if (!selectedDate) {
+    return;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const selectedDateTime = new Date(selectedDate);
+  console.log(selectedDateTime)
+  selectedDateTime.setHours(0, 0, 0, 0); 
+  if (selectedDateTime.getTime() > today.getTime()) {
+    this.installedSoftware.at(index).get('InstalledDate')?.setValue(''); 
+    this.vulnSyncDash.showToast('Installed date cannot be in the future', 'error');
+    return;
+  }
+  }
+  
+
+formatDateTime(date: Date): string {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
+
+formatUTC(date: Date): string {
+  if (!date) return '';
+  return date.toISOString().split('.')[0] + 'Z'; // trims milliseconds
+}
+
+  get installedSoftware(): FormArray {
+    return this.deviceForm.get('installedSoftware') as FormArray;
+  }
+
+  addSoftware(): void {
+    this.installedSoftware.push(this.createSoftwareGroup());
+  }
+
+  removeSoftware(index: number): void {
+    if (this.installedSoftware.length > 1) {
+      this.installedSoftware.removeAt(index);
+    }
+  }
   
   fetchComputerData() {
     this.isTableLoading = true;
-    this.http.get<Computer[]>(vulnSyncEnvironments.getComputers).subscribe({
+    this.http.get<Computer[]>(vulnSyncEnvironments.computerCommonUrl).subscribe({
       next: (response) => {
         console.log(response);
         this.storedComputerData = response || [];
@@ -161,7 +245,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {}
-openDialog() {
+  openDialog() {
     this.dialogRef = this.dialog.open(this.dialogTemplate,{
       hasBackdrop: true,
       width: '50vw',
@@ -187,21 +271,24 @@ openDialog() {
     });
   }
   addComputerData() {
-    if (this.computerForm.invalid) {
+    if (this.deviceForm.invalid) {
       this.vulnSyncDash.showToast('Make sure all fields are filled correctly', 'error');
       return;
     }
+    let timestampDate = this.deviceForm.get('timestamp')?.value;
+    this.deviceForm.get('timestamp')?.setValue(this.formatUTC(timestampDate));
+    console.log(this.deviceForm.value);
     this.vulnSyncService.setLoading(true);
     this.http
       .post<any>(
         vulnSyncEnvironments.computerCommonUrl,
-        this.computerForm.value
+        this.deviceForm.value
       )
       .subscribe({
         next: (response) => {
           console.log(response);
           let successMessage = 'Computer data added successfully';
-          this.computerForm.reset();
+          this.deviceForm.reset()
           this.vulnSyncDash.showToast(successMessage, 'success');
           this.fetchComputerData();
           this.vulnSyncService.setLoading(false);
@@ -214,6 +301,7 @@ openDialog() {
         },
       });
   }
+
   sortData(sort: Sort) {
   const { active, direction } = sort;
   if (!active || direction === '') {
@@ -306,7 +394,7 @@ openDialog() {
 
     const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
       data: { computer, origin },
-      panelClass: 'animated-dialog-container',
+      panelClass: ['animated-dialog-container'],
       hasBackdrop: true,
       backdropClass: 'custom-backdrop',
       disableClose: true,

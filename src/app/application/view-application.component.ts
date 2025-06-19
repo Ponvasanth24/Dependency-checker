@@ -22,18 +22,18 @@ export class ViewApplicationDialogComponent {
   ngOnInit(): void {
      const applicationUuid = this.data.applicationUuid;
      const params = {applicationUuid}
-     this.http.get(vulnSyncEnvironments.getApplicationByUuid, { params })
+     this.http.get(`${vulnSyncEnvironments.applicationCommonUrl}/${applicationUuid}`)
       .subscribe({
         next: (response) => {
         console.log('fetch success:', response);
-        this.applicationData = [response]; 
+        this.applicationData = response || {}; 
         console.log(this.applicationData)
-        this.applicationData.forEach((application: any) => {
-        application.dependencies = Array.isArray(application.dependencies) ? application.dependencies : [];
-        application.dependencies.forEach((dependency: any) => {
-        dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
-    });
-    });
+    //     this.applicationData.forEach((application: any) => {
+    //     application.dependencies = Array.isArray(application.dependencies) ? application.dependencies : [];
+    //     application.dependencies.forEach((dependency: any) => {
+    //     dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
+    // });
+    // });
         },
         error: (err) => {
           console.error('fetch error:', err);

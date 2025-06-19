@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef, ViewChild, ElementRef,
-  AfterViewInit } from '@angular/core';
+  AfterViewInit, 
+  TemplateRef} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environments';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,12 +28,18 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ScanFileComponent } from './scan-file/scan-file.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FileUploadService } from '../services/DashboardService/file-upload.service';
+import { EventSourcePolyfill } from 'event-source-polyfill';
+import { MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [ MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent,
     RouterOutlet, MatFormFieldModule, MatSelectModule, MatRadioModule, RouterModule ,MatInputModule, MatToolbarModule,
-    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatSidenavModule, FlexLayoutModule,
+    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatSidenavModule, FlexLayoutModule, MatDialogModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -62,6 +69,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   searchQuery: string = '';
   searchResults: any[] = [];
   private searchTerms = new Subject<string>();
+  selectedFile: File | null = null;
+  scanUrl :string = '';
+  formData: FormData = new FormData();
   
   cpeRegex = /^cpe:\d+\.\d+:[aho]:([^:]+):([^:]+):([0-9]+\.[0-9]+(?:\.[0-9]+)(?:[-_a-zA-Z0-9.]+)?):([^:]):([^:]):([^:]):([^:]):([^:]):([^:]):([^:])$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
@@ -77,8 +87,12 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('navBar') navBar!: ElementRef;
   @ViewChild('dashBoard') dashBoard!: ElementRef;
   @ViewChild('navBarParent') navBarParent: ElementRef | undefined;
+  @ViewChild('scanDialog') scanDialog: TemplateRef<any> | undefined;
+  dialogRef: MatDialogRef<any> | undefined;
+ 
   constructor( private http: HttpClient, private router: Router, private vulnService: VulnerabilityService,
-    private ngZone: NgZone, private cd: ChangeDetectorRef, private snackBar: MatSnackBar, private renderer: Renderer2, private paginationService: CVSSPaginationService
+    private ngZone: NgZone, private cd: ChangeDetectorRef, private snackBar: MatSnackBar, private renderer: Renderer2, private paginationService: CVSSPaginationService,
+    private dialog: MatDialog, private fileUploadService: FileUploadService
   ) {}
 
   ngOnInit(): void {
@@ -132,7 +146,7 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.vulnService.setPortNumber(this.portNumber);
     this.vulnService.setPortNumberStatus(true);
   }
-fetchData(term: string): Observable<any[]> { 
+  fetchData(term: string): Observable<any[]> { 
     const url = `${this.searchUrl}${term}`;
     console.log('Fetching data for term:', term);
     return this.http.get<any[]>(url);
@@ -275,10 +289,34 @@ private showFeedback(message: string): void {
   isScanning = false;
   dependencies = [];
 
+onFileUpload(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const filename = file.name;
+    if (filename === 'pom.xml') {
+       this.formData.append('file', file);
+       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadPom}`;
+    } else if (filename === 'package.json') {
+       this.formData.append('packageJson', file);
+       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadNodePackage}`;
+    } else if (filename === 'package-lock.json') {
+       this.formData.append('packageLockJson', file);
+       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadNodePackage}`;
+    } else {
+      alert('Unsupported file. Upload pom.xml, package.json, or package-lock.json');
+    }
+  }
+
   startScan(): void {
+     if (this.dialogRef) {
+    this.dialogRef.close(); // ✅ Close the dialog before starting scan
+  }
     this.messages = [];
     this.isScanning = true;
     this.isAnimate = true;
+    this.fetchedDependencies = 0;
+    this.totalDependencies = 0;
     this.progressInterval = setInterval(()=>{
       if(this.progress < 100) this.progress++;
       else {
@@ -288,17 +326,59 @@ private showFeedback(message: string): void {
         this.showError("Unexpected error occured");
       }
     }, 1300);
+
     try {
-      const url = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
-      if (!url || !this.portNumber) {
-        throw new Error('Invalid URL or port number.');
-      }
-      this.eventSource = new EventSource(url);
-      this.eventSource.onmessage = (event) => {
+
+      // if (!this.scanUrl || !this.portNumber) {
+      //   throw new Error('Invalid URL or port number.');
+      // } 
+     let hasFiles = false;
+
+     for (const value of this.formData.values()) {
+     if (value instanceof File && value.name) {
+      hasFiles = true;
+      break;
+     }
+     }
+
+     if (hasFiles) {
+    fetch(this.scanUrl, {
+    method: 'POST',
+    body: this.formData
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Upload failed');
+      return response.text();
+    })
+    .then((res) => {
+       console.log(res)
+         this.ngZone.run(() => {
+            let data = {};
+            if (res !== 'Analysis completed') {
+              data = res;
+            }
+            this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
+            this.totalDependencies = (data as any)?.totalDependencies || 0;
+            this.updateProgress(
+              this.fetchedDependencies,
+              this.totalDependencies
+            );
+          });
+      })
+    .catch(err => {
+      console.error('Upload or SSE setup failed:', err);
+    });
+}
+
+     else {
+       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
+       this.eventSource = new EventSource(this.scanUrl);
+       this.eventSource.onmessage = (event) => {
         try {
           this.ngZone.run(() => {
             let data = {};
             if (event.data !== 'Analysis completed') {
+              console.log(event.data)
               data = JSON.parse(event.data);
             }
             this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
@@ -321,8 +401,7 @@ private showFeedback(message: string): void {
           this.showError('Unexpected error occured.');
         }
       };
-
-      this.eventSource.onerror = (error) => {
+       this.eventSource.onerror = (error) => {
         console.error('SSE error:', error);
         this.showError(`Please check if the server is running on port ${this.portNumber}`);
         this.isAnimate = false;
@@ -334,6 +413,8 @@ private showFeedback(message: string): void {
       this.eventSource.onopen = () => {
         this.messages.push('Connection established');
       };
+     }   
+     
     } catch (error: any) {
       console.error('Error:', error);
       this.vulnService.setAnimate(false);
@@ -346,6 +427,7 @@ private showFeedback(message: string): void {
       this.cd.detectChanges();
     }
   }
+
   stopSSE() {
     this.isAnimate = false;
     this.fetchedDependencies = 0;
@@ -429,22 +511,8 @@ updateProgress(fetched: number, total: number) {
         panelClass: ['snackbar-error'] });
       }
     } else {
-      if (bootstrap && bootstrap.Modal) {
-        this.ngZone.run(()=> {
-        setTimeout(()=>{
-        const scanModal = new bootstrap.Modal(
-        this.portNumberModal.nativeElement
-        );
-        scanModal.show();
-        }, 50);
-        })
-      } else {
-        console.error(
-          'Bootstrap Modal is not available. Make sure Bootstrap is loaded.'
-        );
-        this.snackBar.open('Bootstrap Modal is not available. Make sure Bootstrap is loaded.', 'Dismiss', { duration: 5000, 
-        panelClass: ['snackbar-error'] });
-      }
+        this.dialogRef = this.dialog.open(this.scanDialog!);
+        
     }
   }
   openNewScan() {

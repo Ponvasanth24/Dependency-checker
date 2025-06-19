@@ -27,20 +27,20 @@ export class ViewComputerDialogComponent implements OnInit {
      this.isLoading = true;
      const computerUuid = this.data.computerUuid;
      const params = {computerUuid}
-     this.http.get(vulnSyncEnvironments.getComputersByUuid, { params })
+     this.http.get(`${vulnSyncEnvironments.computerCommonUrl}/${computerUuid}`)
       .subscribe({
         next: (response) => {
-        this.computerData = [response]; 
-        console.log(this.computerData)
-        this.computerData.forEach((computer: any) => {
-        computer.applications = Array.isArray(computer.applications) ? computer.applications : [];
-        computer.applications.forEach((application: any) => {
-        application.dependencies = Array.isArray(application.dependencies) ? application.dependencies : [];
-        application.dependencies.forEach((dependency: any) => {
-        dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
-      });
-      });
-      });
+        this.computerData = response || {}; 
+        console.log(this.computerData.computer)
+      //   this.computerData.forEach((computer: any) => {
+      //   computer.applications = Array.isArray(computer.applications) ? computer.applications : [];
+      //   computer.applications.forEach((application: any) => {
+      //   application.dependencies = Array.isArray(application.dependencies) ? application.dependencies : [];
+      //   application.dependencies.forEach((dependency: any) => {
+      //   dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
+      // });
+      // });
+      // });
     this.isLoading = false;
       },
         error: (err) => {

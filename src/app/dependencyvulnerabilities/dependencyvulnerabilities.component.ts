@@ -24,7 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 @Component({
   selector: 'app-dependencyvulnerabilities',
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
@@ -82,7 +82,7 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
       private dialog: MatDialog,
       private snackBar: MatSnackBar,
       private route: ActivatedRoute,
-      private vulnSyncService: VulnerabilitySyncService
+      private vulnSyncService: VulnerabilitySyncService, private vulnSyncDash: VulnerabilitysyncdashboardComponent
     ) {
       this.vulnerabilityForm = this.fb.group({
         dependencyId:['', Validators.required],
@@ -122,7 +122,7 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
     }
     isExistDependencyId(): boolean {
     if (!this.dependencyId) {
-    this.showToast("DependencyId not found", 'error');
+    this.vulnSyncDash.showToast("DependencyId not found", 'error');
     return false;
     }
     return true;
@@ -130,7 +130,7 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
 
     addVulnerabilityData(): void {
       if (this.vulnerabilityForm.invalid) {
-        this.showToast("Make sure all fields are completed correctly", 'error');
+        this.vulnSyncDash.showToast("Make sure all fields are completed correctly", 'error');
         return;
       }
       this.vulnSyncService.setLoading(true);
@@ -149,12 +149,12 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
         next: (res) => {
           console.log(res);
           this.vulnerabilityForm.reset({dependencyId: this.vulnerabilityForm.get('dependencyId')?.value});
-          this.showToast("Vulnerability data added successfully", 'success');
+          this.vulnSyncDash.showToast("Vulnerability data added successfully", 'success');
           this.fetchVulnerabilityData();
           this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
-          this.showToast("Make sure all fields are filled correctly", 'error');
+          this.vulnSyncDash.showToast("Make sure all fields are filled correctly", 'error');
           console.error(error);
           this.vulnSyncService.setLoading(false);
         }
@@ -205,10 +205,10 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
   
       dialogRef.afterClosed().subscribe(result => {
         if(result) {
-          this.showToast("Application data updated successfully", 'success');
+          this.vulnSyncDash.showToast("Application data updated successfully", 'success');
           this.fetchVulnerabilityData();
         } else {
-          result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
+          result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error') : "";
         }
       })
     }
@@ -222,48 +222,10 @@ export class DependencyvulnerabilitiesComponent implements OnInit, AfterViewInit
           params: { vulnerabilityUuid: vulnerabilityId }
         }));
         this.fetchVulnerabilityData();
-        this.showToast("Application data deleted successfully", 'success');
+        this.vulnSyncDash.showToast("Application data deleted successfully", 'success');
       } catch (error) {
         console.error('Error deleting application data:', error);
       }
     }
-  
-showToast(message: string, type: 'success' | 'error'): void {
-  if (type === 'success') {
-    this.successMessage = message;
-    if (this.successToast) {
-      const toastEl = this.successToast.nativeElement;
-      const toast = new this.bootstrap.Toast(toastEl, {
-        delay: 4000,
-        autohide: true,
-      });
-      toast.show();
-
-      toastEl.classList.add('slide-in-right');
-      toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
-      }, { once: true });
-    } else {
-      window.alert(this.successMessage);
-    }
-  } else if (type === 'error') {
-    this.errorMessage = message;
-    if (this.errorToast) {
-      const toastEl = this.errorToast.nativeElement;
-      const toast = new this.bootstrap.Toast(toastEl, {
-        delay: 4000,
-        autohide: true,
-      });
-      toast.show();
-
-      toastEl.classList.add('slide-in-right');
-      toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
-      }, { once: true });
-    } else {
-      window.alert(this.errorMessage);
-    }
-  }
-}
 
 }

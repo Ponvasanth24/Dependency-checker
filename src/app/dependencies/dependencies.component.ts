@@ -82,13 +82,13 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       }, []);
       console.log(resolvedCount);
        if(LikelyCPEs.length > 0 && LikelyCPEs.length !== resolvedCount) {
-          this.dialog.open(CpeResolveComponent, {
+         const dialogRef = this.dialog.open(CpeResolveComponent, {
             width: '95vw',
             height: '90vh',
             disableClose: true,
             panelClass: ['cpe-resolve-dialog'],
             data:{ dependencies: LikelyCPEs }
-          })
+          });
         }   
       this.initialIndex = this.paginationService.getDepInitialIndex();
       this.pageSize = this.paginationService.getDepPageSize();

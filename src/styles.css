@@ -165,7 +165,7 @@ body.dark-mode {
 
 .border-theme {
   /* border: 5px solid #833AB4 !important; */
-  border: 5px solid rgba(27, 138, 212, 0.945);
+  border: 5px solid rgb(3, 86, 141) !important;
 }
 .common-border {
   /* border: 2px solid #833AB4 !important; */
@@ -231,7 +231,9 @@ body.dark-mode {
     height: 5px;
     animation: reduceWidth 5s forwards;
 }
-
+.fnw-bold{
+  font-weight: 600 !important;
+}
 @keyframes reduceWidth {
     from {
         width: 100%;

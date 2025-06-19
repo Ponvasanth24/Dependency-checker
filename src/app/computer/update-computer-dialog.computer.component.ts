@@ -44,20 +44,22 @@ export class UpdateComputerDialogComponent {
   ) {
     this.updateComputerForm = this.fb.group({
       ipAddress: ['', Validators.required],
+      machineName: ['', Validators.required],
       hostName: ['', Validators.required],
-      osName: ['', Validators.required],
       osVersion: ['', Validators.required],
-      location: ['', Validators.required],
+      antivirusStatus: ['', Validators.required],
+      firewallStatus:['', Validators.required]
     });
   }
   ngOnInit(): void {
     if (this.data && this.data.computer) {
       this.updateComputerForm.patchValue({
         ipAddress: this.data.computer.ipAddress,
-        hostName: this.data.computer.hostName,
-        osName: this.data.computer.osName,
+        machineName: this.data.computer.machineName,
+        hostName: this.data.computer.hostname,
         osVersion: this.data.computer.osVersion,
-        location: this.data.computer.location,
+        antivirusStatus: this.data.computer.antivirusStatus,
+        firewallStatus: this.data.computer.firewallStatus
       });
     }
     const origin = this.data.origin;

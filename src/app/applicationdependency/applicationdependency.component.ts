@@ -23,6 +23,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ViewDependencyDialogComponent } from './view-dependency.component';
+import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 
 @Component({
   selector: 'app-applicationdependency',
@@ -70,7 +71,8 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
   private bootstrap = (window as any).bootstrap;
   snackBar: MatSnackBar;
   constructor(private fb: FormBuilder, private http: HttpClient, private renderer: Renderer2, private cd: ChangeDetectorRef, private destroyRef: DestroyRef,
-    private dialog: MatDialog, snackBar: MatSnackBar, private router: Router, private vulnSyncService: VulnerabilitySyncService
+    private dialog: MatDialog, snackBar: MatSnackBar, private router: Router, private vulnSyncService: VulnerabilitySyncService,
+    private vulnSyncDash: VulnerabilitysyncdashboardComponent
   ) {
     this.snackBar = snackBar;
     this.dependencyForm = this.fb.group({
@@ -115,7 +117,7 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
   }
   isExistApplicationId(): boolean {
     if (!this.applicationId) {
-      this.showToast("ApplicationId not found", 'error');
+      this.vulnSyncDash.showToast("ApplicationId not found", 'error');
       return false;
     }
     return true;
@@ -123,7 +125,7 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
 
   addDependencyData() {
     if (this.dependencyForm.invalid) {
-      this.showToast("Make sure all fields are filled correctly", 'error');
+      this.vulnSyncDash.showToast("Make sure all fields are filled correctly", 'error');
       return;
     }
     this.vulnSyncService.setLoading(true);
@@ -134,55 +136,18 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
         console.log(response);
         let successMessage = "Computer data added successfully";
         this.dependencyForm.reset({ applicationId: this.dependencyForm.get('applicationId')?.value });
-        this.showToast(successMessage, 'success');
+        this.vulnSyncDash.showToast(successMessage, 'success');
         this.fetchDependencyData();
         this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
         let errorMessage = "Make sure all fields are filled correctly";
-        this.showToast(errorMessage, 'error');
+        this.vulnSyncDash.showToast(errorMessage, 'error');
         console.log(error);
         this.vulnSyncService.setLoading(false);
       }
     });
   }
-showToast(message: string, type: 'success' | 'error'): void {
-  if (type === 'success') {
-    this.successMessage = message;
-    if (this.successToast) {
-      const toastEl = this.successToast.nativeElement;
-      const toast = new this.bootstrap.Toast(toastEl, {
-        delay: 4000,
-        autohide: true,
-      });
-      toast.show();
-
-      toastEl.classList.add('slide-in-right');
-      toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
-      }, { once: true });
-    } else {
-      window.alert(this.successMessage);
-    }
-  } else if (type === 'error') {
-    this.errorMessage = message;
-    if (this.errorToast) {
-      const toastEl = this.errorToast.nativeElement;
-      const toast = new this.bootstrap.Toast(toastEl, {
-        delay: 4000,
-        autohide: true,
-      });
-      toast.show();
-
-      toastEl.classList.add('slide-in-right');
-      toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
-      }, { once: true });
-    } else {
-      window.alert(this.errorMessage);
-    }
-  }
-}
 
   nextPage(): void {
     if (this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
@@ -229,10 +194,10 @@ showToast(message: string, type: 'success' | 'error'): void {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Updated dependency data:', result);
-        this.showToast('Dependency data updated successfully', 'success');
+        this.vulnSyncDash.showToast('Dependency data updated successfully', 'success');
         this.fetchDependencyData();
       } else {
-        result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
+        result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error') : "";
         console.log('Update dialog was closed without saving.');
       }
     });
@@ -271,7 +236,7 @@ showToast(message: string, type: 'success' | 'error'): void {
       ).then((res) => {
         this.fetchDependencyData();
         let successMessage = "Dependency data deleted successfully";
-        this.showToast(successMessage, 'success');
+        this.vulnSyncDash.showToast(successMessage, 'success');
       });
       console.log('Dependency data deleted.');
     } catch (error) {

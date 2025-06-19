@@ -49,12 +49,11 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
 
     constructor(public dialogRef: MatDialogRef<CpeResolveComponent>, public cpeResolveRef: MatDialogRef<CpeResolveComponent>,
-                @Inject(MAT_DIALOG_DATA) public data: any, private vulnService: VulnerabilityService,
-            private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient, private snackBar: MatSnackBar) {
+        @Inject(MAT_DIALOG_DATA) public data: any, private vulnService: VulnerabilityService,
+        private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient, private snackBar: MatSnackBar) {
         this.dependencies = data.dependencies || [];
-        console.log(data)
         this.updatePagedData(this.initialIndex);
-          }
+        }
 
     ngOnInit(): void {
       this.vulnService.darkMode$.subscribe((mode: boolean) => {
@@ -90,7 +89,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
       this.vulnService.setIsStickyNavbar(true);
     }
 
-     nextPage(): void {
+    nextPage(): void {
     if(this.pageIndex >= 0 && this.pageIndex <= this.totalPages && this.pageIndex !== this.totalPages - 1) {
     this.pageIndex++;
     this.initialIndex = this.pageIndex;

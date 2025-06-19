@@ -18,17 +18,17 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill">
-          <mat-label>Host Name</mat-label>
-          <input matInput formControlName="hostName" placeholder="Host Name">
+          <mat-label>Machine Name</mat-label>
+          <input matInput formControlName="machineName" placeholder="Machine Name">
           <mat-error *ngIf="updateComputerForm.get('hostName')?.hasError('required')">
             Please fill this field
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
-          <mat-label>OS Name</mat-label>
-          <input matInput formControlName="osName" placeholder="OS Name">
-          <mat-error *ngIf="updateComputerForm.get('osName')?.hasError('required')">
+          <mat-label>Host Name</mat-label>
+          <input matInput formControlName="hostName" placeholder="Host Name">
+          <mat-error *ngIf="updateComputerForm.get('hostName')?.hasError('required')">
             Please fill this field
           </mat-error>
         </mat-form-field>
@@ -42,9 +42,17 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill">
-          <mat-label>Location</mat-label>
-          <input matInput formControlName="location" placeholder="Location">
-          <mat-error *ngIf="updateComputerForm.get('location')?.hasError('required')">
+          <mat-label>Antivirus Status</mat-label>
+          <input matInput formControlName="antivirusStatus" placeholder="Antivirus Status">
+          <mat-error *ngIf="updateComputerForm.get('antivirusStatus')?.hasError('required')">
+            Please fill this field
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Firewall Status</mat-label>
+          <input matInput formControlName="firewallStatus" placeholder="Firewall Status">
+          <mat-error *ngIf="updateComputerForm.get('firewallStatus')?.hasError('required')">
             Please fill this field
           </mat-error>
         </mat-form-field>

@@ -29,6 +29,7 @@ import { ViewApplicationDialogComponent } from './view-application.component';
 import { MatSort } from '@angular/material/sort';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 
 @Component({
   selector: 'app-application',
@@ -67,7 +68,7 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   sortActive = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'location', 'status', 'action'];
+  computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'antivirusStatus', 'firewallStatus', 'status', 'action'];
   displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate', 'createdAt', 'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
@@ -87,7 +88,8 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private route: ActivatedRoute,
-    private router: Router, private vulnSyncService: VulnerabilitySyncService
+    private router: Router, private vulnSyncService: VulnerabilitySyncService,
+    private vulnSyncDash: VulnerabilitysyncdashboardComponent
   ) {
     this.applicationForm = this.fb.group({
       computerUuid: ['', Validators.required],
@@ -125,9 +127,10 @@ fetchApplicationData(): void {
     if(!this.isExistComputrtId()) return;
     this.isLoading = true;
     let params = {computerUuid:this.computerUuid ? this.computerUuid : ""};
-    this.http.get<any>(vulnSyncEnvironments.getApplicationsUrl, {params}).subscribe({
+    this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${this.computerUuid}/applications`).subscribe({
       next: (response) => {
         console.log(params);
+        console.log(response)
         this.storedApplicationData = response || [];
         this.updatePagedData(this.initialIndex);
         this.isLoading = false;
@@ -141,14 +144,14 @@ fetchApplicationData(): void {
   isExistComputrtId():boolean {
     if(!this.computerUuid) {
         let errorMessage = "ComputerUuid not found"
-        this.showToast(errorMessage, 'error');
+        this.vulnSyncDash.showToast(errorMessage, 'error');
         return false;
       }  
       return true
   }
   addApplicationData(): void {
     if (this.applicationForm.invalid) {
-      this.showToast("Make sure all fields are filled correctly", 'error');
+      this.vulnSyncDash.showToast("Make sure all fields are filled correctly", 'error');
       return;
     }
     this.vulnSyncService.setLoading(true);
@@ -157,14 +160,14 @@ fetchApplicationData(): void {
     this.http.post<any>(vulnSyncEnvironments.applicationCommonUrl, this.applicationForm.value, {params}).subscribe({
       next: () => {
         this.applicationForm.reset({computerUuid: this.applicationForm.get('computerUuid')?.value});
-        this.showToast("Application data added successfully", 'success');
+        this.vulnSyncDash.showToast("Application data added successfully", 'success');
         this.fetchApplicationData();
         this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
         this.vulnSyncService.setLoading(false);
         let errorMessage = error.error.errorMessage || 'Check your internet connection';
-        this.showToast(errorMessage, 'error');
+        this.vulnSyncDash.showToast(errorMessage, 'error');
         console.error(error);
       }
     });
@@ -238,10 +241,10 @@ fetchApplicationData(): void {
 
     dialogRef.afterClosed().subscribe(result => {
       if(result) {
-        this.showToast("Application data updated successfully", 'success');
+        this.vulnSyncDash.showToast("Application data updated successfully", 'success');
         this.fetchApplicationData();
       } else {
-        result === false ? this.showToast('An error occurred while updating the computer', 'error') : "";
+        result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error') : "";
       }
     })
   }
@@ -275,7 +278,7 @@ fetchApplicationData(): void {
     try {
       await firstValueFrom(this.http.delete(`${vulnSyncEnvironments.applicationCommonUrl}`, {params}));
       this.fetchApplicationData();
-      this.showToast("Application data deleted successfully", 'success');
+      this.vulnSyncDash.showToast("Application data deleted successfully", 'success');
     } catch (error) {
       console.error('Error deleting application data:', error);
     }
@@ -288,16 +291,16 @@ fetchApplicationData(): void {
       next: (response) => {
         console.log(response)
         if(response.statusCode === 5014) {
-          this.showToast("computer activated successfully", 'success');
+          this.vulnSyncDash.showToast("computer activated successfully", 'success');
         }
         this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
         if(error.error.errorCode === 2009) {
          let errorMessage = error.error.errorMessage || 'Check your internet connection';
-         this.showToast(errorMessage, 'error');
+         this.vulnSyncDash.showToast(errorMessage, 'error');
         } else{
-         this.showToast('Unexpected error occured', 'error');
+         this.vulnSyncDash.showToast('Unexpected error occured', 'error');
         }
         console.error(error);
         this.vulnSyncService.setLoading(false);
@@ -310,15 +313,15 @@ fetchApplicationData(): void {
      this.http.patch<any>(vulnSyncEnvironments.deActivateComputer, null, {headers: new HttpHeaders({ 'Content-Type': 'application/json' }), params}).subscribe({
       next: (response) => {
         if(response.statusCode === 2006) {
-          this.showToast("computer deactivated successfully", 'success');
+          this.vulnSyncDash.showToast("computer deactivated successfully", 'success');
         }
       },
       error: (error) => {
         if(error.error.errorCode === 2008) {
          let errorMessage = error.error.errorMessage;
-         this.showToast(errorMessage, 'error');
+         this.vulnSyncDash.showToast(errorMessage, 'error');
         } else{
-         this.showToast('Unexpected error occured', 'error');
+         this.vulnSyncDash.showToast('Unexpected error occured', 'error');
         }
         console.error(error);
       }

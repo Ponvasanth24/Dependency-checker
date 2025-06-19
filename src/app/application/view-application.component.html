@@ -12,24 +12,24 @@
         </tr>
   </thead>
   <tbody>
-    <ng-container *ngFor="let app of applicationData; let i = index">
+    <ng-container>
 
       <!-- Applications Section -->
       <tr *ngIf="!applicationData?.length">
         <td colspan="5" class="empty">No applications found</td>
       </tr>
         <tr class="section-subtitle">
-          <td colspan="5">{{i+1}}. {{ app.name }}</td>
+          <td colspan="5">{{ applicationData?.name }}</td>
         </tr>
         <tr>
-          <td>{{ app.name }}</td>
-          <td>{{ app.vendor }}</td>
-          <td>{{ app.version }}</td>
-          <td colspan="2">{{ app.installedDate }}</td>
+          <td>{{ applicationData?.name }}</td>
+          <td>{{ applicationData?.vendor }}</td>
+          <td>{{ applicationData?.version }}</td>
+          <td colspan="2">{{ applicationData?.installedDate }}</td>
         </tr>
 
         <!-- Dependencies -->
-        <ng-container *ngFor="let dep of app.dependencies;let i = index">
+        <!-- <ng-container *ngFor="let dep of app.dependencies;let i = index">
         <tr class="section-subtitle">
           <td colspan="5" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
         </tr>
@@ -50,10 +50,10 @@
             <td>{{ dep.groupId }}</td>
             <td>{{ dep.artifactId }}</td>
             <td colspan="2">{{ dep.version }}</td>
-          </tr>
+          </tr> -->
 
           <!-- Vulnerabilities -->
-          <tr class="section-subtitle">
+          <!-- <tr class="section-subtitle">
             <td colspan="5" class="text-center text-danger sticky-top dialog-heading">⚠️ Vulnerabilities</td>
           </tr>
           <tr *ngIf="!dep.vulnerabilities?.length">
@@ -75,8 +75,8 @@
               <td>{{ vul.severity }}</td>
             </tr>
           </ng-container>
-      </ng-container>
-    </ng-container>
+      </ng-container>-->
+    </ng-container> 
   </tbody>
 </table>
 </div>

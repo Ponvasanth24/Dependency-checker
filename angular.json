@@ -35,7 +35,7 @@
               "src/styles.scss","src/styles/custom-themes.scss",
               "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
             ],
-            "scripts": ["node_modules/@popperjs/core/dist/umd/popper.min.js",
+            "scripts": [
              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"]
           },
           "configurations": {

@@ -2,94 +2,96 @@
 <table class="styled-table" *ngIf="!isLoading">
   <thead>
     <tr>
-        <th colspan="5" class="text-center sticky-top dialog-heading">🖥️ Computer Info</th>
+        <th colspan="6" class="text-center sticky-top dialog-heading">🖥️ Computer Info</th>
       </tr>
     <tr class="dash-theme text-white">
+      <th>Device Id</th>
       <th>IP Address</th>
       <th>Host Name</th>
-      <th>OS Name</th>
       <th>OS Version</th>
-      <th>Location</th>
+      <th>Antivirus Status</th>
+      <th>Firewall Status</th>
     </tr>
   </thead>
   <tbody>
     <!-- No Computers -->
     <tr *ngIf="!computerData || computerData.length === 0">
-      <td colspan="5" class="empty">No computer data found</td>
+      <td colspan="6" class="empty">No computer data found</td>
     </tr>
 
-    <ng-container *ngFor="let computer of computerData">
+    <ng-container>
       <!-- Computer Info -->
       <tr>
-        <td>{{ computer.ipAddress }}</td>
-        <td>{{ computer.hostName }}</td>
-        <td>{{ computer.osName }}</td>
-        <td>{{ computer.osVersion }}</td>
-        <td>{{ computer.location }}</td>
+        <td>{{computerData.computer.deviceId}}</td>
+        <td>{{ computerData.computer.ipAddress }}</td>
+        <td>{{ computerData.computer.hostname }}</td>
+        <td>{{ computerData.computer.osVersion }}</td>
+        <td>{{ computerData.computer.antivirusStatus }}</td>
+        <td>{{ computerData.computer.firewallStatus }}</td>
       </tr>
 
       <!-- Applications Section -->
-      <tr *ngIf="!computer.applications?.length">
-        <td colspan="5" class="empty">No applications found</td>
+      <tr *ngIf="!computerData.applications?.length">
+        <td colspan="6" class="empty">No applications found</td>
       </tr>
       
-      <ng-container *ngFor="let app of computer.applications; let i = index">
+      <ng-container *ngFor="let app of computerData.applications; let i = index">
         <tr>
-        <td colspan="5" class="text-center sticky-top dialog-heading text-primary">📦 Application</td>
+        <td colspan="6" class="text-center sticky-top dialog-heading text-primary">📦 Application</td>
         </tr>
         <tr class="section-subtitle">
-          <td colspan="5" class="text-dark">{{i+1}}. {{ app.name }}</td>
+          <td colspan="6" class="text-dark">{{i+1}}. {{ app.name }}</td>
         </tr>
         <tr class="dash-theme text-white">
           <th>Name</th>
           <th>Vendor</th>
           <th>Version</th>
-          <th colspan="2">Installed Date</th>
+          <th colspan="3">Installed Date</th>
         </tr>
         <tr>
           <td>{{ app.name }}</td>
-          <td>{{ app.vendor }}</td>
+          <td>{{ app.vendorName }}</td>
           <td>{{ app.version }}</td>
-          <td colspan="2">{{ app.installedDate }}</td>
+          <td colspan="3">{{ app.installedDate }}</td>
         </tr>
 
         <!-- Dependencies -->
         <ng-container *ngFor="let dep of app.dependencies;let i = index">
         <tr class="section-subtitle">
-          <td colspan="5" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
+          <td colspan="6" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
         </tr>
         <tr *ngIf="!app.dependencies?.length">
-          <td colspan="5" class="empty">No dependencies found</td>
+          <td colspan="6" class="empty">No dependencies found</td>
         </tr>
         <tr class="section-subtitle">
-          <td colspan="5" class="text-dark">{{i+1}}. {{ dep.name }}</td>
+          <td colspan="6" class="text-dark">{{i+1}}. {{ dep.name }}</td>
         </tr>
           <tr class="dash-theme text-white">
             <th>Name</th>
             <th>Group Id</th>
             <th>Artifact Id</th>
-            <th colspan="2">Version</th>
+            <th colspan="3">Version</th>
           </tr>
           <tr>
             <td>{{ dep.name }}</td>
             <td>{{ dep.groupId }}</td>
             <td>{{ dep.artifactId }}</td>
-            <td colspan="2">{{ dep.version }}</td>
+            <td colspan="3">{{ dep.version }}</td>
           </tr>
 
           <!-- Vulnerabilities -->
           <tr class="section-subtitle">
-            <td colspan="5" class="text-center sticky-top dialog-heading text-danger">⚠️ Vulnerabilities</td>
+            <td colspan="6" class="text-center sticky-top dialog-heading text-danger">⚠️ Vulnerabilities</td>
           </tr>
           <tr *ngIf="!dep.vulnerabilities?.length">
-            <td colspan="5" class="empty">No vulnerabilities found</td>
+            <td colspan="6" class="empty">No vulnerabilities found</td>
           </tr>
             <tr class="dash-theme text-white table-danger" *ngIf="dep.vulnerabilities?.length">
               <th>S.No</th>
               <th>CVE ID</th>
               <th>CVSS Score</th>
               <th>Description</th>
-              <th colspan="2">Severity</th>
+              <th colspan="3">Severity</th>
             </tr>
           <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
             <tr class="table-danger">
