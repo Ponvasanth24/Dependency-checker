@@ -394,10 +394,12 @@ formatUTC(date: Date): string {
 
     const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
       data: { computer, origin },
-      panelClass: ['animated-dialog-container'],
+      width: '80vh',
+      height: '90vh',
+      panelClass: 'animated-dialog-container',
       hasBackdrop: true,
       backdropClass: 'custom-backdrop',
-      disableClose: true,
+      disableClose: true
     });
     dialogRef.backdropClick().subscribe(() => {
       dialogRef.close();

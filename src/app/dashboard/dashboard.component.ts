@@ -34,12 +34,15 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FileUploadService } from '../services/DashboardService/file-upload.service';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { SearchComponentComponent } from './search-component/search-component.component';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [ MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent,
     RouterOutlet, MatFormFieldModule, MatSelectModule, MatRadioModule, RouterModule ,MatInputModule, MatToolbarModule,
-    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatSidenavModule, FlexLayoutModule, MatDialogModule
+    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatSidenavModule, FlexLayoutModule, MatDialogModule, MatIcon,
+    ScanFileComponent, SearchComponentComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -72,6 +75,11 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   selectedFile: File | null = null;
   scanUrl :string = '';
   formData: FormData = new FormData();
+  fetchEventLogUrl: string = '';
+  messages: any = [];
+  eventSource: EventSource | null = null;
+  isScanning = false;
+  dependencies = [];
   
   cpeRegex = /^cpe:\d+\.\d+:[aho]:([^:]+):([^:]+):([0-9]+\.[0-9]+(?:\.[0-9]+)(?:[-_a-zA-Z0-9.]+)?):([^:]):([^:]):([^:]):([^:]):([^:]):([^:]):([^:])$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
@@ -255,13 +263,13 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     });
 }
 
-private showError(message: string): void {
+public showError(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
   });
 }
 
-private showFeedback(message: string): void {
+public showFeedback(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
   });
@@ -284,25 +292,24 @@ private showFeedback(message: string): void {
     return vulnerability.baseSeverity;
   }
 
-  messages: any = [];
-  eventSource: EventSource | null = null;
-  isScanning = false;
-  dependencies = [];
-
 onFileUpload(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
 
     const filename = file.name;
+    console.log(filename)
+    this.formData = new FormData();
+    this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadFile}`;
+    console.log(this.scanUrl)
+    this.formData.append('file', file);
     if (filename === 'pom.xml') {
-       this.formData.append('file', file);
-       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadPom}`;
+       this.formData.append('fileType', 'POM');
+       console.log(this.formData.values())
     } else if (filename === 'package.json') {
-       this.formData.append('packageJson', file);
-       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadNodePackage}`;
+       this.formData.append('fileType', 'PACKAGE_JSON');
     } else if (filename === 'package-lock.json') {
-       this.formData.append('packageLockJson', file);
-       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadNodePackage}`;
+       this.formData.append('fileType', 'PACKAGE_LOCK_JSON');
     } else {
       alert('Unsupported file. Upload pom.xml, package.json, or package-lock.json');
     }
@@ -310,13 +317,11 @@ onFileUpload(event: Event): void {
 
   startScan(): void {
      if (this.dialogRef) {
-    this.dialogRef.close(); // ✅ Close the dialog before starting scan
+    this.dialogRef.close();
   }
     this.messages = [];
     this.isScanning = true;
     this.isAnimate = true;
-    this.fetchedDependencies = 0;
-    this.totalDependencies = 0;
     this.progressInterval = setInterval(()=>{
       if(this.progress < 100) this.progress++;
       else {
@@ -340,30 +345,22 @@ onFileUpload(event: Event): void {
       break;
      }
      }
-
-     if (hasFiles) {
+    if (hasFiles) {
     fetch(this.scanUrl, {
     method: 'POST',
     body: this.formData
     })
     .then(response => {
+      console.log(response)
       if (!response.ok) throw new Error('Upload failed');
-      return response.text();
+      return response.json();
     })
     .then((res) => {
        console.log(res)
-         this.ngZone.run(() => {
-            let data = {};
-            if (res !== 'Analysis completed') {
-              data = res;
-            }
-            this.fetchedDependencies = (data as any)?.fetchedDependencies || 0;
-            this.totalDependencies = (data as any)?.totalDependencies || 0;
-            this.updateProgress(
-              this.fetchedDependencies,
-              this.totalDependencies
-            );
-          });
+       const jobId = res.jobId;
+      //  this.formData = new FormData();
+       this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.getFileUploadEventLog}${jobId}`
+       this.fetchEventLog();
       })
     .catch(err => {
       console.error('Upload or SSE setup failed:', err);
@@ -371,8 +368,27 @@ onFileUpload(event: Event): void {
 }
 
      else {
-       this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
-       this.eventSource = new EventSource(this.scanUrl);
+       this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
+       this.fetchEventLog();
+      }   
+     
+    } catch (error: any) {
+      console.error('Error:', error);
+      this.vulnService.setAnimate(false);
+      this.progress = 0;
+      clearInterval(this.progressInterval);
+      this.showError(`Error occurred: ${error.message || 'Please check if the server is running.'}`);
+      if (this.eventSource) {
+        this.eventSource?.close();
+      }
+      this.cd.detectChanges();
+    }
+  }
+  
+  fetchEventLog() {
+       this.fetchedDependencies = 0;
+       this.totalDependencies = 0;
+       this.eventSource = new EventSource(this.fetchEventLogUrl);
        this.eventSource.onmessage = (event) => {
         try {
           this.ngZone.run(() => {
@@ -403,7 +419,7 @@ onFileUpload(event: Event): void {
       };
        this.eventSource.onerror = (error) => {
         console.error('SSE error:', error);
-        this.showError(`Please check if the server is running on port ${this.portNumber}`);
+        this.showError('SSE error');
         this.isAnimate = false;
         this.progress = 0;
         clearInterval(this.progressInterval);
@@ -413,19 +429,6 @@ onFileUpload(event: Event): void {
       this.eventSource.onopen = () => {
         this.messages.push('Connection established');
       };
-     }   
-     
-    } catch (error: any) {
-      console.error('Error:', error);
-      this.vulnService.setAnimate(false);
-      this.progress = 0;
-      clearInterval(this.progressInterval);
-      this.showError(`Error occurred: ${error.message || 'Please check if the server is running.'}`);
-      if (this.eventSource) {
-        this.eventSource?.close();
-      }
-      this.cd.detectChanges();
-    }
   }
 
   stopSSE() {
@@ -511,7 +514,12 @@ updateProgress(fetched: number, total: number) {
         panelClass: ['snackbar-error'] });
       }
     } else {
-        this.dialogRef = this.dialog.open(this.scanDialog!);
+          setTimeout(()=> {
+      const scanModal = new bootstrap.Modal(
+      this.portNumberModal.nativeElement
+      );
+      scanModal.show();
+      }, 50);
         
     }
   }
@@ -521,7 +529,7 @@ updateProgress(fetched: number, total: number) {
     const bootstrap = (window as any).bootstrap;
     const existingModal = bootstrap.Modal.getInstance(element);
     if (existingModal) {
-    existingModal.dispose();
+     existingModal.dispose();
     }
     if (bootstrap && bootstrap.Modal) {
       this.ngZone.run(()=>{

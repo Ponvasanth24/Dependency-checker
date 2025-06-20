@@ -163,3 +163,14 @@ border-bottom: 4px solid rgb(0, 119, 255);
 .fnw-bold{
     font-weight: 600;
 }
+
+
+/*-------------------------------------------------------------------------->*/
+
+
+.bg-top-nav {
+    background-color: rgba(112, 112, 112, 0.911);
+}
+.sidenav {
+  width: 250px;
+}

@@ -1,13 +1,13 @@
-<div class="animation-wrapper" [ngStyle]="originStyle" [class.animate]="animate">
+<div class="animation-wrapper d-flex flex-column" [class.animate]="animate">
   <!-- Dialog content -->
   <div class="dialog-content">
 
-    <div class="dash-theme text-center text-white py-3">
+    <div class="dash-theme sticky-top text-center text-white py-3">
       <strong>Update Computer Data</strong>
     </div>
 
     <form [formGroup]="updateComputerForm" (ngSubmit)="onSubmit()">
-      <div class="d-flex flex-column gap-3 p-3">
+      <div class="update-form d-flex flex-column gap-3 p-3">
 
         <mat-form-field appearance="fill">
           <mat-label>IP Address</mat-label>
@@ -19,15 +19,7 @@
 
         <mat-form-field appearance="fill">
           <mat-label>Machine Name</mat-label>
-          <input matInput formControlName="machineName" placeholder="Machine Name">
-          <mat-error *ngIf="updateComputerForm.get('hostName')?.hasError('required')">
-            Please fill this field
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Host Name</mat-label>
-          <input matInput formControlName="hostName" placeholder="Host Name">
+          <input matInput formControlName="hostName" placeholder="Machine Name">
           <mat-error *ngIf="updateComputerForm.get('hostName')?.hasError('required')">
             Please fill this field
           </mat-error>
@@ -55,6 +47,15 @@
           <mat-error *ngIf="updateComputerForm.get('firewallStatus')?.hasError('required')">
             Please fill this field
           </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <input matInput [matDatepicker]="picker" placeholder="Last Update Check" (dateChange)="onDateChange($event.value, 'lastUpdateCheck')" formControlName="lastUpdateCheck" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="updateComputerForm.get('lastUpdateCheck')?.hasError('required')">
+            Required
+            </mat-error>
         </mat-form-field>
       </div>
 

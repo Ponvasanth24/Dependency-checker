@@ -197,43 +197,44 @@
 }
 
 .animation-wrapper {
-  position: fixed;
+  /* width: 100%; */
   background: white;
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: all 300ms ease-in-out;
   z-index: 1000;
-  overflow: hidden;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  /* overflow: scroll; */
 }
 
 .animation-wrapper.animate {
-  top: 50% !important;
+  /* top: 50% !important;
   left: 50% !important;
   width: 600px !important;
   max-width: 95vw;
   height: auto !important;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
 }
 
 .dialog-content {
   padding: 0;
-}
-:host {
-  display: block;
-  height: 100%;
-}
-
-.dialog-content {
-  height: 100%;
 }
 
 .animated-dialog-container .mat-dialog-container {
-  height: 70vh !important;
+  position: fixed;
   padding: 0;
   border-radius: 8px;
-  overflow: hidden;
+  /* overflow: hidden; */
   background: transparent;
   box-shadow: none;     
+}
+
+.update-form {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
 }
 .dialog-heading {
   background-color: #fafafa;

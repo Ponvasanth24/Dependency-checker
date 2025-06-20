@@ -1,0 +1,42 @@
+<div class="container-fluid">
+<div class="row align-items-center">
+
+        <div class="col-md-3 ps-3 d-flex align-items-center py-2">
+         <label class="search-title w-fit-content h6 mt-2 text-nowrap" for="">Search Type</label> 
+         &nbsp;&nbsp;   
+        <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded form-control">
+          <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
+        </select>
+        </div>
+
+        <div class="col-md-3">
+            <select [(ngModel)]="searchField" class="rounded form-control">
+              <option *ngFor="let variant of ( searchType == 1 ? CVESearch : CPESearch)" [value]="variant.id">{{variant.value}}</option>
+            </select>
+        </div>
+         
+        <div class="col-md-6 dep-inp-ht d-flex align-items-center">
+        <div class="">
+
+        <input [(ngModel)]="searchValue" [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}"
+          class="col-8 p-2 px-5 rounded-start-3 border-0"
+          type="text"
+          id="dependency-search"
+          [placeholder]="searchType == 1 ? 'Vulnerability Search' : 'Dependency Search'" (focus)="onFocus($event)"
+          (keydown)="onKeyDown($event)" (input)="onInputChange($event)" (keyup.enter)="searchField !== 0 && setSearchUrl()"
+        />
+        <button [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}" [disabled]="searchField === 0" (click)="setSearchUrl()"
+          class="border-0 col-4 rounded-end-3 h-100 d-flex align-items-center"
+        >
+          <mat-icon [ngClass]="{'search-button': searchType !== 0, 'text-white': darkMode, 'text-dark': darkMode, 'bg-dark': darkMode, 'bg-white': !darkMode, 'no-hover': searchField === 0}"
+            class="w-100 fs-3 py-3 rounded-3 d-flex justify-content-center align-items-center material-symbols-outlined"
+          >
+            arrow_forward
+          </mat-icon>
+        </button>
+      </div>
+      <span *ngIf="searchField === 5" class="ps-3 text-red fs-sm fw-bold">e.g: cpe:2.3:a:vmware:framework:5.3.20:*:*:*:*:*:*:*</span>
+      </div>
+
+</div>
+</div>
