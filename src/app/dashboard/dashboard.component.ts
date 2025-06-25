@@ -141,11 +141,10 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
       }, 50);
       });}
       this.vulnService.isNavbarSticky$.subscribe((condition: boolean)=> {
-        console.log(condition)
-      if(condition) {
         this.isNavbarSticky = condition;
+        if(this.isNavbarSticky) {
         this.navBarParent?.nativeElement.classList.remove('sticky-top');
-      }
+        }
     });
   }
   

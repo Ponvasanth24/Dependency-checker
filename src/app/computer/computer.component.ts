@@ -151,8 +151,6 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.vulnSyncService.setLoading(false);
   }
   initForm() {
-  const nowUtc = new Date().toISOString();
-  const localTime = nowUtc.split('.')[0].concat('Z');
   this.deviceForm = this.fb.group({
   deviceId: ['', Validators.required],
   machineName: ['', Validators.required],
@@ -165,7 +163,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.createSoftwareGroup()
   ]),
   lastUpdateCheck: [null, Validators.required],
-  timestamp: [localTime]
+  timestamp: ['']
 });
 
   }
@@ -197,9 +195,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.vulnSyncDash.showToast('Installed date cannot be in the future', 'error');
     return;
   }
-  }
+}
   
-
 formatDateTime(date: Date): string {
   if (!date) return '';
   const year = date.getFullYear();
@@ -217,9 +214,9 @@ formatUTC(date: Date): string {
   return date.toISOString().split('.')[0] + 'Z';
 }
 
-  get installedSoftware(): FormArray {
-    return this.deviceForm.get('installedSoftware') as FormArray;
-  }
+get installedSoftware(): FormArray {
+  return this.deviceForm.get('installedSoftware') as FormArray;
+}
 
   addSoftware(): void {
     this.installedSoftware.push(this.createSoftwareGroup());
@@ -280,8 +277,8 @@ formatUTC(date: Date): string {
       this.vulnSyncDash.showToast('Make sure all fields are filled correctly', 'error');
       return;
     }
-    let timestampDate = this.deviceForm.get('timestamp')?.value;
-    console.log(timestampDate)
+    const nowUtc = new Date().toISOString();
+    const timestampDate = nowUtc.split('.')[0].concat('Z');
     this.deviceForm.get('timestamp')?.setValue(timestampDate);
     console.log(this.deviceForm.value);
     this.vulnSyncService.setLoading(true);
@@ -397,7 +394,7 @@ formatUTC(date: Date): string {
       width: rect.width,
       height: rect.height,
     };
-
+    console.log(computer)
     const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
       data: { computer, origin },
       width: '80vh',

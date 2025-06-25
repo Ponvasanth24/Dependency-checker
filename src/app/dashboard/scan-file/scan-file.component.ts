@@ -58,6 +58,7 @@ export class ScanFileComponent implements OnInit, AfterViewInit{
     });
     const dep = sessionStorage.getItem('dependencies');
     this.dependencies = dep ? JSON.parse(dep) : [];
+    this.vulnService.setIsStickyNavbar(false);
   }
 
   ngAfterViewInit(): void {

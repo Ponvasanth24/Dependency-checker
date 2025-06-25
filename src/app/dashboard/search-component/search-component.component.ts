@@ -50,6 +50,7 @@ export class SearchComponentComponent implements OnInit {
      this.vulnService.portNumber$.subscribe((port:number)=>{
       this.portNumber = port;
     });
+    this.vulnService.setIsStickyNavbar(false);
   }
 
   onFocus(event: Event) {

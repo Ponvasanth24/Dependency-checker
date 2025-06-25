@@ -17,5 +17,6 @@ export class DashboardcontentComponent implements OnInit{
         console.log('Dark mode status:', mode);
         this.darkMode = mode;
       }); 
+      this.vulnService.setIsStickyNavbar(false);
      }
 }

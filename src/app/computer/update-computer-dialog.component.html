@@ -19,8 +19,8 @@
 
         <mat-form-field appearance="fill">
           <mat-label>Machine Name</mat-label>
-          <input matInput formControlName="hostName" placeholder="Machine Name">
-          <mat-error *ngIf="updateComputerForm.get('hostName')?.hasError('required')">
+          <input matInput formControlName="machineName" placeholder="Machine Name">
+          <mat-error *ngIf="updateComputerForm.get('machineName')?.hasError('required')">
             Please fill this field
           </mat-error>
         </mat-form-field>
@@ -50,6 +50,7 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Last Update Check</mat-label>
             <input matInput [matDatepicker]="picker" placeholder="Last Update Check" (dateChange)="onDateChange($event.value, 'lastUpdateCheck')" formControlName="lastUpdateCheck" />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
@@ -67,3 +68,29 @@
 
   </div>
 </div>
+
+<!---------------------------------------------success-toast-start-------------------------------------------------->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
+  <div #successToast class="toast success bg-dark" role="alert" aria-live="assertive" aria-atomic="true">
+    <span data-bs-dismiss="toast" aria-label="Close" class="material-symbols-outlined float-end text-white fs-5 me-1 mt-1 cursor-pointer">close
+    </span>
+    <div class="toast-body text-white fw-bold py-3 d-flex align-items-center">
+      {{successMessage}}
+    </div>
+    <div #succToastProgress class="succToastProgress" style="width: 100%;"></div>
+  </div>
+</div>
+<!---------------------------------------------success-toast-end------------------------------------------------------>
+
+<!---------------------------------------------error-toast-start-------------------------------------------------->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 100">
+  <div #errorToast class="toast error-danger bg-dark" role="alert" aria-live="assertive" aria-atomic="true">
+<span data-bs-dismiss="toast" aria-label="Close" class="material-symbols-outlined float-end text-white fs-5 me-1 mt-1 cursor-pointer">close
+</span>
+    <div class="toast-body text-white fw-bold py-3 d-flex align-items-center">
+      <span class="material-symbols-outlined">error</span>&nbsp;&nbsp; {{errorMessage}}
+    </div>
+    <div #errorToastProgress class="errorToastProgress" style="width: 100%;"></div>
+  </div>
+</div>
+<!---------------------------------------------error-toast-end----------------------------------------------------->

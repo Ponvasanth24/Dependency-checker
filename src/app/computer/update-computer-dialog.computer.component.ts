@@ -1,4 +1,4 @@
-import { Component, Inject, HostBinding } from '@angular/core';
+import { Component, Inject, HostBinding, ViewChild, ElementRef } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -18,6 +18,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
+import { timestamp } from 'rxjs';
 @Component({
   selector: 'app-update-computer-dialog',
   standalone: true,
@@ -44,6 +45,12 @@ export class UpdateComputerDialogComponent {
   originStyle = {};
   animate = false;
   updateComputerForm!: FormGroup;
+  successMessage: string = '';
+  errorMessage: string = '';
+  @ViewChild('successToast') successToast!: ElementRef;
+  @ViewChild('errorToast') errorToast!: ElementRef;
+  private bootstrap = (window as any).bootstrap;
+
   constructor(
     public dialogRef: MatDialogRef<UpdateComputerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -52,11 +59,12 @@ export class UpdateComputerDialogComponent {
   ) {
     this.updateComputerForm = this.fb.group({
       ipAddress: ['', Validators.required],
-      hostname: ['', Validators.required],
+      machineName: ['', Validators.required],
       osVersion: ['', Validators.required],
       antivirusStatus: ['', Validators.required],
       firewallStatus:['', Validators.required],
-      lastUpdateCheck:['', Validators.required]
+      lastUpdateCheck:['', Validators.required],
+      timestamp: ['']
     });
   }
   ngOnInit(): void {
@@ -64,7 +72,7 @@ export class UpdateComputerDialogComponent {
     if (this.data && this.data.computer) {
       this.updateComputerForm.patchValue({
         ipAddress: this.data.computer.ipAddress,
-        hostname: this.data.computer.hostname,
+        machineName: this.data.computer.machineName,
         osVersion: this.data.computer.osVersion,
         antivirusStatus: this.data.computer.antivirusStatus,
         firewallStatus: this.data.computer.firewallStatus,
@@ -89,42 +97,44 @@ export class UpdateComputerDialogComponent {
     setTimeout(() => this.dialogRef.close(), 300);
   }
 
-  onSubmit(): void {
-    if (this.updateComputerForm.valid) {
-      // const uuid = this.data?.computer.uuid;
+ onSubmit(): void {
+  const now = new Date();
+  const formattedNow = this.formatUTC(now);
+  this.updateComputerForm.get('timestamp')?.setValue(formattedNow);
+  console.log(this.updateComputerForm.valid)
+  const lucDateRaw = this.updateComputerForm.get('lastUpdateCheck')?.value;
+  console.log(lucDateRaw.indexOf('Z'))
+  if(lucDateRaw.indexOf('Z') === -1){
+    const formattedLuc = lucDateRaw.concat('Z');
+    this.updateComputerForm.get('lastUpdateCheck')?.setValue(formattedLuc);
+  }
 
-      // if (!uuid) {
-      //   this.dialogRef.close(0);
-      //   console.error('UUID not provided for update');
-      //   return;
-      // }
-       const {deleted,uuid,id, ...computerData} = this.data.computer;
-       const updatedForm = {...computerData, ...this.updateComputerForm.value}
-      
-       console.log(updatedForm)
-       this.http
-      .post<any>(
-        vulnSyncEnvironments.computerCommonUrl,
-        updatedForm
-      )
-      .subscribe({
+  const finalPayload = this.updateComputerForm.getRawValue();
+  console.log(finalPayload);
+  try {
+    const { deleted, uuid, id, createdAt, updatedAt, active,timestamp, lastUpdateCheck, ...computerData } = this.data.computer;
+
+    const updatedForm = {...computerData,...finalPayload };
+    console.log(updatedForm)
+    this.http.post<any>( vulnSyncEnvironments.computerCommonUrl, updatedForm).subscribe({
         next: (response) => {
-          console.log(response);
-          let successMessage = 'Computer data added successfully';
-          this.updateComputerForm.reset()
-          this.vulnSyncDash.showToast(successMessage, 'success');
+          console.log(response)
+          this.successMessage = 'Computer data added successfully';
+          this.updateComputerForm.reset();
+          this.showToast(this.successMessage, 'success');
           this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
-          console.log(error);
+          console.log(error)
           this.vulnSyncService.setLoading(false);
-          let errorMessage = error.error.errorMessage || 'Check your internet connection';
-          this.vulnSyncDash.showToast(errorMessage, 'error');
-          console.log(error);
-        },
+          this.errorMessage = error.error?.errorMessage || 'Check your internet connection';
+          this.showToast(this.errorMessage, 'error');
+        }
       });
-    }
+  } catch (error) {
+    console.error('Submit error:', error);
   }
+}
 
   closeDialog(): void {
     setTimeout(() => this.dialogRef.close(), 200);
@@ -134,11 +144,50 @@ export class UpdateComputerDialogComponent {
     setTimeout(() => this.dialogRef.close(), 200);
   }
   onDateChange(date: Date, controlName: string): void {
-  const formatted = this.formatUTC(date);
+  const lucDate = date.toISOString();
+  const formatted = lucDate.split('.')[0].concat('Z');
   this.updateComputerForm.get(controlName)?.setValue(formatted); 
   }
   formatUTC(date: Date): string {
   if (!date) return '';
-  return date.toISOString().split('.')[0] + 'Z'; // trims milliseconds
+  return date.toISOString().split('.')[0] + 'Z';
+  }
+
+showToast(message: string, type: 'success' | 'error'): void {
+  if (type === 'success') {
+    this.successMessage = message;
+    if (this.successToast) {
+      const toastEl = this.successToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.successMessage);
+    }
+  } else if (type === 'error') {
+    this.errorMessage = message;
+    if (this.errorToast) {
+      const toastEl = this.errorToast.nativeElement;
+      const toast = new this.bootstrap.Toast(toastEl, {
+        delay: 4000,
+        autohide: true,
+      });
+      toast.show();
+
+      toastEl.classList.add('slide-in-right');
+      toastEl.addEventListener('animationend', () => {
+        toastEl.classList.remove('slide-in-right');
+      }, { once: true });
+    } else {
+      window.alert(this.errorMessage);
+    }
+  }
 }
 }
