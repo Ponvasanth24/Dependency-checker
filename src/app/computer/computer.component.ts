@@ -151,6 +151,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.vulnSyncService.setLoading(false);
   }
   initForm() {
+  const nowUtc = new Date().toISOString();
+  const localTime = nowUtc.split('.')[0].concat('Z');
   this.deviceForm = this.fb.group({
   deviceId: ['', Validators.required],
   machineName: ['', Validators.required],
@@ -163,7 +165,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.createSoftwareGroup()
   ]),
   lastUpdateCheck: [null, Validators.required],
-  timestamp: [new Date(), Validators.required]
+  timestamp: [localTime]
 });
 
   }
@@ -179,7 +181,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   const formatted = this.formatUTC(date);
   this.deviceForm.get(controlName)?.setValue(formatted); 
   }
- onSoftwareDateChange(selectedDate: Date, index: number): void {
+  onSoftwareDateChange(selectedDate: Date, index: number): void {
   if (!selectedDate) {
     return;
   }
@@ -188,6 +190,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   const selectedDateTime = new Date(selectedDate);
   console.log(selectedDateTime)
   selectedDateTime.setHours(0, 0, 0, 0); 
+  const formattedDate = this.formatDateTime(selectedDate); 
+  this.installedSoftware.at(index).get('InstalledDate')?.setValue(formattedDate); 
   if (selectedDateTime.getTime() > today.getTime()) {
     this.installedSoftware.at(index).get('InstalledDate')?.setValue(''); 
     this.vulnSyncDash.showToast('Installed date cannot be in the future', 'error');
@@ -209,7 +213,8 @@ formatDateTime(date: Date): string {
 
 formatUTC(date: Date): string {
   if (!date) return '';
-  return date.toISOString().split('.')[0] + 'Z'; // trims milliseconds
+  console.log(date)
+  return date.toISOString().split('.')[0] + 'Z';
 }
 
   get installedSoftware(): FormArray {
@@ -276,7 +281,8 @@ formatUTC(date: Date): string {
       return;
     }
     let timestampDate = this.deviceForm.get('timestamp')?.value;
-    this.deviceForm.get('timestamp')?.setValue(this.formatUTC(timestampDate));
+    console.log(timestampDate)
+    this.deviceForm.get('timestamp')?.setValue(timestampDate);
     console.log(this.deviceForm.value);
     this.vulnSyncService.setLoading(true);
     this.http

@@ -1,7 +1,91 @@
-<ul class="nav flex-column">
-          <li data-bs-toggle="collapse" data-bs-target="#scanType" class="nav-item cursor-pointer py-3 ps-2 d-flex align-items-center"><span class="material-symbols-outlined d-flex align-items-center p-1 bg-light rounded">capture</span>&nbsp;<a class="nav-link text-white">Scan</a></li>
-          <ul id="scanType" class="collapse">
-          <li class="nav-item py-2 ps-2 d-flex align-items-center"><span class="material-symbols-outlined d-flex align-items-center p-1 bg-light rounded">capture</span>&nbsp;<a class="nav-link text-white">Scan File</a></li>
-          <li class="nav-item py-2 ps-2 d-flex align-items-center"><span class="material-symbols-outlined d-flex align-items-center p-1 bg-light rounded">capture</span>&nbsp;<a class="nav-link text-white">Scan Project</a></li>  
-        </ul>
-     </ul>
+<div #scanFile [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" *ngIf="scanVariant === 1" class="mb-3 h-100 col-md-6">
+  <label class="fnw-bold" style="font-size: 18px;">
+    Upload your pom.xml, package.json, or package-lock.json file
+    Supports both Spring Boot and Node.js projects
+    Automatically scan for vulnerabilities with a single click
+    Get instant insights to strengthen your application security
+  </label>
+
+<div class="mt-3 p-3 border border-primary border-3 rounded">
+<p class="fnw-bold">1. Port Number</p>
+  <input type="number" [(ngModel)]="portNumber" class="form-control w-50">
+</div>
+
+  <div class="mt-3 p-3 border border-primary border-3 rounded">
+
+      <p class="fnw-bold">2. Upload File</p>
+      <div class="d-flex">
+      <input
+        [readonly]="true"
+        [value]="selectedFile?.name || ''"
+        placeholder="Choose file"
+        class="p-2 form-control"
+      />
+
+    <button
+        mat-raised-button
+        aria-label="Clear file"
+        [disabled]="!selectedFile"
+        (click)="removeFile()"
+        [ngClass]="{'btn-light': darkMode, 'btn-dark': !darkMode}"
+        class="btn h-fit-content ms-3"
+      >
+        <mat-icon class="material-symbols-outlined">delete</mat-icon>
+      </button>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="fileInput.click()"
+      [ngClass]="{'btn-light': darkMode, 'btn-dark': !darkMode}"
+      class="btn h-fit-content ms-3"
+    >
+      <span class="material-symbols-outlined">upload</span>
+    </button>
+    </div>
+    <small class="text-secondary fnw-bold text-small pt-2">
+      * Upload your pom.xml, package.json, or package-lock.json file.
+    </small>
+    <input
+    type="file"
+    hidden
+    #fileInput
+    (change)="onFileUpload($event)"
+    accept=".xml,.json"
+  />
+  </div>
+   
+   <div class="mt-3">
+     <button [ngClass]="{'btn-light': darkMode, 'btn-dark': !darkMode}" class="btn float-end" [disabled]="!selectedFile" (click)="startScan()">Scan</button>
+   </div>
+
+</div>
+
+
+<div #scanProject [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" *ngIf="scanVariant === 2" class="mb-3 col-md-6">
+  <label [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="fnw-bold" style="font-size: 18px;">
+    Enter the port number where your Spring Boot project is running to scan its dependencies
+  </label>
+
+<div class="mt-3 p-3 border border-primary border-3 rounded">
+ <p class="fnw-bold">Port Number</p>
+  <input type="number" [(ngModel)]="portNumber" class="form-control w-50">
+</div>
+
+   <div class="mt-3 d-flex" [ngClass]="{ 'justify-content-between': dependencies!.length > 0, 'justify-content-end': !dependencies!.length }">
+     <button *ngIf="dependencies!.length > 0" [ngClass]="{'btn-light': darkMode, 'btn-dark': !darkMode}" class="btn" (click)="viewScannedDependencies()">Available scanned data</button>
+     <button [ngClass]="{'btn-light': darkMode, 'btn-dark': !darkMode}" class="btn" [disabled]="!portNumber || portNumber.toString().length < 4" (click)="startScan()">Scan</button>
+   </div>
+
+</div>
+
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+      *ngIf="isAnimate" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" style="z-index: 9999;"
+    >
+  <div class="d-flex flex-column"> 
+      <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
+      <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center">Analyzed <span class="text-warning">{{fetchedDependencies}}</span> out of <span class="text-warning">{{totalDependencies}}</span> dependencies</p>
+      <div *ngIf="progress === 100" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center d-flex align-items-center">Please wait while we retrieve the likely CPEs. This process may take a few moments.</div>
+      <div class="text-center"><button (click)="stopSSE()" class="btn btn-secondary">Cancel</button></div>
+      </div>
+  </div>

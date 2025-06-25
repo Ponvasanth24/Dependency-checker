@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { VulnerabilityService } from '../../../shared/VulnerabilityService';
 import { Router } from '@angular/router';
-import { DashboardComponent } from '../dashboard.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-search-component',
@@ -17,7 +17,7 @@ import { DashboardComponent } from '../dashboard.component';
   templateUrl: './search-component.component.html',
   styleUrl: './search-component.component.css'
 })
-export class SearchComponentComponent {
+export class SearchComponentComponent implements OnInit {
   searchType: number = 1;
   searchField: number = 0;
   searchValue: string = '';
@@ -26,7 +26,7 @@ export class SearchComponentComponent {
   dependencies = [];
   portNumber:number = 8080;
   navigationUrl: string = '';
-  isLoading:boolean = false;
+  isLoading: boolean = false;
   searchVariant: boolean = false;
   private cancelRequest$ = new Subject<void>();
   searchTypes = [
@@ -34,14 +34,23 @@ export class SearchComponentComponent {
     { id: 2, value: 'CPE Search' },
   ];
   CVESearch = [ {id: 0, value: 'Select Variant'},{id: 1, value: 'Keyword'}, {id:2, value: 'CVE Id'}, {id:3, value:'CPE Name'}];
-  CPESearch = [ {id: 0, value: 'Select Variant'}, {id: 1, value: 'Keyword'}, {id:2, value: 'Likely CPE Name'}];
+  CPESearch = [ {id: 0, value: 'Select Variant'}, {id: 4, value: 'Keyword'}, {id:5, value: 'Likely CPE Name'}];
   
   cpeRegex = /^cpe:\d+\.\d+:[aho]:([^:]+):([^:]+):([0-9]+\.[0-9]+(?:\.[0-9]+)(?:[-_a-zA-Z0-9.]+)?):([^:]):([^:]):([^:]):([^:]):([^:]):([^:]):([^:])$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
   cveRegex = /^CVE-\d{4}-\d{4,}$/;
   constructor(private paginationService: CVSSPaginationService, private http: HttpClient, private vulnService: VulnerabilityService,
-    private router: Router, private dashboard: DashboardComponent
+    private router: Router, private snackBar: MatSnackBar
   ) {}
+
+  ngOnInit(): void {
+    this.vulnService.darkMode$.subscribe((mode: boolean) => {
+      this.darkMode = mode;
+    });
+     this.vulnService.portNumber$.subscribe((port:number)=>{
+      this.portNumber = port;
+    });
+  }
 
   onFocus(event: Event) {
   if (this.searchField === 2 && event.type === 'focus') {
@@ -72,10 +81,11 @@ onInputChange(event: Event) {
 }
 
 setSearchUrl() {
+  console.log(this.searchField, this.searchType)
     this.dependencies = [];
 
     if (this.searchValue.trim() !== '' && this.searchField !== 0) {
-      switch (this.searchField) {
+      switch (Number(this.searchField)) {
         case 1:
           if (this.searchValue.length > 0) {
             this.searchUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.searchByKeyWordUrl}`;
@@ -84,7 +94,7 @@ setSearchUrl() {
             this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
           } else {
-            this.dashboard.showError('Please enter a valid keyword');
+            this.showError('Please enter a valid keyword');
           }
           break;
         case 2:
@@ -96,7 +106,7 @@ setSearchUrl() {
             this.searchVulnerabilities();
           } else {
 
-            this.dashboard.showError('Please enter a valid CVE ID');
+            this.showError('Please enter a valid CVE ID');
           }
           break;
         case 3:
@@ -107,7 +117,7 @@ setSearchUrl() {
             this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
           } else {
-            this.dashboard.showError('Please enter a valid CPE Name');
+            this.showError('Please enter a valid CPE Name');
           }
           break;
         case 4:
@@ -118,7 +128,7 @@ setSearchUrl() {
             this.paginationService.setCpePageSize(10);
             this.searchVulnerabilities();
           } else {
-            this.dashboard.showError('Please enter a valid Keyword');
+            this.showError('Please enter a valid Keyword');
           }
           break;
         case 5:
@@ -129,51 +139,63 @@ setSearchUrl() {
             this.paginationService.setCpePageSize(10);
             this.searchVulnerabilities();
           } else {
-            this.dashboard.showError('Please enter a valid CPE Name');
+            this.showError('Please enter a valid CPE Name');
           }
           break;
           default:
           return;
       }
     } else {
-            this.dashboard.showError('Please enter a value in this field.');
+            this.showError('Please enter a value in this field.');
     }
   }
 
   searchVulnerabilities(): void {
-    this.cancelSearch();
-    this.isLoading = true;
+    this.vulnService.setLoading(true);
     this.http.get<any[]>(`${this.searchUrl}${this.searchValue}`)
       .pipe(takeUntil(this.cancelRequest$),
       finalize(() => this.vulnService.setLoading(false)))
       .subscribe({
         next: (response) => {
+          console.log(response)
           this.searchVariant = true;
           this.vulnService.setSearchVariant(this.searchVariant);
           this.vulnService.setDarkMode(this.darkMode);
           let dataCount = response.length;
-          if (this.searchField === 4 || this.searchField === 5) {
+          if (Number(this.searchField) === 4 || Number(this.searchField) === 5) {
             this.vulnService.setCpeData(response);
             this.router.navigate([this.navigationUrl]);
           } else {
             this.vulnService.setVulnerabilityData(response);
             this.router.navigate([this.navigationUrl]);
           }
-          this.dashboard.showFeedback(
+          this.showFeedback(
             dataCount ? 'Success! The data has been fetched.' : 'No data found.'
           );
         },
         error: (error) => {
           console.log(error);
-          this.dashboard.showError("An error occurred while searching for vulnerabilities");
+          this.showError("An error occurred while searching for vulnerabilities");
         }
       });
   }
 
   cancelSearch(): void {
     this.cancelRequest$.next();
-    this.isLoading = false;
-    this.dashboard.showFeedback('Search request cancelled.');
+    this.vulnService.setLoading(true);
+    this.showFeedback('Search request cancelled.');
     console.log('Cancellation signal sent.');
   }
+
+  private showError(message: string): void {
+  this.snackBar.open(message, 'Dismiss', {
+    duration: 5000
+  });
+}
+
+private showFeedback(message: string): void {
+  this.snackBar.open(message, 'Dismiss', {
+    duration: 5000
+  });
+}
 }

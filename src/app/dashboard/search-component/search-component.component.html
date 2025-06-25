@@ -1,4 +1,54 @@
-<div class="container-fluid">
+<div class="col-lg-6">
+  <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="fnw-bold">There are two types of searches available: 
+    1. CVE Search 2. CPE Search. Please choose one to proceed.</p>
+  <div [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="border border-primary border-3 rounded p-3">
+  <table [ngClass]="{'table-dark': darkMode, 'table-white': !darkMode}" class="table table-responsive table-borderless">
+    <tbody>
+        <tr>
+        <td>
+           Search Type
+        </td>
+        <td>
+          <select [(ngModel)]="searchType" (change)="searchField = 0" class="rounded form-control">
+             <option *ngFor="let type of searchTypes" [value]="type.id">{{type.value}}</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Select Variant</td>
+        <td>
+          <select [(ngModel)]="searchField" class="rounded form-control">
+            <option *ngFor="let variant of ( searchType == 1 ? CVESearch : CPESearch)" [value]="variant.id">{{variant.value}}</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <input [(ngModel)]="searchValue" [ngClass]="{'text-white': darkMode, 'text-dark': darkMode, 'custom-auto-black': darkMode, 'custom-app-grey': !darkMode}"
+          class="p-2 ps-3 pe-5 rounded border-0 w-100"
+          type="text"
+          id="dependency-search"
+          [placeholder]="searchType == 1 ? 'Vulnerability Search' : 'Dependency Search'" (focus)="onFocus($event)"
+          (keydown)="onKeyDown($event)" (input)="onInputChange($event)" (keyup.enter)="searchField !== 0 && setSearchUrl()"
+        />
+      </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <button [disabled]="searchField === 0" (click)="setSearchUrl()"
+          class="border-0 h-fit-content btn btn-dark" [ngClass]="{'btn-light': darkMode, 'btn-dark': !darkMode}"
+        >
+          Search
+        </button></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- <div class="container-fluid">
 <div class="row align-items-center">
 
         <div class="col-md-3 ps-3 d-flex align-items-center py-2">
@@ -39,4 +89,4 @@
       </div>
 
 </div>
-</div>
+</div> -->

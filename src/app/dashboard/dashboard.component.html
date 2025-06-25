@@ -1,24 +1,88 @@
-<div class="container-fluid position-fixed h-100">
-  <div style="height:60px;" class="row bg-light">
-      <div class="col-md-2">
-
+<mat-toolbar *ngIf="!isAnimate" [ngClass]="{'bg-black': darkMode, 'bg-topnav': !darkMode, 'border-secondary': darkMode,'sticky-top': !isNavbarSticky}" class="p-0 border border-start-0 border-top-0 border-end-0">
+  <div class="p-2 col-2"><img src="images/isteer_logo-1.png" height="50px" alt="isteer"></div>
+  <div class="container-fluid col-10">    
+  <div class="row px-2">
+  <div class="col-3">
+  <button
+        type="button"
+        mat-icon-button
+        class="d-md-none"
+      >
+        <mat-icon class="material-symbols-outlined">menu</mat-icon>
+      </button>
+      <span [ngClass]="{'text-primary': !darkMode, 'text-white': darkMode}" class="fnw-bold fs-3"> CVSS Dashboard</span>
       </div>
-      <div class="col-md-10 d-flex align-items-center">
-        <div class="container-fluid">
-         <app-search-component></app-search-component>
-        </div>  
+      <div class="col-9 d-flex justify-content-end">
+       <div class="form-check form-switch show-lg w-fit-content">
+          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
+          <label class="form-check-label custom-fw-1 text-wrap" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault">Dark Mode</label>
+        </div>
+      </div>  
       </div>
-  </div>
-
-  <div class="row h-100">
-     <div class="col-md-2 bg-top-nav">
-     <app-scan-file></app-scan-file>
-     </div>
-     <div class="col-md-10">
-
-     </div>
-  </div>
+      </div>
+    </mat-toolbar>
+<mat-sidenav-container autosize>
+  <!-- Side Navigation -->
+  <mat-sidenav
+    #sidenav
+    mode="side"
+    opened
+    fixedInViewport="true"
+    [fixedTopGap]="64"
+    *ngIf="!isAnimate"
+    class="mat-elevation-z4 sidenav border border-start-0 border-top-0 border-bottom-0 bg-sidemenu"
+    [ngClass]="{'bg-black': darkMode, 'bg-light': !darkMode, 'text-white': darkMode, 'text-dark': !darkMode, 'border-secondary': darkMode}">
+    <div>
+  <ul class="nav flex-column">
+    <ng-container *ngFor="let item of parentMenu; let pi = index">
+    <li
+      class="nav-item dash-menu-item"
+    >
+      <div class="cursor-pointer py-3 ps-2 d-flex justify-content-between align-items-center fnw-bold" (click)="toggleSubMenu(pi)" [routerLink]="item.route ? [item.route] : null" 
+      [ngClass]="{'text-white': darkMode,'text-dark': !darkMode,'router-link-active': activeParentIndex === pi}"
+      >
+        <div [ngClass]="{'router-link-active': activeParentIndex === pi}" class="d-flex align-items-center">
+          <span class="material-symbols-outlined p-1 rounded fw-light">{{ item.icon }}</span>
+          &nbsp;<span>{{ item.label }}</span>
+        </div>
+        <mat-icons *ngIf="item.child?.length" [ngClass]="'angle'+pi" class="material-symbols-outlined d-flex align-items-center text-secondary angle{{pi}} me-3 rounded-circle bg-gray">stat_minus_1</mat-icons>
+      </div>
+      
+    </li>
+    <ul *ngIf="item.child?.length && activeParentIndex === pi" class="ps-3 no-menu-hover">
+        <li
+          *ngFor="let childItem of item.child"
+          class="scan-child nav-item py-2 d-flex align-items-center cursor-pointer fnw-bold"
+          [routerLink]="[childItem.route, childItem.id]" 
+          routerLinkActive="link-active"
+          #rla="routerLinkActive"
+          [ngClass]="{
+            'link-active': rla.isActive,
+            'text-white': darkMode && !rla.isActive,
+            'text-dark': !darkMode && !rla.isActive
+          }"
+        >
+          <span class="material-symbols-outlined p-1 rounded fw-light">{{ childItem.icon }}</span>
+          &nbsp; {{ childItem.label }}
+        </li>
+      </ul>
+    </ng-container>
+  </ul>
 </div>
+
+  </mat-sidenav>
+
+  <!-- Main Content -->
+  <mat-sidenav-content>
+    <!-- Toolbar -->
+
+    <!-- Main Content Area -->
+    <div #dashBoard class="h-100 content-area" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
 
 <!-- <div #dashBoard *ngIf="!isAnimate && !isLoading" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="pb-2"> -->
 
@@ -166,7 +230,7 @@
 </div> -->
 <!--------------------------------------portnumber-modal--------------------------------------->
 <!--------------------------------------portnumber-modal--------------------------------------->
-<!-- <div class="modal fade" data-bs-backdrop="static" #getPortNumberSearch>
+<div class="modal fade" data-bs-backdrop="static" #getPortNumberSearch>
 <div class="modal-dialog">
   <div class="modal-content">
       <div class="modal-header bg-danger">
@@ -181,21 +245,10 @@
       </div>
   </div>
 </div>
-</div> -->
+</div>
 <!--------------------------------------portnumber-modal--------------------------------------->
- <!-- <div
-      class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-      *ngIf="isAnimate" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
-    >
-      <div class="d-flex flex-column"> 
-      <div id="progress-bar" class="loader" [ngStyle]="{'--p': progress + '', 'animation':animationStyle}" style="--n: 16; --f: 0.2"></div>
-      <p [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center">Analyzed <span class="text-warning">{{fetchedDependencies}}</span> out of <span class="text-warning">{{totalDependencies}}</span> dependencies</p>
-      <div *ngIf="progress === 100" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" class="h5 text-center d-flex align-items-center">Please wait while we retrieve the likely CPEs. This process may take a few moments.</div>
-      <div class="text-center"><button (click)="stopSSE()" class="btn btn-secondary">Cancel</button></div>
-      </div>
-    </div>
 
-    <div
+<div
   class="position-fixed top-0 w-100 h-100 d-flex justify-content-center align-items-center flex-column"
   *ngIf="isLoading"
   [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}"
@@ -205,7 +258,7 @@
   <div class="text-center"><button (click)="cancelSearch()" class="btn btn-secondary">Cancel</button></div>
 </div>
 
-<ng-template #scanDialog>
+<!-- <ng-template #scanDialog>
   <h2 mat-dialog-title class="bg-danger text-white p-2">Enter Your Port Number</h2>
 
   <mat-dialog-content class="p-3">

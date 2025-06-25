@@ -3,7 +3,7 @@
   <thead>
     <tr>
         <th colspan="6" class="text-center sticky-top dialog-heading">🖥️ Computer Info</th>
-      </tr>
+    </tr>
     <tr class="dash-theme text-white">
       <th>Device Id</th>
       <th>IP Address</th>
@@ -14,13 +14,9 @@
     </tr>
   </thead>
   <tbody>
-    <!-- No Computers -->
     <tr *ngIf="!computerData || computerData.length === 0">
       <td colspan="6" class="empty">No computer data found</td>
     </tr>
-
-    <ng-container>
-      <!-- Computer Info -->
       <tr>
         <td>{{computerData.computer.deviceId}}</td>
         <td>{{ computerData.computer.ipAddress }}</td>
@@ -29,85 +25,59 @@
         <td>{{ computerData.computer.antivirusStatus }}</td>
         <td>{{ computerData.computer.firewallStatus }}</td>
       </tr>
-
-      <!-- Applications Section -->
-      <tr *ngIf="!computerData.applications?.length">
-        <td colspan="6" class="empty">No applications found</td>
-      </tr>
-      
-      <ng-container *ngFor="let app of computerData.applications; let i = index">
-        <tr>
-        <td colspan="6" class="text-center sticky-top dialog-heading text-primary">📦 Application</td>
-        </tr>
-        <tr class="section-subtitle">
-          <td colspan="6" class="text-dark">{{i+1}}. {{ app.name }}</td>
-        </tr>
-        <tr class="dash-theme text-white">
-          <th>Name</th>
-          <th>Vendor</th>
-          <th>Version</th>
-          <th colspan="3">Installed Date</th>
-        </tr>
-        <tr>
-          <td>{{ app.name }}</td>
-          <td>{{ app.vendorName }}</td>
-          <td>{{ app.version }}</td>
-          <td colspan="3">{{ app.installedDate }}</td>
-        </tr>
-
-        <!-- Dependencies -->
-        <ng-container *ngFor="let dep of app.dependencies;let i = index">
-        <tr class="section-subtitle">
-          <td colspan="6" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
-        </tr>
-        <tr *ngIf="!app.dependencies?.length">
-          <td colspan="6" class="empty">No dependencies found</td>
-        </tr>
-        <tr class="section-subtitle">
-          <td colspan="6" class="text-dark">{{i+1}}. {{ dep.name }}</td>
-        </tr>
-          <tr class="dash-theme text-white">
-            <th>Name</th>
-            <th>Group Id</th>
-            <th>Artifact Id</th>
-            <th colspan="3">Version</th>
-          </tr>
-          <tr>
-            <td>{{ dep.name }}</td>
-            <td>{{ dep.groupId }}</td>
-            <td>{{ dep.artifactId }}</td>
-            <td colspan="3">{{ dep.version }}</td>
-          </tr>
-
-          <!-- Vulnerabilities -->
-          <tr class="section-subtitle">
-            <td colspan="6" class="text-center sticky-top dialog-heading text-danger">⚠️ Vulnerabilities</td>
-          </tr>
-          <tr *ngIf="!dep.vulnerabilities?.length">
-            <td colspan="6" class="empty">No vulnerabilities found</td>
-          </tr>
-            <tr class="dash-theme text-white table-danger" *ngIf="dep.vulnerabilities?.length">
-              <th>S.No</th>
-              <th>CVE ID</th>
-              <th>CVSS Score</th>
-              <th>Description</th>
-              <th colspan="3">Severity</th>
-            </tr>
-          <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
-            <tr class="table-danger">
-              <td class="text-dark">{{i + 1}}</td>
-              <td>{{ vul.cveId }}</td>
-              <td>{{ vul.cvssScore }}</td>
-              <td>{{ vul.description }}</td>
-              <td>{{ vul.severity }}</td>
-            </tr>
-          </ng-container>
-        </ng-container>
-      </ng-container>
-    </ng-container>
   </tbody>
+  <thead>
+    <tr>
+      <th colspan="6" class="text-center sticky-top dialog-heading text-primary">📦 Application</th>
+    </tr>
+    <tr class="dash-theme text-white">
+        <th>Name</th>
+        <th>Vendor</th>
+        <th>Version</th>
+        <th>Installed Date</th>
+        <th>Created At</th>
+        <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="!computerData.applications?.length">
+      <td colspan="6" class="empty">No applications found</td>
+    </tr>
+    <tr *ngFor="let app of computerData.applications; let i = index">
+      <td>{{ app.name }}</td>
+      <td>{{ app.vendorName }}</td>
+      <td>{{ app.version }}</td>
+      <td>{{ app.installedDate }}</td>
+      <td>{{app.createdAt}}</td>
+      <td class="text-center"><span (click)="openViewApplicationDialog(app.uuid)" matTooltip="View Computer"
+              class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 text-center">visibility</span></td>
+    </tr>
+  </tbody>
+  
 </table>
 </div>
+
+<!-- your-component.component.html -->
+<ng-template #vulnerabilityData let-data>
+  <div>
+    <table class="styled-table">
+      <thead>
+        <tr class="dash-theme text-white p-2">
+          <th>CveId</th>
+          <th>Description</th>
+          <th>Severity</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="4" class="text-center">No Data Found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
 <!------------------------------------Progress-bar--------------------------------------------------->
 <div *ngIf="isLoading" class="position-fixed top-0 start-0 h-100 w-100 d-flex justify-content-center align-items-center spinner-opacity">
     <mat-spinner></mat-spinner>

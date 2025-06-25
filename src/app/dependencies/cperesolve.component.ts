@@ -17,6 +17,8 @@ import { environment } from "../../environments/environments";
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { Router } from "@angular/router";
+import { AppRoutes } from "../../shared/AppRoutes";
 @Component({
     selector: 'app-cperesolve',
     standalone: true,
@@ -50,7 +52,8 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
 
     constructor(public dialogRef: MatDialogRef<CpeResolveComponent>, public cpeResolveRef: MatDialogRef<CpeResolveComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any, private vulnService: VulnerabilityService,
-        private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient, private snackBar: MatSnackBar) {
+        private cd: ChangeDetectorRef, private dialog: MatDialog, private http: HttpClient, private snackBar: MatSnackBar,
+      private router: Router) {
         this.dependencies = data.dependencies || [];
         this.updatePagedData(this.initialIndex);
         }
@@ -60,10 +63,9 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
       this.darkMode = mode;
     });
     this.vulnService.portNumber$.subscribe((port:number)=>{
-       let portNumber = port;
+       this.portNumber = port;
        console.log(port);
-       this.baseUrl = `${environment.baseLocaUrl}${portNumber}`;
-       this.saveDependencyHintEndpoint = `${this.baseUrl}${environment.saveDependencyHint}`;
+       this.saveDependencyHintEndpoint = environment.saveDependencyHint;
     });
     console.log(this.saveDependencyHintEndpoint)
     const deps = sessionStorage.getItem('dependencies');
@@ -135,7 +137,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     console.log(this.saveDependencyHintEndpoint)
     const params = new HttpParams().set('cpeName', cpeName);
     this.http.post<any>(
-      this.saveDependencyHintEndpoint,
+      environment.saveDependencyHint,
       dependency,       
       { params: params }     
     ).subscribe({
@@ -165,6 +167,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
       sessionStorage.setItem('dependencies', JSON.stringify(depWithResolvedKey));
       this.dependencies = resolvedCpe;
       if(this.dependencies.length === resolvedCount) {
+        this.vulnService.setIsStickyNavbar(false);
         this.cpeResolveRef.close();
         return;
       }
@@ -174,6 +177,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
       console.log('Dependency hint added successfully:', response);
       },
       error: (err) => {
+        this.showFeedback('Error occured. Hint not added');
         console.error('Subscription error (already handled by catchError):', err);
       }
     });
@@ -200,7 +204,7 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
     submitButton.onclick = () => this.addDependencyHint(manualInput.value.trim(), this.pagedDependencies[i]);
     submitButton.className = 'btn btn-danger ms-2';
     closeButton.id = `closeBtn_${i}`;
-    closeButton.className = 'btn btn-close float-end mb-1';
+    closeButton.className = 'btn btn-close bg-light float-end mb-1';
     closeButton.onclick = () => this.hideManualInput(i);
     cpeError.className = 'cpe-error text-danger d-none';
     cpeError.innerText = 'Please enter valid CPE Name';
@@ -235,7 +239,6 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
   }
 
   isValidCpe(cpeName: any, index: number) {
-    console.log("typed")
     const cpeError = document?.getElementById(`cpeError_${index}`);
     if(!this.cpeRegex.test(cpeName)) {
       this.cpeNameError = true;
@@ -252,5 +255,26 @@ export class CpeResolveComponent implements OnInit, AfterViewInit {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
   });
+}
+
+searchCpeName(cpeName: string, index: number) {
+    this.vulnService.setLoading(true);
+    this.http.get<any>(`${environment.baseLocaUrl}${this.portNumber}${environment.searchByCpeName}${cpeName}`).subscribe({
+       next:(response)=> {
+        this.vulnService.setDarkMode(this.darkMode);
+        this.vulnService.setVulnerabilityData(response);
+        this.vulnService.setTempVulnerability(false);
+        this.cpeResolveRef.close();
+        this.router.navigate([AppRoutes.VULNERABILITY_LIST]);
+        this.vulnService.setLoading(false);
+       },error: (error) => {
+        this.snackBar.open('Unexpected Error Occured', 'Dismiss', { duration: 5000, 
+        panelClass: ['snackbar-error'] });
+        this.vulnService.setLoading(false);
+        console.error("Error fetching data:", error);
+       }    
+    
+  });
+  sessionStorage.setItem('selectedCpeIndex', index.toString());
 }
 }

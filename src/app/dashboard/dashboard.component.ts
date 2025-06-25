@@ -42,7 +42,7 @@ import { SearchComponentComponent } from './search-component/search-component.co
   imports: [ MatIconModule, CommonModule, FormsModule, VulnerabilitylistComponent, DependenciesComponent,
     RouterOutlet, MatFormFieldModule, MatSelectModule, MatRadioModule, RouterModule ,MatInputModule, MatToolbarModule,
     MatButtonModule, MatSlideToggleModule, MatMenuModule, MatSidenavModule, FlexLayoutModule, MatDialogModule, MatIcon,
-    ScanFileComponent, SearchComponentComponent
+    SearchComponentComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css', './dashboard.component.scss'],
@@ -61,7 +61,6 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   searchUrl: string = '';
   
   progress: number = 0;
-  animationStyle: string = 'none';
   fetchedDependencies: number = 0;
   totalDependencies: number = 0;
   portNumber: number = 8080;
@@ -79,7 +78,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   messages: any = [];
   eventSource: EventSource | null = null;
   isScanning = false;
+  isNavbarSticky: boolean = false;
   dependencies = [];
+  activeParentIndex: number | null = null;
   
   cpeRegex = /^cpe:\d+\.\d+:[aho]:([^:]+):([^:]+):([0-9]+\.[0-9]+(?:\.[0-9]+)(?:[-_a-zA-Z0-9.]+)?):([^:]):([^:]):([^:]):([^:]):([^:]):([^:]):([^:])$/;
   likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/;
@@ -97,6 +98,9 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('navBarParent') navBarParent: ElementRef | undefined;
   @ViewChild('scanDialog') scanDialog: TemplateRef<any> | undefined;
   dialogRef: MatDialogRef<any> | undefined;
+  parentMenu = [{ id:1, label: 'Home', route: '/', icon: 'home', child:[] },
+    { id:2, label: 'Scan', route: null, icon: 'motion_sensor_active', child:[{ id:1, label: 'Scan File', route: '/scanningPage', icon: 'scan' },
+    { id:2, label: 'Scan Project', route: '/scanningPage', icon: 'settings_overscan' }]}, { id:3, label: 'Search', route: '/securitySearch', icon: 'category_search', child:[]}];
  
   constructor( private http: HttpClient, private router: Router, private vulnService: VulnerabilityService,
     private ngZone: NgZone, private cd: ChangeDetectorRef, private snackBar: MatSnackBar, private renderer: Renderer2, private paginationService: CVSSPaginationService,
@@ -119,19 +123,14 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     this.vulnService.portNumber$.subscribe((port:number)=>{
       this.portNumber = port;
     });
-    this.vulnService.isNavbarSticky$.subscribe((condition: boolean)=> {
-      if(condition) {
-      this.navBarParent?.nativeElement.classList.remove('sticky-top');
-      }
-    });
     sessionStorage.removeItem('selectedCpeIndex');
     sessionStorage.removeItem('selectedDependencyIndex');
   }
 
   ngAfterViewInit(): void {
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'min-height', `${window.innerHeight}px`);
-    this.renderer.setStyle(this.dashBoard.nativeElement, 'max-height', "fit-content");
-    const navBarHeight = this.navBar.nativeElement.offsetHeight;
+    this.renderer.setStyle(this.dashBoard?.nativeElement, 'min-height', `${window.innerHeight}px`);
+    this.renderer.setStyle(this.dashBoard?.nativeElement, 'max-height', "fit-content");
+    const navBarHeight = this.navBar?.nativeElement.offsetHeight;
     this.vulnService.setNavBarHeight(navBarHeight);
     const bootstrap = (window as any).bootstrap;
     if (bootstrap && bootstrap.Modal && !this.portNumberSetStatus) {
@@ -141,8 +140,31 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
       scanModal.show();
       }, 50);
       });}
+      this.vulnService.isNavbarSticky$.subscribe((condition: boolean)=> {
+        console.log(condition)
+      if(condition) {
+        this.isNavbarSticky = condition;
+        this.navBarParent?.nativeElement.classList.remove('sticky-top');
+      }
+    });
   }
-
+  
+toggleSubMenu(index: number): void {
+  const getAngleIcon = document.querySelector(`.angle${index}`);
+  if(getAngleIcon?.classList.contains('angle-right')){
+    getAngleIcon.classList.remove('angle-right');
+    getAngleIcon.classList.add('angle-down');
+  } else{
+    getAngleIcon?.classList.remove('angle-down');
+    getAngleIcon?.classList.add('angle-right');
+  }
+  if(this.activeParentIndex !== index) {
+    const preAngleIcon = document.querySelector(`.angle${this.activeParentIndex}`);
+    preAngleIcon?.classList.remove('angle-right');
+    preAngleIcon?.classList.add('angle-down');
+  }
+  this.activeParentIndex = this.activeParentIndex === index ? null : index;
+}
   ngOnDestroy(): void {
     clearInterval(this.progressInterval);
     this.eventSource?.close();
@@ -263,13 +285,13 @@ export class DashboardComponent implements OnDestroy, OnInit, AfterViewInit {
     });
 }
 
-public showError(message: string): void {
+private showError(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
   });
 }
 
-public showFeedback(message: string): void {
+private showFeedback(message: string): void {
   this.snackBar.open(message, 'Dismiss', {
     duration: 5000
   });
@@ -431,15 +453,21 @@ onFileUpload(event: Event): void {
       };
   }
 
-  stopSSE() {
-    this.isAnimate = false;
-    this.fetchedDependencies = 0;
-    this.totalDependencies = 0;
-    this.progress = 0;
-    clearInterval(this.progressInterval);
-    this.eventSource?.close();
+  isScanMenuActive(index:number) {
+    const scanChild = document.querySelectorAll('.scan-child');
+    console.log(scanChild, index)
+      scanChild.forEach((element: Element, i: number)=> {
+         if(i === index) {
+             return true;
+         } else {
+             return false
+         }
+      });
+      // return false;
   }
-
+  isMainmenuActive() {
+      
+  }
   fetchFinalResults() {
     fetch(
       `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.getVulnerabilities}`

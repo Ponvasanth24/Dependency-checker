@@ -39,3 +39,13 @@ table thead th {
     width: 100%;
     transition: width 5s ease-in-out;
 }
+
+::ng-deep .custom-tooltip {
+  white-space: pre-line;
+  background-color: #343a40; 
+  color: #ffffff; 
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  max-width: 300px;
+}

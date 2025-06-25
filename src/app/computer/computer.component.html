@@ -175,11 +175,9 @@
           </td>
           <td>
   <mat-form-field appearance="fill" class="full-width">
-  <input matInput [matDatepicker]="timestampPicker" readonly formControlName="timestamp"
-    placeholder="Select Timestamp" (dateChange)="onDateChange($event.value, 'timestamp')"
-    [disabled]="true" /> 
-  <mat-datepicker-toggle matSuffix [for]="timestampPicker"></mat-datepicker-toggle>
-  <mat-datepicker #timestampPicker></mat-datepicker>
+  <input matInput  formControlName="timestamp" readonly /> 
+  <!-- <mat-datepicker-toggle matSuffix [for]="timestampPicker"></mat-datepicker-toggle>
+  <mat-datepicker #timestampPicker></mat-datepicker> -->
   <mat-error *ngIf="deviceForm.get('timestamp')?.hasError('required')">
     Timestamp is required
   </mat-error>

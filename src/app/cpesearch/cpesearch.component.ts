@@ -132,12 +132,10 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
         this.router.navigate([AppRoutes.VULNERABILITY_LIST]);
         this.vulnService.setLoading(false);
        },error: (error) => {
-        this.snackBar.open('Unexpected Error Occured', 'Dismiss', { duration: 5000, 
-        panelClass: ['snackbar-error'] });
+        this.snackBar.open('Unexpected Error Occured', 'Dismiss', { duration: 5000});
         this.vulnService.setLoading(false);
         console.error("Error fetching data:", error);
        }    
-    
   });
   sessionStorage.setItem('selectedCpeIndex', index.toString());
 }

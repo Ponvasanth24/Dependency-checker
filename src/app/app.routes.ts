@@ -22,11 +22,20 @@ export const routes: Routes = [
         {
           path: 'cpeSearchResults',
           loadComponent: () => import('./cpesearch/cpesearch.component').then(m => m.CpesearchComponent)
-        }
-      ]
-      },{
+        },
+        {
+          path: 'scanningPage/:id',
+          loadComponent: () => import('./dashboard/scan-file/scan-file.component').then(m=> m.ScanFileComponent)
+        },
+        {
+          path: 'securitySearch',
+          loadComponent: () => import('./dashboard/search-component/search-component.component').then(m => m.SearchComponentComponent)
+        },
+        {
           path: 'vulnerability/:id',
           loadComponent: () => import('./vulnerability/vulnerability.component').then(m => m.VulnerabilityComponent)
+      }
+      ]
       },
       {
         path: 'vulnerabilitySync',
