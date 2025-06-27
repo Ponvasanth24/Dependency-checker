@@ -1,81 +1,28 @@
 <div class="view-table border-theme overflow-auto">
 <table class="styled-table">
+  <caption class="status-title sticky-top bg-white fnw-bold">{{title}}</caption>
   <thead>
-    <tr>
-        <th colspan="5" class="text-center sticky-top dialog-heading sticky-top dialog-heading">📦 Application Info</th>
-    </tr>
     <tr class="dash-theme text-white">
-          <th>Name</th>
-          <th>Vendor</th>
-          <th>Version</th>
-          <th colspan="2">Installed Date</th>
-        </tr>
+      <th>Name</th>
+      <th>Vendor</th>
+      <th>Version</th>
+      <th>{{applicationDate}}</th>
+    </tr>
   </thead>
   <tbody>
     <ng-container>
 
       <!-- Applications Section -->
-      <tr *ngIf="!applicationData?.length">
+      <tr *ngIf="!applicationsData?.length">
         <td colspan="5" class="empty">No applications found</td>
       </tr>
-        <tr class="section-subtitle">
-          <td colspan="5">{{ applicationData?.name }}</td>
+      <ng-container *ngIf="applicationsData?.length"></ng-container>
+        <tr *ngFor="let app of applicationsData">
+          <td>{{ app.name }}</td>
+          <td>{{ app.vendorName }}</td>
+          <td>{{ app.version }}</td>
+          <td colspan="2">{{ app.installedDate }}</td>
         </tr>
-        <tr>
-          <td>{{ applicationData?.name }}</td>
-          <td>{{ applicationData?.vendor }}</td>
-          <td>{{ applicationData?.version }}</td>
-          <td colspan="2">{{ applicationData?.installedDate }}</td>
-        </tr>
-
-        <!-- Dependencies -->
-        <!-- <ng-container *ngFor="let dep of app.dependencies;let i = index">
-        <tr class="section-subtitle">
-          <td colspan="5" class="text-center sticky-top dialog-heading text-success">🔗 Dependency</td>
-        </tr>
-        <tr *ngIf="!app.dependencies?.length">
-          <td colspan="5" class="empty">No dependencies found</td>
-        </tr>
-        <tr class="section-subtitle">
-          <td colspan="5">{{i+1}}. {{ dep.name }}</td>
-        </tr>
-          <tr class="dash-theme text-white">
-            <th>Name</th>
-            <th>Group Id</th>
-            <th>Artifact Id</th>
-            <th colspan="2">Version</th>
-          </tr>
-          <tr>
-            <td>{{ dep.name }}</td>
-            <td>{{ dep.groupId }}</td>
-            <td>{{ dep.artifactId }}</td>
-            <td colspan="2">{{ dep.version }}</td>
-          </tr> -->
-
-          <!-- Vulnerabilities -->
-          <!-- <tr class="section-subtitle">
-            <td colspan="5" class="text-center text-danger sticky-top dialog-heading">⚠️ Vulnerabilities</td>
-          </tr>
-          <tr *ngIf="!dep.vulnerabilities?.length">
-            <td colspan="5" class="empty">No vulnerabilities found</td>
-          </tr>
-            <tr class="dash-theme text-white" *ngIf="dep.vulnerabilities?.length">
-              <th>S.No</th>
-              <th>CVE ID</th>
-              <th>CVSS Score</th>
-              <th>Description</th>
-              <th colspan="2">Severity</th>
-            </tr>
-          <ng-container *ngFor="let vul of dep.vulnerabilities; let i = index">
-            <tr>
-              <td>{{i + 1}}</td>
-              <td>{{ vul.cveId }}</td>
-              <td>{{ vul.cvssScore }}</td>
-              <td>{{ vul.description }}</td>
-              <td>{{ vul.severity }}</td>
-            </tr>
-          </ng-container>
-      </ng-container>-->
     </ng-container> 
   </tbody>
 </table>

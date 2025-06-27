@@ -2,7 +2,7 @@ import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, QueryLi
 import { CommonModule } from '@angular/common';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
 import { environment } from '../../environments/environments';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatSelectChange } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +16,6 @@ import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
 import { AppRoutes } from '../../shared/AppRoutes';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DependencyData } from '../../CVSS_Models/CvssModels';
-import { catchError, finalize, firstValueFrom, throwError } from 'rxjs';
 import { MatDialog, MatDialogRef,MatDialogModule} from '@angular/material/dialog';
 @Component({
   selector: 'app-cpesearch',
@@ -59,8 +58,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   @ViewChild('cpeList') cpeList!: ElementRef;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
   constructor(private vulnService: VulnerabilityService, private http: HttpClient, private router: Router, private renderer: Renderer2,
-    private snackBar: MatSnackBar, private location: Location, private paginationService: CVSSPaginationService,
-    private dialog: MatDialog
+    private snackBar: MatSnackBar, private location: Location, private paginationService: CVSSPaginationService
   ) {
     this.vulnService.getDarkMode().subscribe((mode: boolean) => {
       this.darkMode = mode;
@@ -88,8 +86,7 @@ export class CpesearchComponent implements OnInit, AfterViewInit, AfterViewCheck
   ngAfterViewInit(): void {
        this.vulnService.navBarHeight$.subscribe((height: number) => {
        this.renderer.setStyle(this.cpeList.nativeElement, 'min-height', `${window.innerHeight - height}px`);
-      }) 
-      // this.renderer.setStyle(this.cpeList.nativeElement, 'min-height', `${window.innerHeight}px`);
+      });
       this.renderer.setStyle(this.cpeList.nativeElement, 'max-height', "fit-content");
       if(this.cpeData.length === 0) {
           this.vulnService.navBarHeight$.subscribe((height: number) => {
@@ -161,7 +158,8 @@ nextPage(): void {
     this.end = this.start + this.pageSize;
     this.pagedCpeData = this.cpeData.slice(this.start, this.end);
     }
-   }
+}
+
 previousPage(): void {
     if(this.pageIndex > 0) {
       this.pageIndex--;

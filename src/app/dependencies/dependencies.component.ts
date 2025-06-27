@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { VulnerabilityService } from '../../shared/VulnerabilityService';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,7 +17,6 @@ import { ChangeDetectorRef } from '@angular/core';
 import { Renderer2 } from '@angular/core';
 import { HighlightPipe } from '../../shared/HighlightSearch';
 import { CVSSPaginationService } from '../../shared/CVSSPaginationService';
-import { filter } from 'rxjs';
 import { AppRoutes } from '../../shared/AppRoutes';
 import { CpeResolveComponent } from './cperesolve.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -59,9 +58,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
         this.darkMode = mode;
       });
       this.vulnService.portNumber$.subscribe((port:number)=>{
-             let portNumber = port;
              console.log(port);
-            //  this.baseUrl = `${environment.baseLocaUrl}${portNumber}`;
           });
       const deps = sessionStorage.getItem('dependencies');
       const depsFromSession = deps ? JSON.parse(deps) : [];
@@ -82,7 +79,7 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
       }, []);
       console.log(resolvedCount);
        if(LikelyCPEs.length > 0 && LikelyCPEs.length !== resolvedCount) {
-         const dialogRef = this.dialog.open(CpeResolveComponent, {
+         this.dialog.open(CpeResolveComponent, {
             width: '95vw',
             height: '90vh',
             disableClose: true,
@@ -124,13 +121,14 @@ export class DependenciesComponent implements OnInit, AfterViewInit, AfterViewCh
           }); 
         }  
   }
+
   handleDependency(dependency: any, index:number) {
     this.vulnService.setSearchVariant(false);
     this.vulnService.setDependencyHint(dependency);
     if(dependency.vulnerabilities?.length > 0){
       this.viewDependency(dependency.vulnerabilities);
     } else{
-      this.viewCPEs(dependency.likelyCPEs)
+      this.viewCPEs(dependency.likelyCPEs);
     }
     sessionStorage.setItem('selectedDependencyIndex', index.toString());
   }

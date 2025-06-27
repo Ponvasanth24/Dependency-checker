@@ -14,26 +14,26 @@ import { HttpClient } from '@angular/common/http';
   ]
 })
 export class ViewApplicationDialogComponent {
-  applicationData: any= [];
+  applicationsData: any= [];
+  applicationStatus: boolean = false;
+  applicationDate: string = '';
+  title: string = '';
   constructor(
     public dialogRef: MatDialogRef<ViewApplicationDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient) {};
 
   ngOnInit(): void {
-     const applicationUuid = this.data.applicationUuid;
-     const params = {applicationUuid}
-     this.http.get(`${vulnSyncEnvironments.applicationCommonUrl}/${applicationUuid}`)
+     const computerUuid = this.data.computerUuid;
+     const params = {status: this.data.status};
+     this.applicationStatus = this.data.status;
+     this.title = this.applicationStatus ? 'Uninstalled Softwares' : 'Installed Software';
+     this.applicationDate = this.applicationStatus ? 'Uninstalled Date' : 'Installed Date';
+     this.http.get(`${vulnSyncEnvironments.computerCommonUrl}/${ computerUuid }/applications`, { params })
       .subscribe({
         next: (response) => {
         console.log('fetch success:', response);
-        this.applicationData = response || {}; 
-        console.log(this.applicationData)
-    //     this.applicationData.forEach((application: any) => {
-    //     application.dependencies = Array.isArray(application.dependencies) ? application.dependencies : [];
-    //     application.dependencies.forEach((dependency: any) => {
-    //     dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
-    // });
-    // });
+        this.applicationsData = response || {}; 
+        console.log(this.applicationsData)
         },
         error: (err) => {
           console.error('fetch error:', err);

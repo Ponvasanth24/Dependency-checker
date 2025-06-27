@@ -158,7 +158,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   osVersion: ['', Validators.required],
   antivirusStatus: ['', Validators.required],
   firewallStatus: ['', Validators.required],
-  loggedInUser: ['Muthukumar Ramasamy'],
+  loggedInUser: ['', Validators.required],
   installedSoftware: this.fb.array([
     this.createSoftwareGroup()
   ]),
@@ -170,9 +170,9 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   createSoftwareGroup(): FormGroup {
     return this.fb.group({
       name: ['', Validators.required],
-      version: ['', Validators.required],
-      InstalledDate: [null, Validators.required],
-      VendorName: ['', Validators.required]
+      version: [''],
+      InstalledDate: [null],
+      VendorName: ['']
     });
   }
   onDateChange(date: Date, controlName: string): void {
@@ -396,10 +396,10 @@ get installedSoftware(): FormArray {
     };
     console.log(computer)
     const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
-      data: { computer, origin },
+      data: { uuid: computer.uuid, origin },
       width: '80vh',
       height: '90vh',
-      panelClass: 'animated-dialog-container',
+      panelClass: 'update-dialog-container',
       hasBackdrop: true,
       backdropClass: 'custom-backdrop',
       disableClose: true

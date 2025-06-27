@@ -292,3 +292,42 @@
  #comp-detail-table thead{
   border-radius: 10px !important;
  }
+::ng-deep .mat-dialog-container.viewVuln {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+.vertical-middle {
+  vertical-align: middle;
+}
+
+#vulnTable tbody > tr td{
+    vertical-align: middle;
+}
+#vulnTable {
+  border-collapse: collapse;
+}
+#vulnTable tr,th,td{
+   padding: 8px;
+}
+#vulnTable tr:nth-child(even) {
+   background-color: #dad8d8;
+}
+#computerTable tbody > tr td{
+    vertical-align: middle;
+}
+#computerTable {
+  border-collapse: collapse;
+}
+#computerTable tr,th,td {
+   padding: 8px;
+}
+#computerTable tr:nth-child(even) {
+   background-color: #dad8d8;
+}
+#computerTable {
+  color: black;
+}
+

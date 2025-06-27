@@ -149,7 +149,8 @@
       <thead class="dash-theme text-white">
         <tr>
           <th>Firewall Status *</th>
-          <th>Last Update Check</th>
+          <th>Logged In User *</th>
+          <th>Last Update Check *</th>
         </tr>
       </thead>
       <tbody>
@@ -163,6 +164,14 @@
             </mat-form-field>
           </td>
           <td>
+            <mat-form-field appearance="fill" class="full-width">
+            <input matInput placeholder="Logged In User" formControlName="loggedInUser" />
+            <mat-error *ngIf="deviceForm.get('loggedInUser')?.hasError('required')">
+             Required
+            </mat-error>
+            </mat-form-field>
+          </td>
+           <td>
             <mat-form-field appearance="fill" class="full-width">
             <input matInput [matDatepicker]="picker" placeholder="Last Update Check" (dateChange)="onDateChange($event.value, 'lastUpdateCheck')" formControlName="lastUpdateCheck" />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -185,9 +194,9 @@
       <thead class="dash-theme text-white">
         <tr>
           <th>Software Name *</th>
-          <th>Version *</th>
-          <th>Installed Date *</th>
-          <th>Vendor Name *</th>
+          <th>Version</th>
+          <th>Installed Date</th>
+          <th>Vendor Name</th>
           <th>Action</th>
         </tr>
       </thead>

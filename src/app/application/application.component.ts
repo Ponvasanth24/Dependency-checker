@@ -141,6 +141,7 @@ fetchApplicationData(): void {
       }
     });
   }
+
   isExistComputrtId():boolean {
     if(!this.computerUuid) {
         let errorMessage = "ComputerUuid not found"
@@ -248,12 +249,13 @@ fetchApplicationData(): void {
       }
     })
   }
-  openViewApplicationDialog(uuid: string){
+
+  openViewApplicationDialog(statusObj: {status: boolean}){
     const dialogRef = this.dialog.open(ViewApplicationDialogComponent, {
       hasBackdrop: true,
       width: '90vw',
       maxHeight: '90vh',
-      data:{ applicationUuid: uuid}
+      data:{ computerUuid: this.computerUuid, status: statusObj.status}
     });
 
     dialogRef.afterOpened().subscribe(() => {

@@ -1,18 +1,19 @@
 <mat-toolbar *ngIf="!isAnimate" [ngClass]="{'bg-black': darkMode, 'bg-topnav': !darkMode, 'border-secondary': darkMode,'sticky-top': !isNavbarSticky}" class="p-0 border border-start-0 border-top-0 border-end-0">
-  <div class="p-2 col-2"><img src="images/isteer_logo-1.png" height="50px" alt="isteer"></div>
+  <div class="p-2 col-2 show-lg"><img src="images/isteer_logo-1.png" height="64px" alt="isteer"></div>
   <div class="container-fluid col-10">    
-  <div class="row px-2">
-  <div class="col-3">
+  <div class="row align-items-center px-2">
+  <div class="col-9" height="64px">
   <button
         type="button"
         mat-icon-button
-        class="d-md-none"
+        *ngIf="isMobile"
+        (click)="toggleSidenavMode()"
       >
         <mat-icon class="material-symbols-outlined">menu</mat-icon>
       </button>
-      <span [ngClass]="{'text-primary': !darkMode, 'text-white': darkMode}" class="fnw-bold fs-3"> CVSS Dashboard</span>
+      <span [ngClass]="{'text-primary': !darkMode, 'text-white': darkMode}" class="fnw-bold fs-3 mb-4"> CVSS Dashboard</span>
       </div>
-      <div class="col-9 d-flex justify-content-end">
+      <div class="col-3 d-flex justify-content-end">
        <div class="form-check form-switch show-lg w-fit-content">
           <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
           <label class="form-check-label custom-fw-1 text-wrap" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault">Dark Mode</label>
@@ -26,7 +27,7 @@
   <mat-sidenav
     #sidenav
     mode="side"
-    opened
+    [opened]="true"
     fixedInViewport="true"
     [fixedTopGap]="64"
     *ngIf="!isAnimate"
@@ -34,6 +35,7 @@
     [ngClass]="{'bg-black': darkMode, 'bg-light': !darkMode, 'text-white': darkMode, 'text-dark': !darkMode, 'border-secondary': darkMode}">
     <div>
   <ul class="nav flex-column">
+    <li class="show-md"><div class="p-2 col-2"><img src="images/isteer_logo-1.png" height="50px" alt="isteer"></div></li>
     <ng-container *ngFor="let item of parentMenu; let pi = index">
     <li
       class="nav-item dash-menu-item"
@@ -67,6 +69,10 @@
         </li>
       </ul>
     </ng-container>
+    <li class="show-md nav-item"><div class="form-check form-switch w-fit-content ms-3 py-3">
+          <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
+          <label class="form-check-label custom-fw-1 text-wrap" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault">Dark Mode</label>
+        </div></li>
   </ul>
 </div>
 
@@ -77,7 +83,7 @@
     <!-- Toolbar -->
 
     <!-- Main Content Area -->
-    <div #dashBoard class="h-100 content-area" [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}">
+    <div #dashBoard class="h-100 content-area" [ngClass]="{'bg-dark-shade': darkMode, 'bg-white': !darkMode}">
       <router-outlet></router-outlet>
     </div>
   </mat-sidenav-content>

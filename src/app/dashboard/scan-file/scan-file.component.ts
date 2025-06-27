@@ -12,6 +12,7 @@ import { CVSSPaginationService } from '../../../shared/CVSSPaginationService';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoutes } from '../../../shared/AppRoutes';
 import { Renderer2 } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-scan-file',
@@ -25,7 +26,6 @@ export class ScanFileComponent implements OnInit, AfterViewInit{
   formData:FormData = new FormData();
   scanUrl: string = '';
   messages: any[] = [];
-  isScanning: boolean = false;
   darkMode:boolean = false;
   private progressInterval: any = null;
   isAnimate: boolean = false;
@@ -39,6 +39,8 @@ export class ScanFileComponent implements OnInit, AfterViewInit{
   fetchFinalResultUrl: string = '';
   dependencies: any[] = [];
   dialogRef: MatDialogRef<any> | undefined;
+  private cancelRequest$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
   @ViewChild('scanFile') scanFile!: ElementRef;
   @ViewChild('scanProject') scanProject!: ElementRef;
   constructor(private vulnService: VulnerabilityService, private cd: ChangeDetectorRef,
@@ -62,12 +64,21 @@ export class ScanFileComponent implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit(): void {
-    this.renderer.setStyle(this.scanFile?.nativeElement, 'min-height', `${window.innerHeight}px`);
-    this.renderer.setStyle(this.scanFile?.nativeElement, 'max-height', "fit-content");
-    if(this.scanProject) {
-    this.renderer.setStyle(this.scanProject?.nativeElement, 'min-height', `${window.innerHeight}px`);
-    this.renderer.setStyle(this.scanProject?.nativeElement, 'max-height', "fit-content");
-    }
+    // this.renderer.setStyle(this.scanFile?.nativeElement, 'min-height', `${window.innerHeight}px`);
+    // this.renderer.setStyle(this.scanFile?.nativeElement, 'max-height', "fit-content");
+    // console.log(this.scanFile.nativeElement)
+    // if(this.scanProject) {
+    // this.renderer.setStyle(this.scanProject?.nativeElement, 'min-height', `${window.innerHeight}px`);
+    // this.renderer.setStyle(this.scanProject?.nativeElement, 'max-height', "fit-content");
+    // }
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.progressInterval);
+    this.eventSource?.close();
+    this.cancelRequest$.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   removeFile(): void {
@@ -81,101 +92,91 @@ onFileUpload(event: Event): void {
     if (!file) return;
     this.selectedFile = file;
     const filename = file.name;
-    console.log(filename)
     this.formData = new FormData();
     this.formData.append('file', file);
     if (filename === 'pom.xml') {
        this.formData.append('fileType', 'POM');
-       console.log(this.formData.values())
     } else if (filename === 'package.json') {
        this.formData.append('fileType', 'PACKAGE_JSON');
     } else if (filename === 'package-lock.json') {
        this.formData.append('fileType', 'PACKAGE_LOCK_JSON');
     } else {
-      alert('Unsupported file. Upload pom.xml, package.json, or package-lock.json');
+      this.removeFile();
+      this.showFeedback('Unsupported file. Upload pom.xml, package.json, or package-lock.json');
     }
   }
 
-  startScan(): void {
-    console.log(this.portNumber)
+  startFileScan(): void {
     this.messages = [];
-    this.isScanning = true;
     this.isAnimate = true;
-    this.vulnService.setAnimate(true);
-    this.progressInterval = setInterval(()=>{
+    this.startProgress();
+    try {
+    const hasFiles = Array.from(this.formData.values()).some(value => value instanceof File && value.name);
+    if (hasFiles) {
+     this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadFile}`; 
+     this.fetchFinalResultUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.getScanVulnerabilities}`;
+     fetch(this.scanUrl, {method: 'POST',body: this.formData})
+    .then(response => {
+      if (!response.ok) throw new Error('Please check if the server is running on correct port');
+      return response.json();
+    })
+    .then((res) => {
+       const jobId = res.jobId;
+       this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.getFileUploadEventLog}${jobId}`
+       this.fetchEventLog();
+      })
+    .catch(error => {
+      console.log(error);
+      this.resetAnimationState();
+      return;
+     });
+     } else {
+        this.showFeedback('File is not uploaded or Not valid');
+      }   
+    } catch (error: any) {
+      console.error('Error:', error);
+      this.resetAnimationState();
+    }
+  }
+
+  startProjectScan() {
+     this.messages = [];
+     this.isAnimate = true;
+     this.startProgress();
+      try{
+        this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
+        this.fetchFinalResultUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.getVulnerabilities}`;
+        this.fetchEventLog();
+      } catch(error:any) {
+        console.error('Error:', error);
+        this.resetAnimationState();
+      }
+  }
+
+  startProgress(){
+      this.progressInterval = setInterval(()=>{
       if(this.progress < 100) this.progress++;
       else {
         this.isAnimate = false;
-        this.vulnService.setAnimate(false);
         clearInterval(this.progressInterval);
         this.eventSource?.close();
         this.showFeedback("Unexpected error occured");
       }
     }, 1300);
+  }
 
-    try {
-
-      // if (!this.scanUrl || !this.portNumber) {
-      //   throw new Error('Invalid URL or port number.');
-      // } 
-     let hasFiles = false;
-
-     for (const value of this.formData.values()) {
-     if (value instanceof File && value.name) {
-      hasFiles = true;
-      break;
-     }
-     }
-    if (hasFiles) {
-     this.scanUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.uploadFile}`; 
-     this.fetchFinalResultUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.getScanVulnerabilities}`;
-     fetch(this.scanUrl, {
-     method: 'POST',
-     body: this.formData
-    })
-    .then(response => {
-      console.log(response)
-      if (!response.ok) throw new Error('Upload failed');
-      return response.json();
-    })
-    .then((res) => {
-       console.log(res)
-       const jobId = res.jobId;
-      //  this.formData = new FormData();
-       this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber}${environment.getFileUploadEventLog}${jobId}`
-       this.fetchEventLog();
-      })
-    .catch(err => {
+  resetAnimationState() {
       this.isAnimate = false;
       this.vulnService.setAnimate(false);
       this.progress = 0;
       this.fetchedDependencies = 0;
       this.totalDependencies = 0;
       clearInterval(this.progressInterval);
-      console.error('Upload or SSE setup failed:', err);
-      this.showFeedback('Upload or SSE setup failed');
-      return;
-    });
-}
-
-     else {
-       this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
-       this.fetchFinalResultUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.getVulnerabilities}`;
-       this.fetchEventLog();
-      }   
-     
-    } catch (error: any) {
-      console.error('Error:', error);
-      this.isAnimate = false;
-      this.vulnService.setAnimate(false);
-      this.progress = 0;
-      clearInterval(this.progressInterval);
-      this.showFeedback(`Error occurred: ${error.message || 'Please check if the server is running.'}`);
+      this.showFeedback('Failed to fetch | Please check if the server is running on correct port.');
       if (this.eventSource) {
         this.eventSource?.close();
       }
       this.cd.detectChanges();
-    }
   }
   
   fetchEventLog() {
@@ -213,7 +214,7 @@ onFileUpload(event: Event): void {
       };
        this.eventSource.onerror = (error) => {
         console.error('SSE error:', error);
-        this.showFeedback('SSE error');
+        this.showFeedback('SSE error | Please check if the server is running on correct port.');
         this.isAnimate = false;
         this.vulnService.setAnimate(false);
         this.progress = 0;
@@ -225,6 +226,7 @@ onFileUpload(event: Event): void {
         this.messages.push('Connection established');
       };
   }
+
  updateProgress(fetched: number, total: number) {
   const targetProgress = total > 0 ? Math.round((fetched / total) * 100) : 0;
   if (this.progressInterval) {
@@ -276,6 +278,7 @@ fetchFinalResult() {
         this.showFeedback('Error fetching final results:');
       });
   }
+
   viewScannedDependencies() {
     this.router.navigate(['/dependencies']);
   }

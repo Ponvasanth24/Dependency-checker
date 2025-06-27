@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Renderer2 } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Vulnerabilities } from '../../vulnSyncModels/ComputerData';
 
 @Component({
   selector: 'app-view-computer-dialog',
@@ -19,7 +20,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class ViewComputerDialogComponent implements OnInit {
   computerData: any= [];
   isLoading: boolean = false;
-   @ViewChild('vulnerabilityData', { read: TemplateRef }) vulnerabilityData!: TemplateRef<any>;
+  vulnerabilityData: Vulnerabilities[] = []; 
+  @ViewChild('vulnerabilityTable', { read: TemplateRef }) vulnerabilityTable!: TemplateRef<any>;
   constructor(
     public dialogRef: MatDialogRef<ViewComputerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient, private renderer: Renderer2, 
@@ -34,15 +36,6 @@ export class ViewComputerDialogComponent implements OnInit {
         next: (response) => {
         this.computerData = response || {}; 
         console.log(this.computerData)
-      //   this.computerData.forEach((computer: any) => {
-      //   computer.applications = Array.isArray(computer.applications) ? computer.applications : [];
-      //   computer.applications.forEach((application: any) => {
-      //   application.dependencies = Array.isArray(application.dependencies) ? application.dependencies : [];
-      //   application.dependencies.forEach((dependency: any) => {
-      //   dependency.vulnerabilities = Array.isArray(dependency.vulnerabilities) ? dependency.vulnerabilities : [];
-      // });
-      // });
-      // });
     this.isLoading = false;
       },
         error: (err) => {
@@ -54,9 +47,12 @@ export class ViewComputerDialogComponent implements OnInit {
   } 
 
   openViewApplicationDialog(applicationUuid: string) {
-      this.dialog.open(this.vulnerabilityData, {data: {}, width:'90vw', maxHeight: '90vh'},
-
-      );
+      const appVuln = this.computerData.applications.find((app: any, value: number) => {
+           return app.uuid === applicationUuid;
+      });
+      console.log(appVuln)
+      this.vulnerabilityData = appVuln.vulnerabilities;
+      this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'90vw', maxHeight: '90vh'});
   }
 }
 

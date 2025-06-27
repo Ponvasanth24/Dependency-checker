@@ -17,7 +17,7 @@
       <tr>
         <td>Select Variant</td>
         <td>
-          <select [(ngModel)]="searchField" class="rounded form-control">
+          <select [(ngModel)]="searchField" class="w-100 rounded form-control">
             <option *ngFor="let variant of ( searchType == 1 ? CVESearch : CPESearch)" [value]="variant.id">{{variant.value}}</option>
           </select>
         </td>

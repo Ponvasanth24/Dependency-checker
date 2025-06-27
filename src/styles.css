@@ -242,6 +242,10 @@ body.dark-mode {
 .fnw-bold{
   font-weight: 600 !important;
 }
+.bg-dark-shade {
+    background-color: rgb(27, 27, 27);
+    /* color: white; */
+}
 @keyframes reduceWidth {
     from {
         width: 100%;

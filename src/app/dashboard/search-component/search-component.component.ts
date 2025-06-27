@@ -10,7 +10,6 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { VulnerabilityService } from '../../../shared/VulnerabilityService';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
 @Component({
   selector: 'app-search-component',
   imports: [CommonModule, FormsModule, MatSelectModule],
@@ -82,9 +81,7 @@ onInputChange(event: Event) {
 }
 
 setSearchUrl() {
-  console.log(this.searchField, this.searchType)
     this.dependencies = [];
-
     if (this.searchValue.trim() !== '' && this.searchField !== 0) {
       switch (Number(this.searchField)) {
         case 1:
@@ -106,7 +103,6 @@ setSearchUrl() {
             this.paginationService.setVulPageSize(5);
             this.searchVulnerabilities();
           } else {
-
             this.showError('Please enter a valid CVE ID');
           }
           break;

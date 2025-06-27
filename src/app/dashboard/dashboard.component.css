@@ -181,7 +181,7 @@ border-bottom: 4px solid rgb(0, 119, 255);
     background-color: rgb(253, 245, 245);
 }
 .sidenav {
-  width: 16.66%;
+  width: 250px;
 }
 .bg-topnav {
   background-color: rgb(243, 243, 243);
@@ -238,4 +238,5 @@ mat-sidenav-content {
 .bg-gray {
   background-color: rgb(197, 196, 196);
 }
+
 

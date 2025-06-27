@@ -1,5 +1,5 @@
 <div class="view-table border-theme overflow-auto">
-<table class="styled-table" *ngIf="!isLoading">
+<table id="computerTable" class="w-100" *ngIf="!isLoading">
   <thead>
     <tr>
         <th colspan="6" class="text-center sticky-top dialog-heading">🖥️ Computer Info</th>
@@ -9,8 +9,8 @@
       <th>IP Address</th>
       <th>Host Name</th>
       <th>OS Version</th>
-      <th>Antivirus Status</th>
-      <th>Firewall Status</th>
+      <th class="text-nowrap">Antivirus Status</th>
+      <th class="text-nowrap">Firewall Status</th>
     </tr>
   </thead>
   <tbody>
@@ -49,7 +49,7 @@
       <td>{{ app.version }}</td>
       <td>{{ app.installedDate }}</td>
       <td>{{app.createdAt}}</td>
-      <td class="text-center"><span (click)="openViewApplicationDialog(app.uuid)" matTooltip="View Computer"
+      <td class="text-center"><span (click)="openViewApplicationDialog(app.uuid)" matTooltip="View Vulnerabilities"
               class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 text-center">visibility</span></td>
     </tr>
   </tbody>
@@ -58,24 +58,37 @@
 </div>
 
 <!-- your-component.component.html -->
-<ng-template #vulnerabilityData let-data>
-  <div>
-    <table class="styled-table">
-      <thead>
-        <tr class="dash-theme text-white p-2">
+<ng-template #vulnerabilityTable let-data="data">
+    <table id="vulnTable">
+      <thead class="sticky-top">
+        <tr class="dash-theme text-white">
           <th>CveId</th>
           <th>Description</th>
+          <th>Version</th>
+          <th class="text-nowrap">Cvss Score</th>
           <th>Severity</th>
-          <th>Score</th>
+          <th>Source Identifier</th>
+          <th>Vector String</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="4" class="text-center">No Data Found.</td>
+        <tr *ngIf="vulnerabilityData.length === 0">
+          <td colspan="7" class="text-center">No Data Found.</td>
         </tr>
+        <ng-container *ngIf="vulnerabilityData.length > 0">
+        <tr *ngFor="let vulnerability of vulnerabilityData">
+          <td class="text-nowrap"><span class="bg-secondary text-white rounded p-2">{{vulnerability.cveId}}</span></td>
+          <td>{{vulnerability.description}}</td>
+          <td>{{vulnerability.cvssVersion}}</td>
+          <td>{{vulnerability.cvssScore}}</td>
+          <td><span class="text-white p-2" [ngClass]="{'bg-danger': vulnerability.severity === 'HIGH', 'bg-warning': vulnerability.severity === 'MEDIUM',
+          'bg-success': vulnerability.severity === 'LOW', 'bg-secondary': vulnerability.severity === 'CRITICAL'}">{{vulnerability.severity}}</span></td>
+          <td>{{vulnerability.sourceIdentifier}}</td>
+          <td class="text-primary">{{vulnerability.vectorString}}</td>
+        </tr>
+        </ng-container>
       </tbody>
     </table>
-  </div>
 </ng-template>
 
 <!------------------------------------Progress-bar--------------------------------------------------->
