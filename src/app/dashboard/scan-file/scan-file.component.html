@@ -6,12 +6,12 @@
     Get instant insights to strengthen your application security
   </label>
 
-<div class="mt-3 p-3 border bg-dark border-primary border-3 rounded">
+<div [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="mt-3 p-3 border border-primary border-3 rounded">
 <p class="fnw-bold">1. Port Number</p>
   <input type="number" [(ngModel)]="portNumber" class="form-control w-50">
 </div>
 
-  <div class="mt-3 p-3 bg-dark border border-primary border-3 rounded">
+  <div [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="mt-3 p-3 border border-primary border-3 rounded">
 
       <p class="fnw-bold">2. Upload File</p>
       <div class="d-flex">
@@ -67,7 +67,7 @@
     Enter the port number where your Spring Boot project is running to scan its dependencies
   </label>
 
-<div class="mt-3 p-3 bg-dark border border-primary border-3 rounded">
+<div [ngClass]="{'bg-dark': darkMode, 'bg-white': !darkMode}" class="mt-3 p-3 border border-primary border-3 rounded">
  <p class="fnw-bold">Port Number</p>
   <input type="number" [(ngModel)]="portNumber" class="form-control w-50">
 </div>

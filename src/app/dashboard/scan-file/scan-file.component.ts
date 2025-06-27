@@ -109,6 +109,7 @@ onFileUpload(event: Event): void {
   startFileScan(): void {
     this.messages = [];
     this.isAnimate = true;
+    this.vulnService.setAnimate(true);
     this.startProgress();
     try {
     const hasFiles = Array.from(this.formData.values()).some(value => value instanceof File && value.name);
@@ -142,6 +143,7 @@ onFileUpload(event: Event): void {
   startProjectScan() {
      this.messages = [];
      this.isAnimate = true;
+     this.vulnService.setAnimate(true);
      this.startProgress();
       try{
         this.fetchEventLogUrl = `${environment.baseLocaUrl}${this.portNumber.toString()}${environment.fetchVulnerability}`;
@@ -158,6 +160,7 @@ onFileUpload(event: Event): void {
       if(this.progress < 100) this.progress++;
       else {
         this.isAnimate = false;
+        this.vulnService.setAnimate(false);
         clearInterval(this.progressInterval);
         this.eventSource?.close();
         this.showFeedback("Unexpected error occured");
@@ -167,6 +170,7 @@ onFileUpload(event: Event): void {
 
   resetAnimationState() {
       this.isAnimate = false;
+      this.vulnService.setAnimate(false);
       this.vulnService.setAnimate(false);
       this.progress = 0;
       this.fetchedDependencies = 0;
@@ -203,6 +207,7 @@ onFileUpload(event: Event): void {
             console.log('completed');
             this.isAnimate = false;
             this.vulnService.setAnimate(false);
+            this.vulnService.setAnimate(false);
             this.eventSource?.close();
             clearInterval(this.progressInterval);
             this.fetchFinalResult();
@@ -216,6 +221,7 @@ onFileUpload(event: Event): void {
         console.error('SSE error:', error);
         this.showFeedback('SSE error | Please check if the server is running on correct port.');
         this.isAnimate = false;
+        this.vulnService.setAnimate(false);
         this.vulnService.setAnimate(false);
         this.progress = 0;
         clearInterval(this.progressInterval);
@@ -259,6 +265,7 @@ fetchFinalResult() {
       .then((data) => {
         this.isAnimate = false;
         this.vulnService.setAnimate(false);
+        this.vulnService.setAnimate(false);
         let dataCount =data.length;
         if(dataCount) {
           this.showFeedback('Success! The data has been fetched.');
@@ -285,6 +292,7 @@ fetchFinalResult() {
 
   stopSSE() {
     this.isAnimate = false;
+    this.vulnService.setAnimate(false);
     this.vulnService.setAnimate(false);
     this.fetchedDependencies = 0;
     this.totalDependencies = 0;
