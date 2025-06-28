@@ -288,9 +288,8 @@ fetchApplicationData(): void {
   }
 
   activateComputer(uuid: string) {
-     const params = {computerUuid: uuid};
      this.vulnSyncService.setLoading(true);
-     this.http.patch<any>(vulnSyncEnvironments.activateComputer, null, {headers: new HttpHeaders({ 'Content-Type': 'application/json' }), params}).subscribe({
+     this.http.patch<any>(`${vulnSyncEnvironments.computerCommonUrl}/${uuid}/activate`,{headers: new HttpHeaders({ 'Content-Type': 'application/json' })}).subscribe({
       next: (response) => {
         console.log(response)
         if(response.statusCode === 5014) {
@@ -312,8 +311,7 @@ fetchApplicationData(): void {
   }
 
   deActivateComputer(uuid: string) {
-     const params = {computerUuid: uuid}
-     this.http.patch<any>(vulnSyncEnvironments.deActivateComputer, null, {headers: new HttpHeaders({ 'Content-Type': 'application/json' }), params}).subscribe({
+     this.http.patch<any>(`${vulnSyncEnvironments.computerCommonUrl}/${uuid}/deactivate`, {}).subscribe({
       next: (response) => {
         if(response.statusCode === 2006) {
           this.vulnSyncDash.showToast("computer deactivated successfully", 'success');
@@ -330,6 +328,7 @@ fetchApplicationData(): void {
       }
     });
   }
+
   showToast(message: string, type: 'success' | 'error'): void {
   if (type === 'success') {
     this.successMessage = message;
@@ -343,7 +342,7 @@ fetchApplicationData(): void {
 
       toastEl.classList.add('slide-in-right');
       toastEl.addEventListener('animationend', () => {
-        toastEl.classList.remove('slide-in-right');
+      toastEl.classList.remove('slide-in-right');
       }, { once: true });
     } else {
       window.alert(this.successMessage);
@@ -357,7 +356,6 @@ fetchApplicationData(): void {
         autohide: true,
       });
       toast.show();
-
       toastEl.classList.add('slide-in-right');
       toastEl.addEventListener('animationend', () => {
         toastEl.classList.remove('slide-in-right');

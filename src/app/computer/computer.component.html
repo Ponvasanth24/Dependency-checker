@@ -256,7 +256,11 @@
 <div class="mt-3">
   <div class="d-flex justify-content-between">
     <span class="h5 text-secondary">Computer Details</span>
-    <div class="text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedComputerData.length}}</div>
+    <div class="d-flex align-items-center">
+      <button class="btn me-5" matTooltip="Active Computers" (click)="viewComputersByStatus('by-activation-status', 'Active Computers')" matTooltipPosition="above"><span class="material-symbols-outlined fs-1">computer_arrow_up</span></button>
+      <button class="btn me-5" matTooltip="Deleted Computers" (click)="viewComputersByStatus('by-deletion-status', 'Deleted Computers')" matTooltipPosition="above"><span class="material-symbols-outlined fs-1">computer_cancel</span></button>
+    <div class="h-fit-content text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedComputerData.length}}</div>
+    </div>
   </div>
 
   <div class="overflow-auto mt-2 table-wrapper rounded-2 table-shadow">
@@ -434,3 +438,133 @@
 </ng-template>
 
 <!---------------------------------------delete-confirm-toast-end-------------------------------->
+
+<!------------------------------view-computer-status----------------------------------------->
+<ng-template #computerStatus>
+ <mat-dialog-content class="overflow-auto rounded-2 table-shadow p-0">
+    <table mat-table [dataSource]="computerStatusData" matSort (matSortChange)="sortData($event)">
+    <caption class="caption-top sticky-top fnw-bold text-center">{{computerStatusTitle}}</caption>
+      <ng-container matColumnDef="ipAddress">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Ip Address</th>
+        <td mat-cell *matCellDef="let computer" class="fnw-bold">{{computer.ipAddress}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="hostname">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Machine Name</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.machineName}}</td>
+      </ng-container>
+
+      <!-- <ng-container matColumnDef="osName">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Name</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.osName}}</td>
+      </ng-container> -->
+
+      <ng-container matColumnDef="osVersion">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Os Version</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.osVersion}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="antivirusStatus">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Antivirus Status</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.antivirusStatus}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="firewallStatus">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Firewall Status</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.firewallStatus}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="loggedInUser">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Loggedin User</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.loggedInUser}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastUpdateCheck">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Last Update Check</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.lastUpdateCheck}}</td>
+      </ng-container>
+      <!-- <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Time Stamp</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.lastUpdateCheck}}</td>
+      </ng-container>
+       <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created AT</th>
+        <td mat-cell *matCellDef="let computer" class="text-muted">{{computer.createdAt}}</td>
+      </ng-container> -->
+      <ng-container matColumnDef="active">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Status</th>
+        <td mat-cell *matCellDef="let computer">
+         @if(computer.active) {
+          <span class='text-dark fnw-bold'>Active</span>
+         } @else{
+          <span class='text-dark fnw-bold'>No</span>
+         } 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Action</th>
+        <td mat-cell *matCellDef="let computer" class="text-black-shade">
+          <div class="d-flex">
+            <span *ngIf="computerStatusTitle === 'Deleted Computers'" (click)="revertComputerData(computer.uuid)" matTooltip="Revert Computer"
+              class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 text-center">reset_tv</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="comp-table-header dash-theme"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr *ngIf="isTableLoading">
+        <td [attr.colspan]="displayedColumns.length" class="text-center">
+          <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+        </td>
+      </tr>
+      <tr>
+
+     <tr mat-footer-row *matFooterRowDef="['footerColumns']"></tr>   
+  <ng-container matColumnDef="footerColumns">
+
+  <td mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length" class="pb-2">
+           <!------------------------------pagination-start----------------------------------------->
+    <!-- <div *ngIf="storedComputerData.length > 0" class="d-flex justify-content-center height-fit-content mt-4">
+      <div class="col-lg-6 d-flex justify-content-evenly align-items-center height-fit-content">
+        <label class="text-nowrap custom-fw-1">Page Size</label>&nbsp;&nbsp;
+        <mat-select class="border rounded page-size-width p-2 bg-white" (selectionChange)="onPageSizeChange($event)"
+          [(ngModel)]="pageSize">
+          <mat-option class="bg-white" *ngFor="let size of pageSizes" [value]="size">
+            {{ size }}
+          </mat-option>
+        </mat-select>
+        &nbsp;&nbsp;
+        <span class="custom-fw-1 text-nowrap">{{start}} - {{end}} out of {{storedComputerData.length}} total
+          Items</span>
+        &nbsp;&nbsp;
+        <button (click)="previousPage()"
+          class="bg-white page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle mat-elevation-z1">
+          <mat-icon class="material-symbols-outlined">
+            arrow_back_ios
+          </mat-icon>
+        </button>
+        &nbsp;&nbsp;
+        <button (click)="nextPage()"
+          class="bg-white page-custom-btn btn d-flex justify-content-center align-items-center outline-0 border-0 rounded-circle mat-elevation-z1">
+          <mat-icon class="material-symbols-outlined">
+            arrow_forward_ios
+          </mat-icon>
+        </button>
+      </div>
+    </div> -->
+    <!--------------------------------------------pagination-end------------------------------------------------>
+  <div *ngIf="computerStatusData.length === 0 && !isTableLoading" class="text-center text-muted py-3">
+      No data found.
+  </div>  
+  <div *ngIf="isTableLoading" class="d-flex justify-content-center py-3">
+    <mat-progress-spinner diameter="30" mode="indeterminate"></mat-progress-spinner>
+  </div>    
+  </td>
+    </ng-container>
+
+    </table>
+  </mat-dialog-content>
+  </ng-template>
+<!------------------------------view-computer-status-end---------------------------------------->

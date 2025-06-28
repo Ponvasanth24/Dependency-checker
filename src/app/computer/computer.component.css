@@ -334,3 +334,7 @@
   caption-side: top;
 }
 
+.custom-view{
+   border: 5px solid rgb(3, 86, 141) !important;
+}
+

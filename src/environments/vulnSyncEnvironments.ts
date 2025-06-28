@@ -3,6 +3,8 @@ export const vulnSyncEnvironments = {
     getComputers:'http://localhost:8081/api/allComputers',
     getComputersByUuid: 'http://localhost:8081/api/uuid/computer',
     deActivateComputer: 'http://localhost:8081/api/computer/deactivate',
+    deletedComputers: 'http://localhost:8081/api/computers/by-deletion-status',
+    activeComputersList: 'http://localhost:8081/api/computers/by-activation-status',
     activateComputer: 'http://localhost:8081/api/computer/activate',
     applicationCommonUrl : 'http://localhost:8081/api/applications',
     getApplicationVulnerabilities: 'http://localhost:8081/api/applications/',

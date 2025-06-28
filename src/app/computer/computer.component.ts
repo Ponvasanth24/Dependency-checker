@@ -8,6 +8,7 @@ import {
   ViewChild,
   Inject,
   AfterViewInit,
+  viewChild,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -88,10 +89,13 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   computerData: string = '';
   successMessage: string = '';
   errorMessage: string = '';
+  computerStatusTitle: string = '';
+  computerStatusData: Computer[] = [];
   
   @ViewChild('updateDialog') updateDialog!: TemplateRef<any>;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
   @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
+  @ViewChild('computerStatus') computerStatus!: TemplateRef<any>;
 
   dialogRef!: MatDialogRef<any>;
   displayedColumns: string[] = [
@@ -432,6 +436,7 @@ get installedSoftware(): FormArray {
       data: { computerUuid: uuid },
       hasBackdrop: true,
       width: '90vw',
+      minHeight: '50vh',
       maxHeight: '90vh'
     });
     dialogRef.afterOpened().subscribe(() => {
@@ -441,7 +446,7 @@ get installedSoftware(): FormArray {
     if (container) {
       const viewTable = document.querySelector<HTMLElement>('.view-table');
       if (viewTable && typeof conatinerHeight === 'number') {
-        viewTable.style.height = `${conatinerHeight -20}px`;
+        viewTable.style.height = `${conatinerHeight}px`;
       }
     }
     }, 0);
@@ -453,6 +458,37 @@ get installedSoftware(): FormArray {
       }
     });
   }
+
+  viewComputersByStatus(statusEndPoint:string, title: string) {
+     this.vulnSyncService.setLoading(true);
+     this.isTableLoading = true;
+     this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${statusEndPoint}`)
+     .subscribe({
+       next:(response)=>{
+          this.computerStatusData = response || [];
+          this.computerStatusTitle = title;
+          this.updatePagedData(this.pageIndex);
+          this.vulnSyncService.setLoading(false);
+          this.isTableLoading = false;
+       },
+       error:(error)=>{
+           console.log(error)
+       }
+     });
+    const dialogRef = this.dialog.open(this.computerStatus, {
+      data: {computers: this.storedComputerData},
+      hasBackdrop: true,
+      width: '90vw',
+      minHeight: '50vh',
+      maxHeight: '90vh'
+    });
+    dialogRef.afterOpened().subscribe(() => {
+       
+   });
+
+    dialogRef.afterClosed().subscribe((result) => {
+    });
+  }
   
   async deleteComputerData(computerId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
@@ -461,9 +497,7 @@ get installedSoftware(): FormArray {
 
     try {
       await firstValueFrom(
-        this.http.delete(`${vulnSyncEnvironments.computerCommonUrl}`, {
-          params: { computerUuid: computerId },
-        })
+        this.http.delete(`${vulnSyncEnvironments.computerCommonUrl}/${computerId}/soft-delete`)
       ).then((res) => {
         this.fetchComputerData();
         let successMessage = 'Computer data deleted successfully';
@@ -473,6 +507,18 @@ get installedSoftware(): FormArray {
     } catch (error) {
       console.error('Error deleting computer data:', error);
     }
+  }
+
+  revertComputerData(computerId: string) {
+     this.http.patch<any>(`${vulnSyncEnvironments.computerCommonUrl}/${computerId}/revert-soft-delete`, {})
+     .subscribe({
+       next:(response) =>{
+          console.log(response)
+       },
+       error:(error)=>{
+          console.log(error)
+       }
+     });
   }
   addApplication(computer: any): void {
     this.vulnSyncService.setComputerData(computer);
