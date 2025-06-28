@@ -171,7 +171,6 @@ onFileUpload(event: Event): void {
   resetAnimationState() {
       this.isAnimate = false;
       this.vulnService.setAnimate(false);
-      this.vulnService.setAnimate(false);
       this.progress = 0;
       this.fetchedDependencies = 0;
       this.totalDependencies = 0;

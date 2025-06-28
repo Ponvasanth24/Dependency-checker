@@ -21,6 +21,7 @@ import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboa
 import { timestamp } from 'rxjs';
 import { ComputerDetailsResponse } from '../../vulnSyncModels/ComputerData';
 import { Renderer2 } from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-update-computer-dialog',
   standalone: true,
@@ -34,7 +35,7 @@ import { Renderer2 } from '@angular/core';
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
-    MatDatepickerModule
+    MatDatepickerModule, MatIcon
   ],
   providers: [
   { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },  // optional

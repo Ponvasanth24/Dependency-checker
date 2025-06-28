@@ -3,14 +3,14 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
 import { HttpClient } from '@angular/common/http';
-
+import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-view-application-dialog',
   standalone: true,
   templateUrl: './view-application.component.html',
   styleUrl: './application.component.css',
   imports: [
-    CommonModule
+    CommonModule, MatIcon
   ]
 })
 export class ViewApplicationDialogComponent {

@@ -9,6 +9,7 @@ import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
 import { HttpClient } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-update-dependency-dialog',
@@ -20,7 +21,7 @@ import { MatDividerModule } from '@angular/material/divider';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule, MatCardModule, MatDividerModule
+    MatButtonModule, MatCardModule, MatDividerModule, MatIcon
   ]
 })
 export class UpdateDependencyDialogComponent {

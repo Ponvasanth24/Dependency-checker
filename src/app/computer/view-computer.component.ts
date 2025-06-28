@@ -7,14 +7,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Renderer2 } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Vulnerabilities } from '../../vulnSyncModels/ComputerData';
-
+import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-view-computer-dialog',
   standalone: true,
   templateUrl: './view-computer.component.html',
   styleUrl: './computer.component.css',
   imports: [
-    CommonModule, MatProgressSpinnerModule, MatTooltipModule
+    CommonModule, MatProgressSpinnerModule, MatTooltipModule, MatIcon
   ]
 })
 export class ViewComputerDialogComponent implements OnInit {
@@ -47,11 +47,19 @@ export class ViewComputerDialogComponent implements OnInit {
   } 
 
   openViewApplicationDialog(applicationUuid: string) {
-      const appVuln = this.computerData.applications.find((app: any, value: number) => {
-           return app.uuid === applicationUuid;
+      this.http.get(`${vulnSyncEnvironments.getApplicationVulnerabilities}${applicationUuid}`)
+      .subscribe({
+        next: (response) => {
+        this.vulnerabilityData = response as Vulnerabilities[] || {}; 
+        console.log(this.vulnerabilityData)
+    this.isLoading = false;
+      },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('fetch error:', err);
+          this.dialogRef.close(err.error.errorCode);
+        }
       });
-      console.log(appVuln)
-      this.vulnerabilityData = appVuln.vulnerabilities;
       this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'90vw', maxHeight: '90vh'});
   }
 }

@@ -330,4 +330,7 @@
 #computerTable {
   color: black;
 }
+.caption-top{
+  caption-side: top;
+}
 

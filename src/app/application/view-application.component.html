@@ -1,6 +1,10 @@
 <div class="view-table border-theme overflow-auto">
 <table class="styled-table">
-  <caption class="status-title sticky-top bg-white fnw-bold">{{title}}</caption>
+  <caption class="status-title sticky-top dash-theme text-center text-white fnw-bold">💻 {{title}}
+    <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
+    <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
+    </button>
+  </caption>
   <thead>
     <tr class="dash-theme text-white">
       <th>Name</th>

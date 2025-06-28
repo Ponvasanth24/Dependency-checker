@@ -1,13 +1,15 @@
 <div class="view-table border-theme overflow-auto">
 <table id="computerTable" class="w-100" *ngIf="!isLoading">
+  <caption class="caption-top dash-theme text-white text-center sticky-top">🖥️ Computer Info 
+    <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
+    <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
+    </button>
+  </caption>
   <thead>
-    <tr>
-        <th colspan="6" class="text-center sticky-top dialog-heading">🖥️ Computer Info</th>
-    </tr>
     <tr class="dash-theme text-white">
       <th>Device Id</th>
       <th>IP Address</th>
-      <th>Host Name</th>
+      <th>Machine Name</th>
       <th>OS Version</th>
       <th class="text-nowrap">Antivirus Status</th>
       <th class="text-nowrap">Firewall Status</th>
@@ -18,12 +20,12 @@
       <td colspan="6" class="empty">No computer data found</td>
     </tr>
       <tr>
-        <td>{{computerData.computer.deviceId}}</td>
-        <td>{{ computerData.computer.ipAddress }}</td>
-        <td>{{ computerData.computer.hostname }}</td>
-        <td>{{ computerData.computer.osVersion }}</td>
-        <td>{{ computerData.computer.antivirusStatus }}</td>
-        <td>{{ computerData.computer.firewallStatus }}</td>
+        <td>{{computerData?.computer?.deviceId}}</td>
+        <td>{{ computerData?.computer?.ipAddress }}</td>
+        <td>{{ computerData?.computer?.machineName }}</td>
+        <td>{{ computerData?.computer?.osVersion }}</td>
+        <td>{{ computerData?.computer?.antivirusStatus }}</td>
+        <td>{{ computerData?.computer?.firewallStatus }}</td>
       </tr>
   </tbody>
   <thead>

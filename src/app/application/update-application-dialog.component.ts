@@ -11,6 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-update-application-dialog',
@@ -22,7 +23,7 @@ import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule, MatCardModule, MatDividerModule, MatDatepickerModule, MatNativeDateModule
+    MatButtonModule, MatCardModule, MatDividerModule, MatDatepickerModule, MatNativeDateModule, MatIcon
   ],
   providers: [
     provideNativeDateAdapter()

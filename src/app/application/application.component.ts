@@ -254,6 +254,7 @@ fetchApplicationData(): void {
     const dialogRef = this.dialog.open(ViewApplicationDialogComponent, {
       hasBackdrop: true,
       width: '90vw',
+      minHeight: '50vh',
       maxHeight: '90vh',
       data:{ computerUuid: this.computerUuid, status: statusObj.status}
     });
@@ -265,7 +266,7 @@ fetchApplicationData(): void {
     if (container) {
       const viewTable = document.querySelector<HTMLElement>('.view-table');
       if (viewTable && typeof conatinerHeight === 'number') {
-        viewTable.style.height = `${conatinerHeight - 20}px`;
+        viewTable.style.height = `${conatinerHeight}px`;
       }
     }
     }, 0);
