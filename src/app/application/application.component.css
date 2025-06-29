@@ -240,7 +240,7 @@
 .styled-table thead tr{
   position: sticky;
   position: -webkit-sticky;
-  top: 40px; 
+  /* top: 40px;  */
 }
 .section-subtitle {
   background-color: #eeeeee;

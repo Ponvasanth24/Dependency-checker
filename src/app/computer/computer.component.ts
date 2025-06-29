@@ -70,6 +70,7 @@ import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/mate
 })
 export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   isTableLoading: boolean = false;
+  isStatusTableLoading: boolean = false;
   computerForm!: FormGroup;
   deviceForm!: FormGroup;
   updateComputerForm!: FormGroup;
@@ -460,19 +461,17 @@ get installedSoftware(): FormArray {
   }
 
   viewComputersByStatus(statusEndPoint:string, title: string) {
-     this.vulnSyncService.setLoading(true);
-     this.isTableLoading = true;
+     this.isStatusTableLoading = true;
      this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${statusEndPoint}`)
      .subscribe({
        next:(response)=>{
           this.computerStatusData = response || [];
           this.computerStatusTitle = title;
-          this.updatePagedData(this.pageIndex);
-          this.vulnSyncService.setLoading(false);
-          this.isTableLoading = false;
+          this.isStatusTableLoading = false;
        },
        error:(error)=>{
            console.log(error)
+           this.isStatusTableLoading = false;
        }
      });
     const dialogRef = this.dialog.open(this.computerStatus, {
@@ -482,19 +481,12 @@ get installedSoftware(): FormArray {
       minHeight: '50vh',
       maxHeight: '90vh'
     });
-    dialogRef.afterOpened().subscribe(() => {
-       
-   });
-
-    dialogRef.afterClosed().subscribe((result) => {
-    });
   }
   
   async deleteComputerData(computerId: number): Promise<void> {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
     if (!confirmed) return;
-
     try {
       await firstValueFrom(
         this.http.delete(`${vulnSyncEnvironments.computerCommonUrl}/${computerId}/soft-delete`)
@@ -514,9 +506,11 @@ get installedSoftware(): FormArray {
      .subscribe({
        next:(response) =>{
           console.log(response)
+          this.vulnSyncDash.showToast('Computer revert to list', 'success');
        },
        error:(error)=>{
           console.log(error)
+          this.vulnSyncDash.showToast(error.error.errorMessage, 'error');
        }
      });
   }

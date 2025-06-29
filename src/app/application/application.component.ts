@@ -292,7 +292,7 @@ fetchApplicationData(): void {
      this.http.patch<any>(`${vulnSyncEnvironments.computerCommonUrl}/${uuid}/activate`,{headers: new HttpHeaders({ 'Content-Type': 'application/json' })}).subscribe({
       next: (response) => {
         console.log(response)
-        if(response.statusCode === 5014) {
+        if(response.statusCode === 2012) {
           this.vulnSyncDash.showToast("computer activated successfully", 'success');
         }
         this.vulnSyncService.setLoading(false);

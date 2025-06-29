@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
 import { HttpClient } from '@angular/common/http';
@@ -8,13 +8,14 @@ import { Renderer2 } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Vulnerabilities } from '../../vulnSyncModels/ComputerData';
 import { MatIcon } from '@angular/material/icon';
+MatDialogContent
 @Component({
   selector: 'app-view-computer-dialog',
   standalone: true,
   templateUrl: './view-computer.component.html',
   styleUrl: './computer.component.css',
   imports: [
-    CommonModule, MatProgressSpinnerModule, MatTooltipModule, MatIcon
+    CommonModule, MatProgressSpinnerModule, MatTooltipModule, MatIcon, MatDialogContent
   ]
 })
 export class ViewComputerDialogComponent implements OnInit {

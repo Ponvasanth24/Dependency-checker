@@ -315,6 +315,11 @@
 #vulnTable tr:nth-child(even) {
    background-color: #dad8d8;
 }
+#vulnTable thead{
+  position: sticky !important;
+  top: 40px;
+  position: -webkit-sticky;
+}
 #computerTable tbody > tr td{
     vertical-align: middle;
 }
@@ -337,4 +342,3 @@
 .custom-view{
    border: 5px solid rgb(3, 86, 141) !important;
 }
-

@@ -1,10 +1,10 @@
-<div class="view-table border-theme overflow-auto">
-<table class="styled-table">
-  <caption class="status-title sticky-top dash-theme text-center text-white fnw-bold">💻 {{title}}
+<div class="status-title sticky-top dash-theme text-white fs-5 py-2 text-center fnw-bold">💻 {{title}}
     <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
     <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
     </button>
-  </caption>
+  </div>
+<div class="view-table border-them overflow-auto">
+<table class="styled-table">
   <thead>
     <tr class="dash-theme text-white">
       <th>Name</th>
@@ -20,14 +20,15 @@
       <tr *ngIf="!applicationsData?.length">
         <td colspan="5" class="empty">No applications found</td>
       </tr>
-      <ng-container *ngIf="applicationsData?.length"></ng-container>
+      <ng-container *ngIf="applicationsData?.length">
         <tr *ngFor="let app of applicationsData">
-          <td>{{ app.name }}</td>
+          <td class="text-nowrap">{{ app.name }}</td>
           <td>{{ app.vendorName }}</td>
           <td>{{ app.version }}</td>
           <td colspan="2">{{ app.installedDate }}</td>
         </tr>
+        </ng-container>
     </ng-container> 
   </tbody>
 </table>
-</div>
+</div> 
