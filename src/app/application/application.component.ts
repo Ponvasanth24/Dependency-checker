@@ -69,7 +69,7 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   sortDirection: 'asc' | 'desc' = 'asc';
 
   computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'antivirusStatus', 'firewallStatus', 'status', 'action'];
-  displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate', 'createdAt', 'action'];
+  displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate', 'createdAt','status' ,'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
