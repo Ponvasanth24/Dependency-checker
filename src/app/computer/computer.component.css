@@ -315,9 +315,9 @@
 #vulnTable tr:nth-child(even) {
    background-color: #dad8d8;
 }
-#vulnTable thead{
+#vulnTable thead tr{
   position: sticky !important;
-  top: 40px;
+  top: 0;
   position: -webkit-sticky;
 }
 #computerTable tbody > tr td{

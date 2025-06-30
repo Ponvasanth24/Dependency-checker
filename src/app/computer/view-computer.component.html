@@ -62,15 +62,14 @@
 
 <!-- your-component.component.html -->
 <ng-template #vulnerabilityTable let-data="data" let-dialogRef="dialogRef">
- 
   <div class="sticky-top bg-white fnw-bold text-center d-flex align-items-center justify-content-between"><div class="col-11"><span>Vulnerabilities</span></div>
     <button mat-icon-button class="btn bg-secondary rounded-circle d-flex justify-content-center align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
     <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
     </button>
   </div>
-   <mat-dialog-content>
-  <div class="overflow-auto">
-    <table id="vulnTable">
+<mat-dialog-content class="p-0">
+  <!-- <div class="overflow-auto"> -->
+    <table class="w-100" id="vulnTable">
       <thead>
         <tr class="dash-theme text-white">
           <th>CveId</th>
@@ -100,7 +99,7 @@
         </ng-container>
       </tbody>
     </table>
-    </div>
+    <!-- </div> -->
     </mat-dialog-content>
 </ng-template>
 
