@@ -25,7 +25,7 @@
           <td class="text-nowrap">{{ app.name }}</td>
           <td>{{ app.vendorName }}</td>
           <td>{{ app.version }}</td>
-          <td colspan="2">{{ app.installedDate }}</td>
+          <td colspan="2">{{ applicationDate === 'Installed Date' ? app.installedDate : app.updatedAt}}</td>
         </tr>
         </ng-container>
     </ng-container> 

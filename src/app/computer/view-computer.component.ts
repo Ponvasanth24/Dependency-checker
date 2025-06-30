@@ -61,7 +61,7 @@ export class ViewComputerDialogComponent implements OnInit {
           this.dialogRef.close(err.error.errorCode);
         }
       });
-      this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'90vw', maxHeight: '90vh'});
+      this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'95vw', maxHeight: '90vh'});
   }
 }
 

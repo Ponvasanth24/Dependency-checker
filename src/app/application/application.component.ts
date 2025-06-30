@@ -31,6 +31,19 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 
+interface ApplicationData {
+  id: number;
+  uuid: string;
+  name: string;
+  version: string;
+  createdAt: string;
+  updatedAt: string;
+  deleted: boolean;
+  active: boolean;
+  vulnerabilities: any[];
+  [key: string]: any;
+}
+
 @Component({
   selector: 'app-application',
   standalone: true,
@@ -94,8 +107,8 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applicationForm = this.fb.group({
       computerUuid: ['', Validators.required],
       name: ['', Validators.required],
-      vendor: ['', Validators.required],
       version: ['', Validators.required],
+      vendorName: ['', Validators.required],
       installedDate: ['', Validators.required],
     });
   }
@@ -158,7 +171,21 @@ fetchApplicationData(): void {
     this.vulnSyncService.setLoading(true);
     if(!this.isExistComputrtId()) return;
     let params = {computerUuid:this.computer.uuid};
-    this.http.post<any>(vulnSyncEnvironments.applicationCommonUrl, this.applicationForm.value, {params}).subscribe({
+    const AddedApplication = this.applicationForm.getRawValue();
+    AddedApplication.installedDate = AddedApplication.installedDate.toISOString();
+    const { computerUuid ,...refinigAddedApplication} = AddedApplication;
+    if(this.computer.timestamp.indexOf('Z') === -1) {
+       const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
+       const timestamp = this.computer.timestamp.concat('Z');
+       this.computer.timestamp = timestamp;
+       this.computer.lastUpdateCheck = lastUpdateCheck;
+    }
+    const { deleted ,uuid, id, createdAt, updatedAt, active, ...computerData } = this.computer;
+    const refiningInstalledSoftware = (this.storedApplicationData as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
+    const installedSoftware = [...refiningInstalledSoftware, refinigAddedApplication];
+    const updatedForm = { ...computerData, installedSoftware};
+    console.log(updatedForm);
+    this.http.post<any>(vulnSyncEnvironments.computerCommonUrl, updatedForm ).subscribe({
       next: () => {
         this.applicationForm.reset({computerUuid: this.applicationForm.get('computerUuid')?.value});
         this.vulnSyncDash.showToast("Application data added successfully", 'success');
@@ -295,6 +322,7 @@ fetchApplicationData(): void {
         if(response.statusCode === 2012) {
           this.vulnSyncDash.showToast("computer activated successfully", 'success');
         }
+        this.fetchApplicationData();
         this.vulnSyncService.setLoading(false);
       },
       error: (error) => {
@@ -315,7 +343,9 @@ fetchApplicationData(): void {
       next: (response) => {
         if(response.statusCode === 2006) {
           this.vulnSyncDash.showToast("computer deactivated successfully", 'success');
+          this.fetchApplicationData();
         }
+
       },
       error: (error) => {
         if(error.error.errorCode === 2008) {
