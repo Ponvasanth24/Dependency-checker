@@ -506,6 +506,7 @@ get installedSoftware(): FormArray {
      .subscribe({
        next:(response) =>{
           console.log(response)
+          this.fetchComputerData();
           this.vulnSyncDash.showToast('Computer revert to list', 'success');
        },
        error:(error)=>{
