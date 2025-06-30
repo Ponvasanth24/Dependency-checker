@@ -138,7 +138,11 @@
           </td>
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput formControlName="antivirusStatus" placeholder="Antivirus Status" />
+              <mat-select formControlName="antivirusStatus" required>
+              <mat-option value="" disabled selected>Select status</mat-option>  
+              <mat-option value="enabled">Enabled</mat-option>
+              <mat-option value="disabled">Disabled</mat-option>
+              </mat-select>
               <mat-error *ngIf="deviceForm.get('antivirusStatus')?.hasError('required')">
                 Required
               </mat-error>
@@ -157,7 +161,11 @@
             <tr>
               <td>
             <mat-form-field class="full-width" appearance="fill">
-              <input matInput formControlName="firewallStatus" placeholder="Firewall Status">
+              <mat-select formControlName="firewallStatus" required>
+              <mat-option value="" disabled selected>Select status</mat-option>
+              <mat-option value="enabled">Enabled</mat-option>
+              <mat-option value="disabled">Disabled</mat-option>
+              </mat-select>
               <mat-error *ngIf="deviceForm.get('firewallStatus')?.hasError('required')">
                 Required
               </mat-error>

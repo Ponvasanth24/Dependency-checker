@@ -51,7 +51,7 @@ export class ViewComputerDialogComponent implements OnInit {
       this.http.get(`${vulnSyncEnvironments.getApplicationVulnerabilities}${applicationUuid}`)
       .subscribe({
         next: (response) => {
-        this.vulnerabilityData = response as Vulnerabilities[] || {}; 
+        this.vulnerabilityData = response as Vulnerabilities[] || []; 
         console.log(this.vulnerabilityData)
     this.isLoading = false;
       },
