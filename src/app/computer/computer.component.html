@@ -224,18 +224,18 @@
           </td>
           <td>
             <mat-form-field appearance="fill" class="full-width">
-            <input matInput [matDatepicker]="picker" (dateChange)="onSoftwareDateChange($event.value, i)" placeholder="Installed Date" formControlName="InstalledDate" />
+            <input matInput [matDatepicker]="picker" (dateChange)="onSoftwareDateChange($event.value, i)" placeholder="Installed Date" formControlName="installedDate" />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            <mat-error *ngIf="software.get('InstalledDate')?.touched && software.get('InstalledDate')?.hasError('required')">
+            <mat-error *ngIf="software.get('installedDate')?.touched && software.get('installedDate')?.hasError('required')">
              Required
             </mat-error>
             </mat-form-field>
           </td>
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput placeholder="Vendor Name" formControlName="VendorName" />
-              <mat-error *ngIf="software.get('VendorName')?.hasError('required')">Required</mat-error>
+              <input matInput placeholder="Vendor Name" formControlName="vendorName" />
+              <mat-error *ngIf="software.get('vendorName')?.hasError('required')">Required</mat-error>
             </mat-form-field>
           </td>
           <td>

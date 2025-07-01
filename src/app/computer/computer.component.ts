@@ -176,8 +176,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.fb.group({
       name: ['', Validators.required],
       version: [''],
-      InstalledDate: [null],
-      VendorName: ['']
+      installedDate: [null],
+      vendorName: ['']
     });
   }
   onDateChange(date: Date, controlName: string): void {
@@ -194,9 +194,9 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   console.log(selectedDateTime)
   selectedDateTime.setHours(0, 0, 0, 0); 
   const formattedDate = this.formatDateTime(selectedDate); 
-  this.installedSoftware.at(index).get('InstalledDate')?.setValue(formattedDate); 
+  this.installedSoftware.at(index).get('installedDate')?.setValue(formattedDate); 
   if (selectedDateTime.getTime() > today.getTime()) {
-    this.installedSoftware.at(index).get('InstalledDate')?.setValue(''); 
+    this.installedSoftware.at(index).get('installedDate')?.setValue(''); 
     this.vulnSyncDash.showToast('Installed date cannot be in the future', 'error');
     return;
   }

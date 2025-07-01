@@ -143,7 +143,7 @@ fetchApplicationData(): void {
     this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${this.computerUuid}/applications`).subscribe({
       next: (response) => {
         console.log(params);
-        console.log(response)
+        console.log(response);
         this.storedApplicationData = response || [];
         this.updatePagedData(this.initialIndex);
         this.isLoading = false;
@@ -174,7 +174,7 @@ fetchApplicationData(): void {
     const AddedApplication = this.applicationForm.getRawValue();
     AddedApplication.installedDate = AddedApplication.installedDate.toISOString();
     const { computerUuid ,...refinigAddedApplication} = AddedApplication;
-    if(this.computer.timestamp.indexOf('Z') === -1 && this.computer.installedDate.indexOf('Z')) {
+    if(String(this.computer.timestamp).indexOf('Z') === -1 || String(this.computer.installedDate).indexOf('Z')) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
        const timestamp = this.computer.timestamp.concat('Z');
        this.computer.timestamp = timestamp;
@@ -311,13 +311,29 @@ fetchApplicationData(): void {
     this.dialogRef = this.dialog.open(this.confirmDialog);
     const confirmed = await firstValueFrom(this.dialogRef.afterClosed());
     if (!confirmed) return;
-    let params = { applicationUuid: applicationId }
+    console.log(this.storedApplicationData)
+    console.log(this.computer)
+    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z')) {
+       const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
+       const timestamp = this.computer.timestamp.concat('Z');
+       this.computer.timestamp = timestamp;
+       this.computer.lastUpdateCheck = lastUpdateCheck;
+    }
+    const { deleted,uuid, id,createdAt, updatedAt, active, ...computerData } = this.computer;
+    const afterRemovedApp = this.storedApplicationData.filter((app: any, index:number)=> app.uuid !== applicationId).map((app:any )=> {
+         const { id, uuid,createdAt, updatedAt, deleted, vulnerabilities, ...refinedApp } = app;
+         return refinedApp;
+    });  
+    console.log(afterRemovedApp)
+    const updatedValue = {...computerData, installedSoftware: afterRemovedApp};
+    console.log(updatedValue)
     try {
-      await firstValueFrom(this.http.delete(`${vulnSyncEnvironments.applicationCommonUrl}`, {params}));
+      await firstValueFrom(this.http.post<any>(`${vulnSyncEnvironments.computerCommonUrl}`,{updatedValue}));
       this.fetchApplicationData();
       this.vulnSyncDash.showToast("Application data deleted successfully", 'success');
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error deleting application data:', error);
+      this.vulnSyncDash.showToast(error.error.errorMessage, 'error');
     }
   }
 

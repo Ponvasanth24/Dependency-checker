@@ -8,7 +8,7 @@
     <div class="row">
     <mat-form-field appearance="fill" class="full-width">
       <mat-label class="fw-bold">Name</mat-label>
-      <input matInput formControlName="name" placeholder="Name">
+      <input matInput formControlName="name" placeholder="Name" readonly>
       <mat-error class="error-field" *ngIf="updateDependencyForm.get('name')?.hasError('required')">
         Please fill this field
       </mat-error>

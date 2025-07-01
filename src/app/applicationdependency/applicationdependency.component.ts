@@ -237,10 +237,14 @@ export class ApplicationdependencyComponent implements OnInit, AfterViewInit {
         this.fetchDependencyData();
         let successMessage = "Dependency data deleted successfully";
         this.vulnSyncDash.showToast(successMessage, 'success');
+      }).catch((error)=> {
+          console.error('Error deleting dependency data:', error);
+          this.vulnSyncDash.showToast(error.error.errorMessage, 'error');
       });
       console.log('Dependency data deleted.');
     } catch (error) {
       console.error('Error deleting dependency data:', error);
+      this.vulnSyncDash.showToast('Error deleting dependency application', 'error');
     }
   }
   addVulnerability(dependency: any): void {
