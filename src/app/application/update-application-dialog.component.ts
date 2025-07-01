@@ -55,9 +55,9 @@ export class UpdateApplicationDialogComponent {
   ) {
     this.updateApplicationForm = this.fb.group({
       name: [data?.application.name, Validators.required],
-      vendorName: [data?.application.vendorName, Validators.required],
-      version: [data?.application.version, Validators.required],
-      installedDate: [data?.application.installedDate, Validators.required],
+      version: [data?.application.version],
+      vendorName: [data?.application.vendorName],
+      installedDate: [data?.application.installedDate],
     });
     this.fetchComputerData();
     console.log(this.data)
@@ -80,7 +80,7 @@ export class UpdateApplicationDialogComponent {
 
   onSubmit(): void {
   if (this.updateApplicationForm.valid) {
-    const uuid = this.data?.uuid;
+    // const uuid = this.data?.uuid;
 
     // if (!uuid) {
     //   console.error('UUID not provided for update');
@@ -90,24 +90,35 @@ export class UpdateApplicationDialogComponent {
     const updatedValues = this.updateApplicationForm.getRawValue();
     console.log(this.computer)
    if (updatedValues.installedDate && typeof updatedValues.installedDate === 'object' && updatedValues.installedDate.toISOString) {
-    updatedValues.installedDate = updatedValues.installedDate.toISOString();
+    updatedValues.installedDate = updatedValues.installedDate.toISOString().replace(/Z$/, '');
   }
-    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.installedDate.indexOf('Z')) {
+    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z')) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
        const timestamp = this.computer.timestamp.concat('Z');
        this.computer.timestamp = timestamp;
        this.computer.lastUpdateCheck = lastUpdateCheck;
     }
-    const { deleted, id,createdAt, updatedAt, active, ...computerData } = this.computer;
-    const refiningInstalledSoftware = (this.applications as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
-    const installedSoftware = [...refiningInstalledSoftware, updatedValues];
+    const { deleted,uuid, id,createdAt, updatedAt, active, ...computerData } = this.computer;
+    const addUpdatedValues = this.applications.map((app: any, index:number)=> {
+         if(app.id === this.data.application.id){
+            app = updatedValues;
+         }
+         return app;
+    })
+    console.log(addUpdatedValues)
+    const refiningInstalledSoftware = (addUpdatedValues as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
+    const installedSoftware = [...refiningInstalledSoftware];
     const updatedForm = { ...computerData, installedSoftware};
     console.log(updatedForm)
-    this.http.post(`${vulnSyncEnvironments.computerCommonUrl}`, updatedForm)
+    this.http.post<any>(`${vulnSyncEnvironments.computerCommonUrl}`, updatedForm)
       .subscribe({
-        next: (res) => {
-          console.log('Update success:', res);
-          this.dialogRef.close(200);
+        next: (response) => {
+          console.log('Update success:', response);
+          if(response.statusCode === 2033) {
+            this.dialogRef.close(201);
+          } else {
+            this.dialogRef.close(200);
+          }
           this.vulnSyncService.setLoading(false);
         },
         error: (error) => {

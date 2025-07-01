@@ -272,7 +272,10 @@ fetchApplicationData(): void {
       if(result === 200) {
         this.vulnSyncDash.showToast("Application data updated successfully", 'success');
         this.fetchApplicationData();
-      } else if(result === 4001) {
+      } else if(result === 201) {
+        this.vulnSyncDash.showToast('No changes detected in applications', 'error');
+      }  
+      else if(result === 4001) {
         this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
       } else {
         this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error');
