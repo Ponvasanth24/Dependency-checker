@@ -93,7 +93,7 @@ export class UpdateApplicationDialogComponent {
    if (updatedValues.installedDate && typeof updatedValues.installedDate === 'object' && updatedValues.installedDate.toISOString) {
     updatedValues.installedDate = updatedValues.installedDate.toLocaleString('sv-SE').replace(' ', 'T');
   }
-    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z')) {
+    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z') === -1) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
        const timestamp = this.computer.timestamp.concat('Z');
        this.computer.timestamp = timestamp;

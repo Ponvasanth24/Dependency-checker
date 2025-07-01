@@ -30,6 +30,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
+import { fakeAsync } from '@angular/core/testing';
 
 interface ApplicationData {
   id: number;
@@ -172,9 +173,9 @@ fetchApplicationData(): void {
     if(!this.isExistComputrtId()) return;
     let params = {computerUuid:this.computer.uuid};
     const AddedApplication = this.applicationForm.getRawValue();
-    AddedApplication.installedDate = AddedApplication.installedDate.toISOString();
+    AddedApplication.installedDate = String(AddedApplication.installedDate.toISOString()).replace(/Z$/,'');
     const { computerUuid ,...refinigAddedApplication} = AddedApplication;
-    if(String(this.computer.timestamp).indexOf('Z') === -1 || String(this.computer.installedDate).indexOf('Z')) {
+    if(String(this.computer.timestamp).indexOf('Z') === -1 || String(this.computer.installedDate).indexOf('Z') === -1) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
        const timestamp = this.computer.timestamp.concat('Z');
        this.computer.timestamp = timestamp;
@@ -320,7 +321,8 @@ fetchApplicationData(): void {
     if (!confirmed) return;
     console.log(this.storedApplicationData)
     console.log(this.computer)
-    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z')) {
+    this.vulnSyncService.setLoading(true);
+    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z') === -1) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
        const timestamp = this.computer.timestamp.concat('Z');
        this.computer.timestamp = timestamp;
@@ -332,16 +334,20 @@ fetchApplicationData(): void {
          return refinedApp;
     });  
     console.log(afterRemovedApp)
-    const updatedValue = {...computerData, installedSoftware: afterRemovedApp};
+    const installedSoftware = [...afterRemovedApp]
+    const updatedValue = {...computerData, installedSoftware};
     console.log(updatedValue)
-    try {
-      await firstValueFrom(this.http.post<any>(`${vulnSyncEnvironments.computerCommonUrl}`,{updatedValue}));
-      this.fetchApplicationData();
-      this.vulnSyncDash.showToast("Application data deleted successfully", 'success');
-    } catch (error:any) {
-      console.error('Error deleting application data:', error);
-      this.vulnSyncDash.showToast(error.error.errorMessage, 'error');
-    }
+      this.http.post<any>(vulnSyncEnvironments.computerCommonUrl,updatedValue).subscribe({
+        next:(reponse)=>{
+             this.fetchApplicationData();
+             this.vulnSyncService.setLoading(false);
+             this.vulnSyncDash.showToast("Application data deleted successfully", 'success');
+        }, error: (error)=>{
+             console.log(error);
+             this.vulnSyncService.setLoading(false);
+             this.vulnSyncDash.showToast(error.error.errorMessage, 'error');
+        }
+      });
   }
 
   activateComputer(uuid: string) {
@@ -380,8 +386,8 @@ fetchApplicationData(): void {
         if(error.error.errorCode === 2008) {
          let errorMessage = error.error.errorMessage;
          this.vulnSyncDash.showToast(errorMessage, 'error');
-        } else{
-         this.vulnSyncDash.showToast('Unexpected error occured', 'error');
+        } else if(error.error.errorCode === 2017) {
+         this.vulnSyncDash.showToast(error.error.errorMessage, 'error');
         }
         console.error(error);
       }
