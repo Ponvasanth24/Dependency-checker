@@ -51,9 +51,10 @@ export class ViewComputerDialogComponent implements OnInit {
       this.http.get(`${vulnSyncEnvironments.getApplicationVulnerabilities}${applicationUuid}`)
       .subscribe({
         next: (response) => {
-        this.vulnerabilityData = response as Vulnerabilities[] || []; 
+        this.vulnerabilityData = response as Vulnerabilities[] || [];
+        this.vulnerabilityData = this.vulnerabilityData.map(v => ({...v, expanded: false}));
         console.log(this.vulnerabilityData)
-    this.isLoading = false;
+        this.isLoading = false;
       },
         error: (err) => {
           this.isLoading = false;
@@ -63,6 +64,10 @@ export class ViewComputerDialogComponent implements OnInit {
       });
       this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'95vw', maxHeight: '90vh'});
   }
+  toggleDescription(index: number): void {
+  this.vulnerabilityData[index].expanded = !this.vulnerabilityData[index].expanded;
+}
+
 }
 
 

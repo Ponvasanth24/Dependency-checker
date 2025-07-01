@@ -75,8 +75,9 @@
   <!-- <div class="overflow-auto"> -->
     <table class="w-100" id="vulnTable">
       <thead class="bg-white text-theme-color">
-        <tr>
+        <tr class="bg-white">
           <th>CveId</th>
+          <th>CPE Name</th>
           <th>Description</th>
           <th>Version</th>
           <th class="text-nowrap">Cvss Score</th>
@@ -90,9 +91,14 @@
           <td colspan="7" class="text-center">No Data Found.</td>
         </tr>
         <ng-container *ngIf="vulnerabilityData.length > 0">
-        <tr *ngFor="let vulnerability of vulnerabilityData">
+        <tr *ngFor="let vulnerability of vulnerabilityData; let i = index">
           <td class="text-nowrap"><span class="bg-secondary text-white rounded p-2">{{vulnerability.cveId}}</span></td>
-          <td>{{vulnerability.description}}</td>
+          <td>{{vulnerability.cpeName}}</td>
+          <td><div class="description-text" [class.collapsed]="vulnerability.expanded" (click)="toggleDescription(i)">
+            {{ vulnerability.description }}</div>
+          <div class="text-primary cursor-pointer small" (click)="toggleDescription(i)">
+            {{ vulnerability.expanded ? 'Show less' : 'Show more' }}
+          </div></td>
           <td>{{vulnerability.cvssVersion}}</td>
           <td>{{vulnerability.cvssScore}}</td>
           <td><span class="text-white p-2" [ngClass]="{'bg-danger': vulnerability.severity === 'HIGH', 'bg-warning': vulnerability.severity === 'MEDIUM',

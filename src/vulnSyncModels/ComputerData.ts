@@ -78,6 +78,7 @@ export interface Vulnerabilities {
   createdAt: string;
   updatedAt: string | null;
   deleted: boolean;
+  expanded: boolean
 }
 
 export interface InstalledSoftware {

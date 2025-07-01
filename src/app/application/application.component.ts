@@ -329,9 +329,11 @@ fetchApplicationData(): void {
        this.computer.lastUpdateCheck = lastUpdateCheck;
     }
     const { deleted,uuid, id,createdAt, updatedAt, active, ...computerData } = this.computer;
-    const afterRemovedApp = this.storedApplicationData.filter((app: any, index:number)=> app.uuid !== applicationId).map((app:any )=> {
+    const afterRemovedApp = this.storedApplicationData.filter((app: any, index:number)=> app.uuid !== applicationId && !app.deleted).map((app:any )=> {
          const { id, uuid,createdAt, updatedAt, deleted, vulnerabilities, ...refinedApp } = app;
-         return refinedApp;
+         if(!refinedApp.deleted) {
+             return refinedApp;
+         };
     });  
     console.log(afterRemovedApp)
     const installedSoftware = [...afterRemovedApp]

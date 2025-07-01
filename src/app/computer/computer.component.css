@@ -338,3 +338,17 @@
 .custom-view{
    border: 5px solid rgb(3, 86, 141) !important;
 }
+.description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;       /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5em;
+  max-height: 4.5em;           /* 3 lines * 1.5em */
+}
+.description-text.collapsed {
+  -webkit-line-clamp: unset;
+  max-height: 10em;
+}
+
