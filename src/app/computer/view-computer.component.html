@@ -1,12 +1,14 @@
 <div class="view-table border-theme overflow-auto">
-<table id="computerTable" class="w-100" *ngIf="!isLoading">
-  <caption class="caption-top dash-theme text-white text-center sticky-top">🖥️ Computer Info 
-    <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
+  <div class="dash-theme text-white py-2 fnw-bold text-center sticky-top d-flex align-items-center justify-content-between"><div class="flex-grow-1 text-center">🖥️ Computer Info </div>
+    <div class="position-absolute me-2 end-0">
+    <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
     <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
     </button>
-  </caption>
+    </div>
+  </div>
+<table id="computerTable" class="w-100" *ngIf="!isLoading">
   <thead>
-    <tr class="dash-theme text-white">
+    <tr class="text-theme-color bg-white">
       <th>Device Id</th>
       <th>IP Address</th>
       <th>Machine Name</th>
@@ -28,11 +30,11 @@
         <td>{{ computerData?.computer?.firewallStatus }}</td>
       </tr>
   </tbody>
-  <thead>
+  <thead class="appData">
     <tr>
-      <th colspan="6" class="text-center sticky-top dialog-heading text-primary">📦 Application</th>
+      <th colspan="6" class="text-center sticky-top dialog-heading text-theme-color">📦 Application</th>
     </tr>
-    <tr class="dash-theme text-white">
+    <tr class="bg-white">
         <th>Name</th>
         <th>Vendor</th>
         <th>Version</th>
@@ -62,16 +64,18 @@
 
 <!-- your-component.component.html -->
 <ng-template #vulnerabilityTable let-data="data" let-dialogRef="dialogRef">
-  <div class="sticky-top bg-white fnw-bold text-center d-flex align-items-center justify-content-between"><div class="col-11"><span>Vulnerabilities</span></div>
-    <button mat-icon-button class="btn bg-secondary rounded-circle d-flex justify-content-center align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
+  <div class="sticky-top dash-theme text-white fnw-bold text-center py-2 d-flex align-items-center justify-content-between"><div class="flex-grow-1 text-center">Vulnerabilities</div>
+    <div class="position-absolute end-0 me-2">  
+    <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex justify-content-center align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
     <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
     </button>
+    </div>
   </div>
 <mat-dialog-content class="p-0">
   <!-- <div class="overflow-auto"> -->
     <table class="w-100" id="vulnTable">
-      <thead>
-        <tr class="dash-theme text-white">
+      <thead class="bg-white text-theme-color">
+        <tr>
           <th>CveId</th>
           <th>Description</th>
           <th>Version</th>

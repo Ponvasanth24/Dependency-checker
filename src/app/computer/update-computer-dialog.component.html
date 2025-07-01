@@ -1,12 +1,14 @@
-<div #updateDialog class="animation-wrapper d-flex flex-column" [class.animate]="animate">
+<div #updateDialog class="animation-wrappe d-flex flex-column" [class.animate]="animate">
   <!-- Dialog content -->
   <div class="dialog-content">
 
     <div class="dash-theme sticky-top text-white p-2 d-flex justify-content-between align-items-center">
-      <strong>Update Computer Data</strong>
-      <button mat-icon-button class="d-flex align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
+      <div class="flex-grow-1 text-center">Update Computer Data</div>
+      <div class="position-absolute end-0 me-2 fnw-bold">
+      <button class="btn bg-secondary rounded-circle p-1 d-flex align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
       <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
       </button>
+      </div>
     </div>
 
     <form [formGroup]="updateComputerForm" (ngSubmit)="onSubmit()">

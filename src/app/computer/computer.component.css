@@ -66,8 +66,12 @@
     max-height: 25px;
     padding-left: 4px;
 }
-.comp-table-header {
-  font-weight: 500;
+.comp-table-header th.mat-mdc-header-cell{
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  font-weight: 600;
+  color: rgb(3, 86, 141) !important;
 }
 .btn-gray-shade {
     color: white;
@@ -196,19 +200,6 @@
   }
 }
 
-.animation-wrapper {
-  /* width: 100%; */
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: all 300ms ease-in-out;
-  z-index: 1000;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  /* overflow: scroll; */
-}
-
 .animation-wrapper.animate {
   /* top: 50% !important;
   left: 50% !important;
@@ -334,6 +325,11 @@
 }
 #computerTable {
   color: black;
+}
+#computerTable .appData{
+  position: sticky;
+  top: 40px;
+  color: rgb(3, 86, 141) !important;
 }
 .caption-top{
   caption-side: top;

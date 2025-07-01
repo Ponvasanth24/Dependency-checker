@@ -449,10 +449,12 @@
 
 <!------------------------------view-computer-status----------------------------------------->
 <ng-template #computerStatus let-dialogRef="dialogRef">
-  <div class="caption-top sticky-top fnw-bold text-center d-flex align-items-center justify-content-between"><div class="col-11"><span> {{computerStatusTitle}}</span></div>
-    <button mat-icon-button class="btn bg-secondary rounded-circle d-flex justify-content-center align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
+  <div class="sticky-top fnw-bold text-center py-2 dash-theme text-white d-flex align-items-center justify-content-between"><div class="flex-grow-1 text-center">{{computerStatusTitle}}</div>
+    <div class="position-absolute me-2 end-0"> 
+    <button class="btn bg-secondary p-1 rounded-circle d-flex justify-content-center align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
     <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
     </button>
+    </div>
   </div>
  <mat-dialog-content class="overflow-auto rounded-2 table-shadow p-0">
     <table mat-table [dataSource]="computerStatusData" matSort (matSortChange)="sortData($event)">
@@ -524,7 +526,7 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="comp-table-header dash-theme"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="comp-table-header bg-white"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       <tr *ngIf="isStatusTableLoading">
         <td [attr.colspan]="displayedColumns.length" class="text-center">

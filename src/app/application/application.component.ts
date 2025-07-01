@@ -267,20 +267,27 @@ fetchApplicationData(): void {
       data:{ computer: this.computer, application: application},
       panelClass:['app-update-form']
     });
-
+    dialogRef.backdropClick().subscribe(()=> {
+         dialogRef.close();
+    }) 
     dialogRef.afterClosed().subscribe(result => {
       console.log(result)
-      if(result === 200) {
-        this.vulnSyncDash.showToast("Application data updated successfully", 'success');
-        this.fetchApplicationData();
-      } else if(result === 201) {
-        this.vulnSyncDash.showToast('No changes detected in applications', 'error');
-      }  
-      else if(result === 4001) {
-        this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
-      } else {
-        this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error');
-      }
+      switch (result) {
+      case 200:
+      this.vulnSyncDash.showToast("Application data updated successfully", 'success');
+      this.fetchApplicationData();
+      break;
+
+      case 201:
+      this.vulnSyncDash.showToast('No changes detected in applications', 'error');
+      break;
+
+      case 4001:
+      this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
+      break;
+      default:
+         break;
+}
     })
   }
 
@@ -368,7 +375,6 @@ fetchApplicationData(): void {
           this.vulnSyncDash.showToast("computer deactivated successfully", 'success');
           this.fetchApplicationData();
         }
-
       },
       error: (error) => {
         if(error.error.errorCode === 2008) {

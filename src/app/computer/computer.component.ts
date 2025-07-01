@@ -403,11 +403,7 @@ get installedSoftware(): FormArray {
     const dialogRef = this.dialog.open(UpdateComputerDialogComponent, {
       data: { uuid: computer.uuid, origin },
       width: '80vh',
-      height: '90vh',
-      panelClass: 'update-dialog-container',
-      hasBackdrop: true,
-      backdropClass: 'custom-backdrop',
-      disableClose: true
+      height: '90vh'
     });
     dialogRef.backdropClick().subscribe(() => {
       dialogRef.close();
@@ -419,13 +415,8 @@ get installedSoftware(): FormArray {
         this.fetchComputerData();
       } else if (result === 0) {
         this.vulnSyncDash.showToast('UUID not provided for update', 'error');
-      } else {
-        result === false
-          ? this.vulnSyncDash.showToast(
-              'An error occurred while updating the computer',
-              'error'
-            )
-          : '';
+      } else {result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer',
+              'error') : '';
         console.log('Update dialog was closed without saving.');
       }
     });
