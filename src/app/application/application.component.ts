@@ -264,7 +264,8 @@ fetchApplicationData(): void {
     const dialogRef = this.dialog.open(UpdateApplicationDialogComponent, {
       width: '500px',
       disableClose: false,
-      data:{ computer: this.computer, application: application}
+      data:{ computer: this.computer, application: application},
+      panelClass:['app-update-form']
     });
 
     dialogRef.afterClosed().subscribe(result => {

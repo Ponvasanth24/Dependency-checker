@@ -87,10 +87,11 @@ export class UpdateApplicationDialogComponent {
     //   return;
     // }
     this.vulnSyncService.setLoading(true);
+    document.querySelector('.app-update-form')?.classList.add('d-none');
     const updatedValues = this.updateApplicationForm.getRawValue();
     console.log(this.computer)
    if (updatedValues.installedDate && typeof updatedValues.installedDate === 'object' && updatedValues.installedDate.toISOString) {
-    updatedValues.installedDate = updatedValues.installedDate.toISOString().replace(/Z$/, '');
+    updatedValues.installedDate = updatedValues.installedDate.toLocaleString('sv-SE').replace(' ', 'T');
   }
     if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z')) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');

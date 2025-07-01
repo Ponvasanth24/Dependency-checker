@@ -16,7 +16,7 @@
 
     <mat-form-field appearance="fill" class="full-width">
       <mat-label class="fw-bold">Version</mat-label>
-      <input matInput formControlName="version" placeholder="Version">
+      <input matInput formControlName="version" placeholder="Version" readonly>
       <!-- <mat-error class="error-field" *ngIf="updateApplicationForm.get('version')?.hasError('required')">
         Please fill this field
       </mat-error> -->
@@ -24,7 +24,7 @@
 
     <mat-form-field appearance="fill" class="full-width">
       <mat-label class="fw-bold">Vendor</mat-label>
-      <input matInput formControlName="vendorName" placeholder="Vendor">
+      <input matInput formControlName="vendorName" placeholder="Vendor" readonly>
       <!-- <mat-error class="error-field" *ngIf="updateApplicationForm.get('vendorName')?.hasError('required')">
         Please fill this field
       </mat-error> -->
@@ -32,7 +32,7 @@
 
    <mat-form-field appearance="fill" class="full-width">
    <mat-label class="fw-bold">Installed Date</mat-label>
-   <input matInput [matDatepicker]="picker" formControlName="installedDate" placeholder="Choose a date">
+   <input matInput [matDatepicker]="picker" formControlName="installedDate" placeholder="Choose a date" readonly>
    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
    <mat-datepicker #picker></mat-datepicker>
    <!-- <mat-error class="error-field" *ngIf="updateApplicationForm.get('installedDate')?.hasError('required')">
