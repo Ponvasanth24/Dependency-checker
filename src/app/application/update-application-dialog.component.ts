@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,21 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
+import { ComputerData } from '../../vulnSyncModels/ComputerData';
+import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
 
+interface ApplicationData {
+  id: number;
+  uuid: string;
+  name: string;
+  version: string;
+  createdAt: string;
+  updatedAt: string;
+  deleted: boolean;
+  active: boolean;
+  vulnerabilities: any[];
+  [key: string]: any;
+}
 @Component({
   selector: 'app-update-application-dialog',
   standalone: true,
@@ -31,40 +45,78 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class UpdateApplicationDialogComponent {
   updateApplicationForm!: FormGroup;
+  computer!: any;
+  applications!: any;
 
   constructor(
     public dialogRef: MatDialogRef<UpdateApplicationDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private fb: FormBuilder, private http: HttpClient
+    private fb: FormBuilder, private http: HttpClient, private vulnSyncService: VulnerabilitySyncService
   ) {
     this.updateApplicationForm = this.fb.group({
-      name: [data?.name, Validators.required],
-      vendor: [data?.vendor, Validators.required],
-      version: [data?.version, Validators.required],
-      installedDate: [data?.installedDate, Validators.required],
+      name: [data?.application.name, Validators.required],
+      vendorName: [data?.application.vendorName, Validators.required],
+      version: [data?.application.version, Validators.required],
+      installedDate: [data?.application.installedDate, Validators.required],
     });
+    this.fetchComputerData();
+    console.log(this.data)
+  }
+
+  fetchComputerData(): void {
+    this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${this.data.computer.uuid}` )
+      .subscribe({
+        next: (response) => {
+          console.log(response);
+          this.computer = response.computer;
+          this.applications = response.applications;
+          // this.dialogRef.close(this.updateApplicationForm.value);
+        },
+        error: (error) => {
+          console.error(error);
+        }
+      });
   }
 
   onSubmit(): void {
   if (this.updateApplicationForm.valid) {
     const uuid = this.data?.uuid;
 
-    if (!uuid) {
-      console.error('UUID not provided for update');
-      return;
+    // if (!uuid) {
+    //   console.error('UUID not provided for update');
+    //   return;
+    // }
+    this.vulnSyncService.setLoading(true);
+    const updatedValues = this.updateApplicationForm.getRawValue();
+    console.log(this.computer)
+   if (updatedValues.installedDate && typeof updatedValues.installedDate === 'object' && updatedValues.installedDate.toISOString) {
+    updatedValues.installedDate = updatedValues.installedDate.toISOString();
+  }
+    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.installedDate.indexOf('Z')) {
+       const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
+       const timestamp = this.computer.timestamp.concat('Z');
+       this.computer.timestamp = timestamp;
+       this.computer.lastUpdateCheck = lastUpdateCheck;
     }
-
-    const params = { applicationUuid: uuid };
-
-    this.http.put(`${vulnSyncEnvironments.applicationCommonUrl}`, this.updateApplicationForm.value, { params })
+    const { deleted, id,createdAt, updatedAt, active, ...computerData } = this.computer;
+    const refiningInstalledSoftware = (this.applications as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
+    const installedSoftware = [...refiningInstalledSoftware, updatedValues];
+    const updatedForm = { ...computerData, installedSoftware};
+    console.log(updatedForm)
+    this.http.post(`${vulnSyncEnvironments.computerCommonUrl}`, updatedForm)
       .subscribe({
         next: (res) => {
           console.log('Update success:', res);
-          this.dialogRef.close(this.updateApplicationForm.value);
+          this.dialogRef.close(200);
+          this.vulnSyncService.setLoading(false);
         },
-        error: (err) => {
-          this.dialogRef.close(false);
-          console.error('Update error:', err);
+        error: (error) => {
+           console.error('Update error:', error);
+          this.vulnSyncService.setLoading(false); 
+          if(error.error.errorCode === 2109) {
+          this.dialogRef.close(4001);
+          console.error('Update error:', error);
+          }
         }
       });
   }

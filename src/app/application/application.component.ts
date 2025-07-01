@@ -174,7 +174,7 @@ fetchApplicationData(): void {
     const AddedApplication = this.applicationForm.getRawValue();
     AddedApplication.installedDate = AddedApplication.installedDate.toISOString();
     const { computerUuid ,...refinigAddedApplication} = AddedApplication;
-    if(this.computer.timestamp.indexOf('Z') === -1) {
+    if(this.computer.timestamp.indexOf('Z') === -1 && this.computer.installedDate.indexOf('Z')) {
        const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
        const timestamp = this.computer.timestamp.concat('Z');
        this.computer.timestamp = timestamp;
@@ -264,15 +264,18 @@ fetchApplicationData(): void {
     const dialogRef = this.dialog.open(UpdateApplicationDialogComponent, {
       width: '500px',
       disableClose: false,
-      data:{...application}
+      data:{ computer: this.computer, application: application}
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if(result) {
+      console.log(result)
+      if(result === 200) {
         this.vulnSyncDash.showToast("Application data updated successfully", 'success');
         this.fetchApplicationData();
+      } else if(result === 4001) {
+        this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
       } else {
-        result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error') : "";
+        this.vulnSyncDash.showToast('An error occurred while updating the computer', 'error');
       }
     })
   }

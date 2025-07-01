@@ -24,8 +24,8 @@
 
     <mat-form-field appearance="fill" class="full-width">
       <mat-label class="fw-bold">Vendor</mat-label>
-      <input matInput formControlName="vendor" placeholder="Vendor">
-      <mat-error class="error-field" *ngIf="updateApplicationForm.get('vendor')?.hasError('required')">
+      <input matInput formControlName="vendorName" placeholder="Vendor">
+      <mat-error class="error-field" *ngIf="updateApplicationForm.get('vendorName')?.hasError('required')">
         Please fill this field
       </mat-error>
     </mat-form-field>
