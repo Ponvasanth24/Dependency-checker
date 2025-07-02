@@ -357,6 +357,7 @@ fetchApplicationData(): void {
      this.http.patch<any>(`${vulnSyncEnvironments.computerCommonUrl}/${uuid}/activate`,{headers: new HttpHeaders({ 'Content-Type': 'application/json' })}).subscribe({
       next: (response) => {
         console.log(response)
+        this.computer.active = true;
         if(response.statusCode === 2012) {
           this.vulnSyncDash.showToast("computer activated successfully", 'success');
         }
@@ -380,6 +381,7 @@ fetchApplicationData(): void {
      this.http.patch<any>(`${vulnSyncEnvironments.computerCommonUrl}/${uuid}/deactivate`, {}).subscribe({
       next: (response) => {
         if(response.statusCode === 2006) {
+          this.computer.active = false;
           this.vulnSyncDash.showToast("computer deactivated successfully", 'success');
           this.fetchApplicationData();
         }

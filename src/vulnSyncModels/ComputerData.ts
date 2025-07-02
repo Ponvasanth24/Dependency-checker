@@ -69,6 +69,7 @@ export interface Vulnerabilities {
   id: number;
   uuid: string;
   cveId: string;
+  cpeName: string,
   description: string;
   cvssScore: number;
   cvssVersion: string;

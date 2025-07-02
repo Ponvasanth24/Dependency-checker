@@ -77,7 +77,7 @@
       <thead class="bg-white text-theme-color">
         <tr class="bg-white">
           <th>CveId</th>
-          <!-- <th>CPE Name</th> -->
+          <th>CPE Name</th>
           <th>Description</th>
           <th>Version</th>
           <th class="text-nowrap">Cvss Score</th>
@@ -93,7 +93,7 @@
         <ng-container *ngIf="vulnerabilityData.length > 0">
         <tr *ngFor="let vulnerability of vulnerabilityData; let i = index">
           <td class="text-nowrap"><span class="bg-secondary text-white rounded p-2">{{vulnerability.cveId}}</span></td>
-          <!-- <td>{{vulnerability.cpeName}}</td> -->
+          <td>{{vulnerability.cpeName}}</td>
           <td><div class="description-text" [class.collapsed]="vulnerability.expanded" (click)="toggleDescription(i)">
             {{ vulnerability.description }}</div>
           <div class="text-primary cursor-pointer small" (click)="toggleDescription(i)">

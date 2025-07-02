@@ -451,9 +451,10 @@ get installedSoftware(): FormArray {
     });
   }
 
-  viewComputersByStatus(statusEndPoint:string, title: string) {
+  viewComputersByStatus(statusEndPoint:string, title: string, status: boolean) {
      this.isStatusTableLoading = true;
-     this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${statusEndPoint}`)
+     const params = {status: status};
+     this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${statusEndPoint}`,{params})
      .subscribe({
        next:(response)=>{
           this.computerStatusData = response || [];

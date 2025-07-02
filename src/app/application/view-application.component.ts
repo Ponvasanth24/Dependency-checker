@@ -4,13 +4,15 @@ import { CommonModule } from '@angular/common';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
 import { HttpClient } from '@angular/common/http';
 import { MatIcon } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 @Component({
   selector: 'app-view-application-dialog',
   standalone: true,
   templateUrl: './view-application.component.html',
   styleUrl: './application.component.css',
   imports: [
-    CommonModule, MatIcon
+    CommonModule, MatIcon, FormsModule, MatCheckboxModule
   ]
 })
 export class ViewApplicationDialogComponent {
