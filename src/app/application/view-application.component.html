@@ -1,5 +1,5 @@
 <div class="status-title sticky-top dash-theme text-white py-2 d-flex justify-content-between align-items-center fnw-bold">
-    <!-- <mat-checkbox >Enable Option</mat-checkbox> -->
+    <input type="checkbox" class="form-check ms-4 cursor-pointer accent-gray" (change)="selectAll()" matTooltip="Select All" [matTooltipPosition]="'above'" *ngIf="data.status" [(ngModel)]="isAllAppSelected">
     <div class="flex-grow-1 text-center"> 💻 {{title}}</div>
     <div class="position-absolute end-0 me-2">
     <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
@@ -11,6 +11,7 @@
 <table class="styled-table">
   <thead>
     <tr class="text-theme-color sticky-top bg-white">
+      <th *ngIf="data.status"></th>
       <th>Name</th>
       <th>Vendor</th>
       <th>Version</th>
@@ -21,11 +22,13 @@
     <ng-container>
 
       <!-- Applications Section -->
-      <tr *ngIf="!applicationsData?.length">
+      <tr *ngIf="!uninstalledApplicationsData?.length">
         <td colspan="5" class="empty">No applications found</td>
       </tr>
-      <ng-container *ngIf="applicationsData?.length">
-        <tr *ngFor="let app of applicationsData">
+      <ng-container *ngIf="uninstalledApplicationsData?.length">
+        <tr *ngFor="let app of uninstalledApplicationsData; let i = index">
+          <td *ngIf="data.status">
+            <input type="checkbox" class="form-check ms-2 cursor-pointer accent-gray" *ngIf="data.status" [(ngModel)]="app.select"></td>
           <td class="text-nowrap">{{ app.name }}</td>
           <td>{{ app.vendorName }}</td>
           <td>{{ app.version }}</td>
@@ -34,5 +37,10 @@
         </ng-container>
     </ng-container> 
   </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="5"><button [disabled]="!isAnyAppSelected" (click)="reInstallApplications()" class="btn btn-secondary">Add to Installed List</button></td>
+    </tr>
+  </tfoot>
 </table>
 </div> 

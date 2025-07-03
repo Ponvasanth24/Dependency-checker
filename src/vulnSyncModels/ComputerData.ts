@@ -23,22 +23,24 @@ export interface Dependency {
   status: number;
   createdAt: string;
   updatedAt: string;
-  vulnerabilities?: Vulnerability[]; // Optional in case it's empty
+  vulnerabilities?: Vulnerability[]; 
 }
 
 export interface Application {
+  [x: string]: any;
   id: number;
   uuid: string;
-  computerUuid: string;
   name: string;
   version: string;
-  vendor: string;
-  installDate: Date;
-  status: number;
+  vendorName: string;
+  installedDate: string; 
   createdAt: string;
   updatedAt: string;
-  dependencies?: Dependency[];
+  deleted: boolean;
+  select?: boolean;
+  vulnerabilities: any[];
 }
+
 
 export interface storedApplications {
   id: number;
@@ -117,7 +119,7 @@ export interface storedComputer {
   updatedAt: string | null;
   deleted: boolean;
   active: boolean;
-  applications: storedApplications[];
+  // applications?: storedApplications[];
 }
 
 export interface ComputerDetailsResponse {

@@ -311,4 +311,15 @@
    caption-side: top;
    text-align: center;
 }
+.accent-gray {
+  accent-color: gray !important;
+}
+.form-check {
+  width: 20px !important;
+  height: 20px !important; 
+}
+
+
+
+
 

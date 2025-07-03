@@ -52,9 +52,12 @@ export const routes: Routes = [
         path:'application/:applicationUuid',
         loadComponent:()=> import('./applicationdependency/applicationdependency.component').then(m=> m.ApplicationdependencyComponent)
       },
-    {
+      {
         path:'dependency/:dependencyId',
         loadComponent:()=> import('./dependencyvulnerabilities/dependencyvulnerabilities.component').then(m=> m.DependencyvulnerabilitiesComponent)
+      },
+      { path:'unresolvedCpe', 
+        loadComponent:()=> import('./unresolvedcpe/unresolvedcpe.component').then(m=> m.UnresolvedcpeComponent)
       }]
       }
   ];

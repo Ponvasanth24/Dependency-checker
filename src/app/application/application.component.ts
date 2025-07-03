@@ -236,6 +236,7 @@ fetchApplicationData(): void {
   }
 
   this.pagedApplicationData = new MatTableDataSource(sortedData.slice(this.start, this.end));
+  console.log(this.pagedApplicationData)
 }
 
 
@@ -298,7 +299,7 @@ fetchApplicationData(): void {
       width: '90vw',
       minHeight: '50vh',
       maxHeight: '90vh',
-      data:{ computerUuid: this.computerUuid, status: statusObj.status}
+      data:{ computer: this.computer, applications: this.storedApplicationData, status: statusObj.status}
     });
 
     dialogRef.afterOpened().subscribe(() => {
@@ -313,6 +314,26 @@ fetchApplicationData(): void {
     }
     }, 0);
    });
+   dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+      switch (result) {
+      case 200:
+      this.vulnSyncDash.showToast("Application data updated successfully", 'success');
+      this.fetchApplicationData();
+      break;
+
+      case 201:
+      this.vulnSyncDash.showToast('No changes detected in applications', 'error');
+      break;
+
+      case 4001:
+      this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
+      break;
+      default:
+         break;
+    }
+  });
+   
   }
 
   async deleteApplicationData(applicationId: number): Promise<void> {

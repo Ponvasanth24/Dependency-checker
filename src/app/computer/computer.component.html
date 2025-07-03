@@ -265,6 +265,7 @@
   <div class="d-flex justify-content-between">
     <span class="h5 text-secondary">Computer Details</span>
     <div class="d-flex align-items-center">
+      <a class="btn btn-secondary me-5" [routerLink]="['/vulnerabilitySync/unresolvedCpe']">Un Resolved CPE</a>
       <button class="btn me-5" matTooltip="Active Computers" (click)="viewComputersByStatus('by-activation-status', 'Active Computers',true)" matTooltipPosition="above"><span class="material-symbols-outlined fs-1">computer_arrow_up</span></button>
       <button class="btn me-5" matTooltip="Deleted Computers" (click)="viewComputersByStatus('by-deletion-status', 'Deleted Computers',true)" matTooltipPosition="above"><span class="material-symbols-outlined fs-1">computer_cancel</span></button>
     <div class="h-fit-content text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedComputerData.length}}</div>

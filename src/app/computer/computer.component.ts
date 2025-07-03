@@ -44,6 +44,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-computer',
   standalone: true,
@@ -58,7 +59,7 @@ import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/mate
     MatIconModule,
     MatDialogModule,
     MatTableModule,
-    MatTooltipModule, MatNativeDateModule,
+    MatTooltipModule, MatNativeDateModule, RouterModule,
     MatProgressSpinnerModule, MatSortModule, MatDatepickerModule
   ],
   templateUrl: './computer.component.html',
@@ -512,5 +513,16 @@ get installedSoftware(): FormArray {
     this.router.navigate(['/vulnerabilitySync/computer', computer.uuid], {
       state: { computer: computer },
     });
+  }
+  viewUnresolvedCpe() {
+    console.log("cl")
+    this.http.get<any>(vulnSyncEnvironments.viewUnresolvedPageUrl).subscribe({
+      next:(response)=>{
+           console.log(response);
+      },
+      error:(error)=>{
+           console.log(error);
+      }
+    })
   }
 }
