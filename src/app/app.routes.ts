@@ -58,6 +58,9 @@ export const routes: Routes = [
       },
       { path:'unresolvedCpe', 
         loadComponent:()=> import('./unresolvedcpe/unresolvedcpe.component').then(m=> m.UnresolvedcpeComponent)
-      }]
+      },
+      {path: 'unresolvedCpe/:computerUuid',
+       loadComponent: () => import('./unresolvedcpe/unresolvedcpe.component').then(m => m.UnresolvedcpeComponent)
+       }]
       }
   ];

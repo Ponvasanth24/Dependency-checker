@@ -88,7 +88,7 @@
       </thead>
       <tbody>
         <tr *ngIf="vulnerabilityData.length === 0">
-          <td colspan="8" class="text-center">No Data Found.</td>
+          <td colspan="8" class="text-center">No vulnerabilities available.</td>
         </tr>
         <ng-container *ngIf="vulnerabilityData.length > 0">
         <tr *ngFor="let vulnerability of vulnerabilityData; let i = index">

@@ -8,3 +8,9 @@
 .mat-mdc-row:hover {
   background-color: #e0e0e0;
 }
+.resolve-cpe-table tr,th,td{
+   padding: 10px;
+}
+.resolve-cpe-table tbody tr:nth-child(odd){
+       background-color: #ddd;
+   }

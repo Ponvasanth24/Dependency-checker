@@ -9,18 +9,24 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
 import { HttpClient } from '@angular/common/http';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-unresolvedcpe',
+  standalone: true,
   imports: [CommonModule, MatTableModule, MatIconModule, MatLabel, MatSelect, FormsModule, MatOptionModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule, MatTooltipModule
   ],
   templateUrl: './unresolvedcpe.component.html',
   styleUrl: './unresolvedcpe.component.css'
 })
 export class UnresolvedcpeComponent implements OnInit{
      storedApplicationData: any[] = [];
-     pagedApplicationData!: MatTableDataSource<any>;
+     expandedElement: any | null = null;
+     likelyCpeNames: any[] = [];
+     pagedApplicationData!: any[];
      pageSize: number = 5;
      pageIndex: number = 0;
      initialIndex: number = 0;
@@ -30,18 +36,29 @@ export class UnresolvedcpeComponent implements OnInit{
      pageSizes: Array<number> = [];
      start: number = 0;
      end: number = 0;
+     cpeName: string = "";
+     computerUuid: string | null = null;
      displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate', 'createdAt','status' ,'action'];
+     expandedColumns: string[] = [...this.displayedColumns, 'expandedDetail'];
      sortActive = '';
      sortDirection: 'asc' | 'desc' = 'asc';
-
-     constructor(private cd: ChangeDetectorRef, private http: HttpClient){}
+    
+     likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/
+     constructor(private cd: ChangeDetectorRef, private http: HttpClient, private vulnSyncDash: VulnerabilitysyncdashboardComponent,
+         private router: ActivatedRoute
+     ){}
 
      ngOnInit(): void {
-       this.viewUnresolvedCpe();
+       this.router.paramMap.subscribe((params) => {
+          console.log(params.get('computerUuid'))
+          this.computerUuid = params.get('computerUuid');
+          this.viewUnresolvedCpe();
+       })
      }
 
-    onPageSizeChange(event: MatSelectChange): void {
-    this.pageSize = event.value;
+    onPageSizeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;  
+    this.pageSize = Number(target.value);
     this.pageIndex = 0;
     this.updatePagedData(this.initialIndex);
   }
@@ -76,7 +93,7 @@ export class UnresolvedcpeComponent implements OnInit{
     });
   }
 
-  this.pagedApplicationData = new MatTableDataSource(sortedData.slice(this.start, this.end));
+  this.pagedApplicationData = sortedData.slice(this.start, this.end);
   console.log(sortedData)
 }
     nextPage(): void {
@@ -96,16 +113,61 @@ export class UnresolvedcpeComponent implements OnInit{
   }
 
   viewUnresolvedCpe() {
-      console.log("cl")
-      this.http.get<any>(vulnSyncEnvironments.viewUnresolvedPageUrl).subscribe({
+     let url = vulnSyncEnvironments.viewUnresolvedPageUrl;
+     console.log(this.computerUuid)
+     if(this.computerUuid) {
+       url += `/${this.computerUuid}`;
+       console.log(url)
+     }
+      this.http.get<any>(url).subscribe({
         next:(response)=>{
              console.log(response);
-             this.storedApplicationData = response || [];
+             this.storedApplicationData = response.map((app: any)=> { return {...app, cpeHint: "", collapse: false, likelyCpeData:[]}}) || [];
              this.updatePagedData(this.pageIndex);
         },
         error:(error)=>{
              console.log(error);
         }
-      })
+      });
+  }
+
+showLikelyCpeNames(vendor: string, product: string, version: string, application: any): void {
+    if(application.collapse) {
+      application.collapse = false;
+      return;
+    } else {
+       application.collapse = true;
     }
+    const params = { vendor: vendor, product: product, version: "" };
+    this.http.get<any[]>(vulnSyncEnvironments.getLikelyCpeNames, { params }).subscribe({
+      next: (response) => {
+        console.log(response)
+        application.likelyCpeData = response;
+      },
+      error: (err) => {
+        console.error('Error fetching likely CPE names:', err);
+      }
+    });
+}
+
+addDependencyHint(cpeName: string, application: any){
+     if(!this.likelyCpeRegex.test(cpeName)){
+        this.vulnSyncDash.showToast("CPE Name Not Valid",'error');
+        return;
+     }
+     const params = {cpeName: cpeName}
+     const applicationModal = {applicationUuid: application.uuid, applicationName: application.name, applicationVersion: application.version, applicationVendor: application.vendorName, isExists:false};
+     console.log(applicationModal)
+     this.http.post<any[]>(vulnSyncEnvironments.addCpeHintUrl, applicationModal,{params}).subscribe({
+      next: (response) => {
+        console.log(response);
+        this.vulnSyncDash.showToast("Hint Added Successfully",'success');
+      },
+      error: (err) => {
+        console.error('Error add hint:', err);
+        this.vulnSyncDash.showToast("Hint Added failed",'error');
+      }
+})
+
+}
 }

@@ -31,6 +31,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 import { fakeAsync } from '@angular/core/testing';
+import { RouterLink } from '@angular/router';
 
 interface ApplicationData {
   id: number;
@@ -50,7 +51,7 @@ interface ApplicationData {
   standalone: true,
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, MatSelectModule,
   FormsModule, MatIconModule, MatDialogModule, MatTableModule, MatTooltipModule, MatCardModule,
-  MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule, MatSortModule],
+  MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule, MatSortModule, RouterLink],
   providers: [
     provideNativeDateAdapter()
   ],

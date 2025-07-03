@@ -15,5 +15,7 @@ export const vulnSyncEnvironments = {
     getDependencyByUuid : 'http://localhost:8081/api/uuid/dependency',
     vulnerabilitiesCommonUrl: 'http://localhost:8081/api/vulnerability',
     getVulnerabilitiesUrl: 'http://localhost:8081/api/vulnerabilities',
-    viewUnresolvedPageUrl: "http://localhost:8081/api/applications/unresolved-cpe"
+    viewUnresolvedPageUrl: "http://localhost:8081/api/applications/unresolved-cpe",
+    getLikelyCpeNames: "http://localhost:8081/api/hint/likelyCpeNames",
+    addCpeHintUrl: "http://localhost:8081/api/hint/application/addHint"
 }
