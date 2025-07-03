@@ -48,11 +48,12 @@ export class ViewComputerDialogComponent implements OnInit {
   } 
 
   openViewApplicationDialog(applicationUuid: string) {
-      this.http.get(`${vulnSyncEnvironments.getApplicationVulnerabilities}${applicationUuid}`)
+      this.http.get(`${vulnSyncEnvironments.getApplicationVulnerabilities}${applicationUuid}/vulnerabilities`)
       .subscribe({
         next: (response) => {
+          console.log(response)
         this.vulnerabilityData = response as Vulnerabilities[] || [];
-        this.vulnerabilityData = this.vulnerabilityData.map(v => ({...v, expanded: false}));
+        this.vulnerabilityData = this.vulnerabilityData.map(v => ({...v, expanded: false})) || [];
         console.log(this.vulnerabilityData)
         this.isLoading = false;
       },
