@@ -48,9 +48,9 @@
       <td colspan="6" class="empty">No applications found</td>
     </tr>
     <tr *ngFor="let app of computerData.applications; let i = index">
-      <td>{{ app.name }}</td>
+      <td>{{ app.softwareName }}</td>
       <td>{{ app.vendorName }}</td>
-      <td>{{ app.version }}</td>
+      <td>{{ app.softwareVersion }}</td>
       <td>{{ app.installedDate }}</td>
       <td>{{app.createdAt}}</td>
       <td class="text-center"><span (click)="openViewApplicationDialog(app.uuid)" matTooltip="View Vulnerabilities"
@@ -64,7 +64,8 @@
 
 <!-- your-component.component.html -->
 <ng-template #vulnerabilityTable let-data="data" let-dialogRef="dialogRef">
-  <div class="sticky-top dash-theme text-white fnw-bold text-center py-2 d-flex align-items-center justify-content-between"><div class="flex-grow-1 text-center">Vulnerabilities</div>
+  <div class="sticky-top dash-theme text-white fnw-bold text-center py-2 d-flex align-items-center justify-content-between">
+    <div class="flex-grow-1 text-center">Vulnerabilities</div>
     <div class="position-absolute end-0 me-2">  
     <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex justify-content-center align-items-center text-white" (click)="dialogRef.close()" aria-label="Close dialog">
     <mat-icon class="material-symbols-outlined fw-bold">close</mat-icon>
@@ -75,9 +76,11 @@
   <!-- <div class="overflow-auto"> -->
     <table class="w-100" id="vulnTable">
       <thead class="bg-white text-theme-color">
+        <tr>
+          <td colspan="7"><span class="fnw-bold">CPE Name: {{cpeName}}</span></td>
+        </tr>
         <tr class="bg-white">
           <th>CveId</th>
-          <th>CPE Name</th>
           <th>Description</th>
           <th>Version</th>
           <th class="text-nowrap">Cvss Score</th>
@@ -93,7 +96,6 @@
         <ng-container *ngIf="vulnerabilityData.length > 0">
         <tr *ngFor="let vulnerability of vulnerabilityData; let i = index">
           <td class="text-nowrap"><span class="bg-secondary text-white rounded p-2">{{vulnerability.cveId}}</span></td>
-          <td>{{vulnerability.cpeName}}</td>
           <td><div class="description-text" [class.collapsed]="vulnerability.expanded" (click)="toggleDescription(i)">
             {{ vulnerability.description }}</div>
           <div class="text-primary cursor-pointer small" (click)="toggleDescription(i)">

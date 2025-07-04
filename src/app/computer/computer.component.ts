@@ -165,7 +165,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   antivirusStatus: ['', Validators.required],
   firewallStatus: ['', Validators.required],
   loggedInUser: ['', Validators.required],
-  installedSoftware: this.fb.array([
+  installedSoftwares: this.fb.array([
     this.createSoftwareGroup()
   ]),
   lastUpdateCheck: [null, Validators.required],
@@ -175,8 +175,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   createSoftwareGroup(): FormGroup {
     return this.fb.group({
-      name: ['', Validators.required],
-      version: [''],
+      softwareName: ['', Validators.required],
+      softwareVersion: [''],
       installedDate: [null],
       vendorName: ['']
     });
@@ -195,9 +195,9 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   console.log(selectedDateTime)
   selectedDateTime.setHours(0, 0, 0, 0); 
   const formattedDate = this.formatDateTime(selectedDate); 
-  this.installedSoftware.at(index).get('installedDate')?.setValue(formattedDate); 
+  this.installedSoftwares.at(index).get('installedDate')?.setValue(formattedDate); 
   if (selectedDateTime.getTime() > today.getTime()) {
-    this.installedSoftware.at(index).get('installedDate')?.setValue(''); 
+    this.installedSoftwares.at(index).get('installedDate')?.setValue(''); 
     this.vulnSyncDash.showToast('Installed date cannot be in the future', 'error');
     return;
   }
@@ -220,17 +220,17 @@ formatUTC(date: Date): string {
   return date.toISOString().split('.')[0] + 'Z';
 }
 
-get installedSoftware(): FormArray {
-  return this.deviceForm.get('installedSoftware') as FormArray;
+get installedSoftwares(): FormArray {
+  return this.deviceForm.get('installedSoftwares') as FormArray;
 }
 
   addSoftware(): void {
-    this.installedSoftware.push(this.createSoftwareGroup());
+    this.installedSoftwares.push(this.createSoftwareGroup());
   }
 
   removeSoftware(index: number): void {
-    if (this.installedSoftware.length > 1) {
-      this.installedSoftware.removeAt(index);
+    if (this.installedSoftwares.length > 1) {
+      this.installedSoftwares.removeAt(index);
     }
   }
   
@@ -243,7 +243,7 @@ get installedSoftware(): FormArray {
         this.updatePagedData(this.pageIndex);
         this.isTableLoading = false;
         this.cd.detectChanges();
-      },
+      }, 
       error: (error) => {
         this.isTableLoading = false;
         this.cd.detectChanges();
@@ -297,7 +297,9 @@ get installedSoftware(): FormArray {
         next: (response) => {
           console.log(response);
           let successMessage = 'Computer data added successfully';
-          this.deviceForm.reset()
+          this.deviceForm.reset();
+          this.installedSoftwares.clear();
+          this.initForm();
           this.vulnSyncDash.showToast(successMessage, 'success');
           this.fetchComputerData();
           this.vulnSyncService.setLoading(false);

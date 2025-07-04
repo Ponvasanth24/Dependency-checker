@@ -1,5 +1,5 @@
 <div class="status-title sticky-top dash-theme text-white py-2 d-flex justify-content-between align-items-center fnw-bold">
-    <input type="checkbox" class="form-check ms-4 cursor-pointer accent-gray" (change)="selectAll()" matTooltip="Select All" [matTooltipPosition]="'above'" *ngIf="data.status" [(ngModel)]="isAllAppSelected">
+    <input *ngIf="uninstalledApplicationsData?.length && data.status" type="checkbox" class="form-check ms-4 cursor-pointer accent-gray" (change)="selectAll()" matTooltip="Select All" [matTooltipPosition]="'above'" [(ngModel)]="isAllAppSelected">
     <div class="flex-grow-1 text-center"> 💻 {{title}}</div>
     <div class="position-absolute end-0 me-2">
     <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
@@ -29,16 +29,16 @@
         <tr *ngFor="let app of uninstalledApplicationsData; let i = index">
           <td *ngIf="data.status">
             <input type="checkbox" class="form-check ms-2 cursor-pointer accent-gray" *ngIf="data.status" [(ngModel)]="app.select"></td>
-          <td class="text-nowrap">{{ app.name }}</td>
+          <td class="text-nowrap">{{ app.softwareName }}</td>
           <td>{{ app.vendorName }}</td>
-          <td>{{ app.version }}</td>
+          <td>{{ app.softwareVersion }}</td>
           <td colspan="2">{{ applicationDate === 'Installed Date' ? app.installedDate : app.updatedAt}}</td>
         </tr>
         </ng-container>
     </ng-container> 
   </tbody>
   <tfoot>
-    <tr>
+    <tr *ngIf="uninstalledApplicationsData?.length">
       <td colspan="5"><button [disabled]="!isAnyAppSelected" (click)="reInstallApplications()" class="btn btn-secondary">Add to Installed List</button></td>
     </tr>
   </tfoot>

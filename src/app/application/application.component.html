@@ -62,9 +62,9 @@
           <tr>
           <th> Computer ID *</th>
           <th> Name * </th>
-          <th> Version * </th>
-          <th> Vendor * </th>
-          <th> Install Date * </th>
+          <th> Version </th>
+          <th> Vendor </th>
+          <th> Install Date </th>
           </tr>
         </thead>
          <tbody class="border border-top-0 border-start-0 border-end-0 border-bottom">
@@ -121,7 +121,7 @@
           <tfoot>
           <tr>
           <td colspan="5" class="text-center">
-          <button class="btn btn-gray-shade" type="submit" (click)="addApplicationData()">
+          <button class="btn btn-gray-shade" [disabled]="applicationForm.invalid" type="submit" (click)="addApplicationData()">
           Submit
           </button>
           </td>
@@ -137,7 +137,7 @@
   <div class="d-flex justify-content-between">
   <span class="text-secondary h5">Application Details</span>
   <div class="d-flex">
-    <a class="bg-secondary rounded p-1 px-2 text-white me-5 h-fit-content text-decoration-none" [routerLink]="['/vulnerabilitySync/unresolvedCpe', computer.uuid]">Un Resolved CPE</a>
+    <a class="bg-secondary rounded p-1 px-2 text-white me-5 h-fit-content text-decoration-none" [routerLink]="['/vulnerabilitySync/unresolvedCpe', computer.uuid]">Unresolved CPE</a>
     <span class="text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedApplicationData?.length}}</span></div>
   </div>
 <div class="overflow-auto rounded-2 table-shadow">
@@ -145,12 +145,12 @@
     <!-- Name Column -->
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Name</th>
-      <td mat-cell *matCellDef="let application" class="fnw-bold text-nowrap">{{ application.name }}</td>
+      <td mat-cell *matCellDef="let application" class="fnw-bold text-nowrap">{{ application.softwareName }}</td>
     </ng-container>
 
     <ng-container matColumnDef="version">
       <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Version</th>
-      <td mat-cell *matCellDef="let application" class="text-muted">{{ application.version }}</td>
+      <td mat-cell *matCellDef="let application" class="text-muted">{{ application.softwareVersion }}</td>
     </ng-container>
 
     <ng-container matColumnDef="vendor">
@@ -161,11 +161,6 @@
     <ng-container matColumnDef="installedDate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-white text-nowrap header-bold">Installed Date</th>
       <td mat-cell *matCellDef="let application" class="text-muted">{{ application.installedDate | date: 'shortDate' }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="createdAt">
-      <th mat-header-cell *matHeaderCellDef class="text-white text-nowrap">Created At</th>
-      <td mat-cell *matCellDef="let application" class="text-muted">{{ application.createdAt }}</td>
     </ng-container>
 
     <ng-container matColumnDef="status">

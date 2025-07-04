@@ -84,7 +84,7 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   sortDirection: 'asc' | 'desc' = 'asc';
 
   computerDetailTable: string[] = ['ipAddress', 'hostName', 'os', 'antivirusStatus', 'firewallStatus', 'status', 'action'];
-  displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate', 'createdAt','status' ,'action'];
+  displayedColumns: string[] = ['name', 'version', 'vendor', 'installedDate','status' ,'action'];
   @ViewChild('successToast') successToast!: ElementRef;
   @ViewChild('errorToast') errorToast!: ElementRef;
   @ViewChild('succToastProgress') succToastProgress!: ElementRef;
@@ -109,9 +109,9 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applicationForm = this.fb.group({
       computerUuid: ['', Validators.required],
       name: ['', Validators.required],
-      version: ['', Validators.required],
-      vendorName: ['', Validators.required],
-      installedDate: ['', Validators.required],
+      version: [''],
+      vendorName: [''],
+      installedDate: [''],
     });
   }
 
@@ -183,9 +183,9 @@ fetchApplicationData(): void {
        this.computer.lastUpdateCheck = lastUpdateCheck;
     }
     const { deleted ,uuid, id, createdAt, updatedAt, active, ...computerData } = this.computer;
-    const refiningInstalledSoftware = (this.storedApplicationData as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
-    const installedSoftware = [...refiningInstalledSoftware, refinigAddedApplication];
-    const updatedForm = { ...computerData, installedSoftware};
+    const refiningInstalledSoftwares = (this.storedApplicationData as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
+    const installedSoftwares = [...refiningInstalledSoftwares, refinigAddedApplication];
+    const updatedForm = { ...computerData, installedSoftwares};
     console.log(updatedForm);
     this.http.post<any>(vulnSyncEnvironments.computerCommonUrl, updatedForm ).subscribe({
       next: () => {
@@ -287,7 +287,7 @@ fetchApplicationData(): void {
 
       case 4001:
       this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
-      break;
+      break; 
       default:
          break;
 }
@@ -358,8 +358,8 @@ fetchApplicationData(): void {
          };
     });  
     console.log(afterRemovedApp)
-    const installedSoftware = [...afterRemovedApp]
-    const updatedValue = {...computerData, installedSoftware};
+    const installedSoftwares = [...afterRemovedApp]
+    const updatedValue = {...computerData, installedSoftwares};
     console.log(updatedValue)
       this.http.post<any>(vulnSyncEnvironments.computerCommonUrl,updatedValue).subscribe({
         next:(reponse)=>{

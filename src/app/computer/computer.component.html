@@ -138,11 +138,7 @@
           </td>
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <mat-select formControlName="antivirusStatus" required>
-              <mat-option value="" disabled selected>Select status</mat-option>  
-              <mat-option value="enabled">Enabled</mat-option>
-              <mat-option value="disabled">Disabled</mat-option>
-              </mat-select>
+              <input matInput formControlName="antivirusStatus" placeholder="Antivirus Status" />
               <mat-error *ngIf="deviceForm.get('antivirusStatus')?.hasError('required')">
                 Required
               </mat-error>
@@ -163,8 +159,8 @@
             <mat-form-field class="full-width" appearance="fill">
               <mat-select formControlName="firewallStatus" required>
               <mat-option value="" disabled selected>Select status</mat-option>
-              <mat-option value="enabled">Enabled</mat-option>
-              <mat-option value="disabled">Disabled</mat-option>
+              <mat-option value="Unknown">Unknown</mat-option>
+              <li class="list-unstyled px-2"><input formControlName="firewallStatus" class="form-control" type="text"></li>
               </mat-select>
               <mat-error *ngIf="deviceForm.get('firewallStatus')?.hasError('required')">
                 Required
@@ -203,23 +199,29 @@
         <tr>
           <th>Software Name *</th>
           <th>Version</th>
-          <th>Installed Date</th>
           <th>Vendor Name</th>
+          <th>Installed Date</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody formArrayName="installedSoftware">
-        <tr *ngFor="let software of installedSoftware.controls; let i = index; let last = last" [formGroupName]="i">
+      <tbody formArrayName="installedSoftwares">
+        <tr *ngFor="let software of installedSoftwares.controls; let i = index; let last = last" [formGroupName]="i">
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput placeholder="Software Name" formControlName="name" />
-              <mat-error *ngIf="software.get('name')?.hasError('required')">Required</mat-error>
+              <input matInput placeholder="Software Name" formControlName="softwareName" />
+              <mat-error *ngIf="software.get('softwareName')?.hasError('required')">Required</mat-error>
             </mat-form-field>
           </td>
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput placeholder="Version" formControlName="version" />
-              <mat-error *ngIf="software.get('version')?.hasError('required')">Required</mat-error>
+              <input matInput placeholder="Version" formControlName="softwareVersion" />
+              <mat-error *ngIf="software.get('softwareVersion')?.hasError('required')">Required</mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field appearance="fill" class="full-width">
+              <input matInput placeholder="Vendor Name" formControlName="vendorName" />
+              <mat-error *ngIf="software.get('vendorName')?.hasError('required')">Required</mat-error>
             </mat-form-field>
           </td>
           <td>
@@ -230,12 +232,6 @@
             <mat-error *ngIf="software.get('installedDate')?.touched && software.get('installedDate')?.hasError('required')">
              Required
             </mat-error>
-            </mat-form-field>
-          </td>
-          <td>
-            <mat-form-field appearance="fill" class="full-width">
-              <input matInput placeholder="Vendor Name" formControlName="vendorName" />
-              <mat-error *ngIf="software.get('vendorName')?.hasError('required')">Required</mat-error>
             </mat-form-field>
           </td>
           <td>
@@ -265,7 +261,7 @@
   <div class="d-flex justify-content-between">
     <span class="h5 text-secondary">Computer Details</span>
     <div class="d-flex align-items-center">
-      <a class="btn btn-secondary me-5" [routerLink]="['/vulnerabilitySync/unresolvedCpe']">Un Resolved CPE</a>
+      <a class="btn btn-secondary me-5" [routerLink]="['/vulnerabilitySync/unresolvedCpe']">Unresolved CPE</a>
       <button class="btn me-5" matTooltip="Active Computers" (click)="viewComputersByStatus('by-activation-status', 'Active Computers',true)" matTooltipPosition="above"><span class="material-symbols-outlined fs-1">computer_arrow_up</span></button>
       <button class="btn me-5" matTooltip="Deleted Computers" (click)="viewComputersByStatus('by-deletion-status', 'Deleted Computers',true)" matTooltipPosition="above"><span class="material-symbols-outlined fs-1">computer_cancel</span></button>
     <div class="h-fit-content text-white h5 me-2 w-fit-content bg-secondary rounded p-2 fs-6">Total Items: {{storedComputerData.length}}</div>
@@ -340,7 +336,7 @@
             <span (click)="openUpdateDialog($event, computer)" matTooltip="Edit Computer"
               class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 text-center">edit_square</span> 
             &nbsp;&nbsp;&nbsp;
-            <span (click)="openViewComputerDialog(computer.uuid)" matTooltip="View Computer"
+            <span (click)="openViewComputerDialog(computer.uuid)" matTooltip="View Applications"
               class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 text-center">visibility</span>
             &nbsp;&nbsp;&nbsp;
             <span (click)="addApplication(computer)" matTooltip="Add Application"

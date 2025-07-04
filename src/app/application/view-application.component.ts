@@ -108,12 +108,12 @@ export class ViewApplicationDialogComponent {
       map.set(app.uuid, app);
     });
     console.log(Array.from(map.values()))
-    let refiningUninstalledSoftware = (Array.from(map.values()).filter((app: any)=> {
+    let refiningUninstalledSoftwares = (Array.from(map.values()).filter((app: any)=> {
         return app.deleted == false;
     }) as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, select, updatedAt, vulnerabilities, ...rest}) => rest);
-    refiningUninstalledSoftware = [...refiningUninstalledSoftware];
-    const installedSoftware = [...refiningUninstalledSoftware];
-    const updatedForm = { ...computerData, installedSoftware};
+    refiningUninstalledSoftwares = [...refiningUninstalledSoftwares];
+    const installedSoftwares = [...refiningUninstalledSoftwares];
+    const updatedForm = { ...computerData, installedSoftwares};
     console.log(updatedForm);
     this.http.post<any>(`${vulnSyncEnvironments.computerCommonUrl}`, updatedForm)
       .subscribe({

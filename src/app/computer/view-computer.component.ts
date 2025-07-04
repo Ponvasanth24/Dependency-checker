@@ -22,6 +22,7 @@ export class ViewComputerDialogComponent implements OnInit {
   computerData: any= [];
   isLoading: boolean = false;
   vulnerabilityData: Vulnerabilities[] = []; 
+  cpeName: string = "";
   @ViewChild('vulnerabilityTable', { read: TemplateRef }) vulnerabilityTable!: TemplateRef<any>;
   constructor(
     public dialogRef: MatDialogRef<ViewComputerDialogComponent>,
@@ -53,6 +54,7 @@ export class ViewComputerDialogComponent implements OnInit {
         next: (response) => {
           console.log(response)
         this.vulnerabilityData = response as Vulnerabilities[] || [];
+        this.cpeName = this.vulnerabilityData[0].cpeName || "";
         this.vulnerabilityData = this.vulnerabilityData.map(v => ({...v, expanded: false})) || [];
         console.log(this.vulnerabilityData)
         this.isLoading = false;
