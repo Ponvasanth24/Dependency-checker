@@ -161,7 +161,7 @@ addDependencyHint(cpeName: string, application: any){
      }
      this.vulnSyncService.setLoading(true);
      const params = {cpeName: cpeName}
-     const applicationModal = {applicationUuid: application.uuid, applicationName: application.name, applicationVersion: application.version, applicationVendor: application.vendorName, isExists:false};
+     const applicationModal = {applicationUuid: application.uuid, applicationName: application.softwareName, applicationVersion: application.softwareVersion, applicationVendor: application.vendorName, isExists:false};
      console.log(applicationModal)
      if(!application.cpeResolved){
      this.http.post<any[]>(vulnSyncEnvironments.addCpeHintUrl, applicationModal,{params}).subscribe({
