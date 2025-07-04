@@ -48,7 +48,7 @@
             <div class="p-3 bg-light rounded">
               <div class="d-flex justify-content-between align-items-center py-2">
               <span class="mb-2 h6">Likely CPE Names</span>
-              <div class="col-5 d-flex align-items-center">
+              <div *ngIf="!application.cpeResolved" class="col-5 d-flex align-items-center">
                 <input type="text" placeholder="Enter CPE Hint Name" [(ngModel)]="application.cpeName" class="form-control h-fit-content me-2">
                 <button class="btn btn-secondary h-fit-content text-nowrap" [disabled]="!application.cpeName" (click)="addDependencyHint(application.cpeName, application)">Add Hint</button></div>
               </div>
@@ -62,14 +62,20 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let cpe of application.likelyCpeData">
+                  <ng-container *ngFor="let cpe of application.likelyCpeData">
+                  <tr *ngIf="!application.cpeResolved">
                     <td>{{cpe.cpe23Uri}}</td>
                     <td>{{cpe.product}}</td>
                     <td>{{cpe.vendor}}</td>
-                    <td><span (click)="addDependencyHint(cpe.cpe23Uri, application)" class="material-symbols-outlined cursor-pointer" matTooltip="Add Hint">add_notes</span></td>
+                    <td><span *ngIf="!application.cpeResolved" (click)="addDependencyHint(cpe.cpe23Uri, application)" class="material-symbols-outlined cursor-pointer" matTooltip="Add Hint">add_notes</span>
+                        <span *ngIf="application.cpeResolved" class="text-success d-flex align-items-center"><span class="material-symbols-outlined ">fact_check</span>&nbsp;&nbsp; Resolved</span></td>
                   </tr>
-                  <tr *ngIf="application.likelyCpeData.length === 0">
+                  </ng-container>
+                  <tr *ngIf="application.likelyCpeData.length === 0 && !application.cpeResolved">
                     <td colspan="4" class="text-center text-muted">No data found</td>
+                  </tr>
+                  <tr *ngIf="application.cpeResolved">
+                    <td colspan="4"><div class="text-success d-flex justify-content-center align-items-center"><span class="material-symbols-outlined ">fact_check</span>&nbsp;&nbsp; Resolved</div></td>
                   </tr>
                 </tbody>
               </table>

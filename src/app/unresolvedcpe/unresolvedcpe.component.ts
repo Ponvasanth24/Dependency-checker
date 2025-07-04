@@ -12,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 import { ActivatedRoute } from '@angular/router';
+import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
 
 @Component({
   selector: 'app-unresolvedcpe',
@@ -45,10 +46,11 @@ export class UnresolvedcpeComponent implements OnInit{
     
      likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/
      constructor(private cd: ChangeDetectorRef, private http: HttpClient, private vulnSyncDash: VulnerabilitysyncdashboardComponent,
-         private router: ActivatedRoute
+         private router: ActivatedRoute, private vulnSyncService: VulnerabilitySyncService
      ){}
 
      ngOnInit(): void {
+       this.vulnSyncService.setLoading(true);
        this.router.paramMap.subscribe((params) => {
           console.log(params.get('computerUuid'))
           this.computerUuid = params.get('computerUuid');
@@ -122,11 +124,13 @@ export class UnresolvedcpeComponent implements OnInit{
       this.http.get<any>(url).subscribe({
         next:(response)=>{
              console.log(response);
-             this.storedApplicationData = response.map((app: any)=> { return {...app, cpeHint: "", collapse: false, likelyCpeData:[]}}) || [];
+             this.storedApplicationData = response.map((app: any)=> { return {...app, cpeResolved: false, cpeHint: "", collapse: false, likelyCpeData:[]}}) || [];
              this.updatePagedData(this.pageIndex);
+             this.vulnSyncService.setLoading(false);
         },
         error:(error)=>{
              console.log(error);
+             this.vulnSyncService.setLoading(false);
         }
       });
   }
@@ -155,19 +159,24 @@ addDependencyHint(cpeName: string, application: any){
         this.vulnSyncDash.showToast("CPE Name Not Valid",'error');
         return;
      }
+     this.vulnSyncService.setLoading(true);
      const params = {cpeName: cpeName}
      const applicationModal = {applicationUuid: application.uuid, applicationName: application.name, applicationVersion: application.version, applicationVendor: application.vendorName, isExists:false};
      console.log(applicationModal)
+     if(!application.cpeResolved){
      this.http.post<any[]>(vulnSyncEnvironments.addCpeHintUrl, applicationModal,{params}).subscribe({
       next: (response) => {
         console.log(response);
+        application.cpeResolved = true;
+        this.vulnSyncService.setLoading(false);
         this.vulnSyncDash.showToast("Hint Added Successfully",'success');
       },
       error: (err) => {
         console.error('Error add hint:', err);
+        this.vulnSyncService.setLoading(false);
         this.vulnSyncDash.showToast("Hint Added failed",'error');
       }
-})
-
-}
+    }) 
+   }
+   }
 }
