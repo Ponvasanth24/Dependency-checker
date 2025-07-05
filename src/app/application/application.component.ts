@@ -108,8 +108,8 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     this.applicationForm = this.fb.group({
       computerUuid: ['', Validators.required],
-      name: ['', Validators.required],
-      version: [''],
+      softwareName: ['', Validators.required],
+      softwareVersion: [''],
       vendorName: [''],
       installedDate: [''],
     });
@@ -172,13 +172,12 @@ fetchApplicationData(): void {
     }
     this.vulnSyncService.setLoading(true);
     if(!this.isExistComputrtId()) return;
-    let params = {computerUuid:this.computer.uuid};
     const AddedApplication = this.applicationForm.getRawValue();
     AddedApplication.installedDate = String(AddedApplication.installedDate.toISOString()).replace(/Z$/,'');
     const { computerUuid ,...refinigAddedApplication} = AddedApplication;
-    if(String(this.computer.timestamp).indexOf('Z') === -1 || String(this.computer.installedDate).indexOf('Z') === -1) {
-       const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
-       const timestamp = this.computer.timestamp.concat('Z');
+    if(String(this.computer.timestamp)?.indexOf('Z') === -1 || String(this.computer.installedDate)?.indexOf('Z') === -1) {
+       const lastUpdateCheck = `${this.computer.lastUpdateCheck}Z`;
+       const timestamp = this.toFullIsoStringWithOffset(this.computer.timestamp);
        this.computer.timestamp = timestamp;
        this.computer.lastUpdateCheck = lastUpdateCheck;
     }
@@ -289,6 +288,7 @@ fetchApplicationData(): void {
       this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
       break; 
       default:
+        this.vulnSyncDash.showToast('Unexpected error occured', 'error');
          break;
 }
     })
@@ -330,6 +330,9 @@ fetchApplicationData(): void {
       case 4001:
       this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
       break;
+      case 5008:
+      this.vulnSyncDash.showToast('Invalid input provided', 'error');
+      break;
       default:
          break;
     }
@@ -344,11 +347,11 @@ fetchApplicationData(): void {
     console.log(this.storedApplicationData)
     console.log(this.computer)
     this.vulnSyncService.setLoading(true);
-    if(this.computer.timestamp.indexOf('Z') === -1 || this.computer.lastUpdateCheck.indexOf('Z') === -1) {
-       const lastUpdateCheck = this.computer.lastUpdateCheck.concat('Z');
-       const timestamp = this.computer.timestamp.concat('Z');
-       this.computer.timestamp = timestamp;
+    this.computer.timestamp = this.toFullIsoStringWithOffset(this.computer.timestamp);
+    if(this.computer.lastUpdateCheck?.indexOf('Z') === -1) {
+       const lastUpdateCheck = this.computer.lastUpdateChect;
        this.computer.lastUpdateCheck = lastUpdateCheck;
+       console.log(this.computer.lastUpdateCheck)
     }
     const { deleted,uuid, id,createdAt, updatedAt, active, ...computerData } = this.computer;
     const afterRemovedApp = this.storedApplicationData.filter((app: any, index:number)=> app.uuid !== applicationId && !app.deleted).map((app:any )=> {
@@ -373,6 +376,25 @@ fetchApplicationData(): void {
         }
       });
   }
+
+  toFullIsoStringWithOffset(dateStr: string): string {
+  const date = new Date(dateStr);
+
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(date.getTime() + istOffsetMs);
+
+  const pad = (num: number, size: number = 2) => num.toString().padStart(size, '0');
+
+  const year = istDate.getFullYear();
+  const month = pad(istDate.getMonth() + 1);
+  const day = pad(istDate.getDate());
+  const hour = pad(istDate.getHours());
+  const minute = pad(istDate.getMinutes());
+  const second = pad(istDate.getSeconds());
+  const nanoSeconds = '4424717';
+
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}.${nanoSeconds}+05:30`;
+}
 
   activateComputer(uuid: string) {
      this.vulnSyncService.setLoading(true);

@@ -412,13 +412,16 @@ get installedSoftwares(): FormArray {
       dialogRef.close();
     });
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
+      if (result === 200) {
         console.log('Updated computer data:', result);
         this.vulnSyncDash.showToast('Computer data updated successfully', 'success');
         this.fetchComputerData();
       } else if (result === 0) {
         this.vulnSyncDash.showToast('UUID not provided for update', 'error');
-      } else {result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer',
+      } else if(result === 5017){
+        this.vulnSyncDash.showToast('Computer is inactive, cannot perform this operation, Kindly activate it first.', 'error');
+      }
+      else {result === false ? this.vulnSyncDash.showToast('An error occurred while updating the computer',
               'error') : '';
         console.log('Update dialog was closed without saving.');
       }

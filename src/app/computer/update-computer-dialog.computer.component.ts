@@ -128,22 +128,26 @@ export class UpdateComputerDialogComponent {
   try {
     if (this.computerData) {
       const { deleted ,uuid, id, createdAt, updatedAt, active, timestamp, lastUpdateCheck, ...computerData } = this.computerData.computer;
-      const installedSoftware = [...this.computerData.applications];
-      const updatedForm = { ...computerData, ...finalPayload, installedSoftware };
+      const installedSoftwares = [...this.computerData.applications];
+      const updatedForm = { ...computerData, ...finalPayload, installedSoftwares };
       
       console.log(updatedForm)
       this.http.post<any>(vulnSyncEnvironments.computerCommonUrl, updatedForm).subscribe({
         next: (response) => {
           console.log(response)
-          this.dialogRef.close(true);
+          this.dialogRef.close(200);
           this.successMessage = 'Computer data added successfully';
           this.updateComputerForm.reset();
           this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
           console.log(error)
-          this.vulnSyncService.setLoading(false);
-          this.dialogRef.close(false);
+            this.vulnSyncService.setLoading(false);
+          if(error.error?.errorCode === 5017) {
+            this.dialogRef.close(5017);
+          } else{
+            this.dialogRef.close(false);
+          }
           this.errorMessage = error.error?.errorMessage || 'Check your internet connection';
           this.showToast(this.errorMessage, 'error');
         }

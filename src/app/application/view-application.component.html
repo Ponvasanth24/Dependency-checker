@@ -1,5 +1,6 @@
 <div class="status-title sticky-top dash-theme text-white py-2 d-flex justify-content-between align-items-center fnw-bold">
-    <input *ngIf="uninstalledApplicationsData?.length && data.status" type="checkbox" class="form-check ms-4 cursor-pointer accent-gray" (change)="selectAll()" matTooltip="Select All" [matTooltipPosition]="'above'" [(ngModel)]="isAllAppSelected">
+    <input *ngIf="uninstalledApplicationsData?.length" type="checkbox" class="form-check ms-4 cursor-pointer accent-gray" (change)="selectAllUninstallApp()" matTooltip="Select All" [matTooltipPosition]="'above'" [(ngModel)]="isAllAppSelected">
+    <input *ngIf="installedApplicationsData?.length" type="checkbox" class="form-check ms-4 cursor-pointer accent-gray" (change)="selectAllInstallApp()" matTooltip="Select All" [matTooltipPosition]="'above'" [(ngModel)]="isAllAppSelected">
     <div class="flex-grow-1 text-center"> 💻 {{title}}</div>
     <div class="position-absolute end-0 me-2">
     <button mat-icon-button class="btn bg-secondary p-1 rounded-circle d-flex align-items-center text-white float-end" (click)="dialogRef.close()" aria-label="Close dialog">
@@ -22,24 +23,37 @@
     <ng-container>
 
       <!-- Applications Section -->
-      <tr *ngIf="!uninstalledApplicationsData?.length">
+      <tr *ngIf="!uninstalledApplicationsData?.length && !installedApplicationsData?.length">
         <td colspan="5" class="empty">No applications found</td>
       </tr>
       <ng-container *ngIf="uninstalledApplicationsData?.length">
         <tr *ngFor="let app of uninstalledApplicationsData; let i = index">
-          <td *ngIf="data.status">
+          <td *ngIf="uninstalledApplicationsData">
             <input type="checkbox" class="form-check ms-2 cursor-pointer accent-gray" *ngIf="data.status" [(ngModel)]="app.select"></td>
           <td class="text-nowrap">{{ app.softwareName }}</td>
           <td>{{ app.vendorName }}</td>
           <td>{{ app.softwareVersion }}</td>
-          <td colspan="2">{{ applicationDate === 'Installed Date' ? app.installedDate : app.updatedAt}}</td>
+          <td colspan="2">{{ app.updatedAt}}</td>
+        </tr>
+        </ng-container>
+        <ng-container *ngIf="installedApplicationsData?.length">
+        <tr *ngFor="let app of installedApplicationsData; let i = index">
+          <td *ngIf="installedApplicationsData?.length">
+            <input type="checkbox" class="form-check ms-2 cursor-pointer accent-gray" [(ngModel)]="app.select"></td>
+          <td class="text-nowrap">{{ app.softwareName }}</td>
+          <td>{{ app.vendorName }}</td>
+          <td>{{ app.softwareVersion }}</td>
+          <td colspan="2">{{ app.installedDate}}</td>
         </tr>
         </ng-container>
     </ng-container> 
   </tbody>
   <tfoot>
+    <tr *ngIf="installedApplicationsData?.length">
+      <td colspan="5"><button [disabled]="!isAnyAppSelected" (click)="uninstallApplications()" class="btn btn-secondary">Add to Uninstalled List</button></td>
+    </tr>
     <tr *ngIf="uninstalledApplicationsData?.length">
-      <td colspan="5"><button [disabled]="!isAnyAppSelected" (click)="reInstallApplications()" class="btn btn-secondary">Add to Installed List</button></td>
+      <td colspan="5"><button [disabled]="!isAnyAppSelected" (click)="installApplications()" class="btn btn-secondary">Add to Installed List</button></td>
     </tr>
   </tfoot>
 </table>

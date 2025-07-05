@@ -77,8 +77,8 @@
 
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput formControlName="name" placeholder="Name">
-              <mat-error *ngIf="applicationForm.get('name')?.touched && applicationForm.get('name')?.hasError('required')">
+              <input matInput formControlName="softwareName" placeholder="Name">
+              <mat-error *ngIf="applicationForm.get('softwareName')?.touched && applicationForm.get('softwareName')?.hasError('required')">
                 Please fill this field
               </mat-error>
             </mat-form-field>
@@ -87,11 +87,11 @@
           
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput formControlName="version" placeholder="Version">
-              <mat-error *ngIf="applicationForm.get('version')?.touched && applicationForm.get('version')?.hasError('required')">
+              <input matInput formControlName="softwareVersion" placeholder="Version">
+              <mat-error *ngIf="applicationForm.get('softwareVersion')?.touched && applicationForm.get('softwareVersion')?.hasError('required')">
                 Please fill this field
               </mat-error>
-              <mat-error *ngIf="applicationForm.get('version')?.touched && applicationForm.get('version')?.hasError('pattern')">
+              <mat-error *ngIf="applicationForm.get('softwareVersion')?.hasError('pattern')">
                 Please fill valid format
               </mat-error>
             </mat-form-field>
