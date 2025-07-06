@@ -122,7 +122,7 @@ export class UpdateApplicationDialogComponent {
           this.dialogRef.close(4001);
           console.error('Update error:', error);
           } else{
-            this.dialogRef.close();
+            this.dialogRef.close(206);
           }
         }
       });

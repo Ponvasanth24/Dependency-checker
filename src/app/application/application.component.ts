@@ -116,11 +116,9 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 ngOnInit(): void {
-    this.computer = this.vulnSyncService.getComputerData();
-    console.log(this.computer);
-    this.computerUuid = this.computer?.uuid;
-    if(!this.isExistComputrtId()) return;
-    this.storedApplicationData = this.computer.applications;
+    this.route.paramMap.subscribe((params)=> {
+       this.computerUuid = params.get('computerUuid') || '';
+    });
     this.fetchApplicationData();
 }
 
@@ -139,20 +137,18 @@ ngOnDestroy(): void {
 }
 
 fetchApplicationData(): void {
-    if(!this.isExistComputrtId()) return;
     this.isLoading = true;
-    let params = {computerUuid:this.computerUuid ? this.computerUuid : ""};
-    this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${this.computerUuid}/applications`).subscribe({
+    this.http.get<any>(`${vulnSyncEnvironments.computerCommonUrl}/${this.computerUuid}`).subscribe({
       next: (response) => {
-        console.log(params);
         console.log(response);
-        this.storedApplicationData = response || [];
+        this.computer = response.computer || [];
+        this.storedApplicationData = response.applications || [];
         this.updatePagedData(this.initialIndex);
         this.isLoading = false;
       },
       error: (error) => {
-        console.error(error);
         this.isLoading = false;
+        console.error(error);
       }
     });
   }
@@ -287,8 +283,10 @@ fetchApplicationData(): void {
       case 4001:
       this.vulnSyncDash.showToast('Duplicate application added. please check the input', 'error');
       break; 
+      case 206:
+      this.vulnSyncDash.showToast('Unexpected Error occured', 'error');
+      break; 
       default:
-        this.vulnSyncDash.showToast('Unexpected error occured', 'error');
          break;
 }
     })

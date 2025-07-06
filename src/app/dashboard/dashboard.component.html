@@ -11,7 +11,7 @@
       >
         <mat-icon class="material-symbols-outlined">menu</mat-icon>
       </button>
-      <span [ngClass]="{'text-primary': !darkMode, 'text-white': darkMode}" class="fnw-bold fs-3 mb-4"> CVSS Dashboard</span>
+      <span [ngClass]="{'text-custom-primary': !darkMode, 'text-white': darkMode}" class="fnw-bold fs-3 mb-4"> CVSS Dashboard</span>
       </div>
       <div class="col-3 d-flex justify-content-end">
        <div class="form-check form-switch show-lg w-fit-content">
@@ -47,7 +47,7 @@
           <span class="material-symbols-outlined p-1 rounded fw-light">{{ item.icon }}</span>
           &nbsp;<span>{{ item.label }}</span>
         </div>
-        <mat-icons *ngIf="item.child?.length" [ngClass]="'angle'+pi" class="material-symbols-outlined d-flex align-items-center text-secondary angle{{pi}} me-3 rounded-circle bg-gray">stat_minus_1</mat-icons>
+        <mat-icons *ngIf="item.child?.length" [ngClass]="'angle'+pi" class="material-symbols-outlined d-flex align-items-center text-secondary angle{{pi}} me-3 rounded-circle">stat_minus_1</mat-icons>
       </div>
       
     </li>
@@ -72,7 +72,8 @@
     <li class="show-md nav-item"><div class="form-check form-switch w-fit-content ms-3 py-3">
           <input class="form-check-input" [(ngModel)]="darkMode" (click)="changeTheme($event)" type="checkbox" id="flexSwitchCheckDefault">
           <label class="form-check-label custom-fw-1 text-wrap" [ngClass]="{'text-white': darkMode, 'text-dark': !darkMode}" for="flexSwitchCheckDefault">Dark Mode</label>
-        </div></li>
+        </div>
+    </li>
   </ul>
 </div>
 

@@ -28,7 +28,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { Computer } from '../../vulnSyncModels/ComputerData';
 import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
@@ -58,7 +58,7 @@ import { RouterModule } from '@angular/router';
     FormsModule,
     MatIconModule,
     MatDialogModule,
-    MatTableModule,
+    MatTableModule,RouterLink,
     MatTooltipModule, MatNativeDateModule, RouterModule,
     MatProgressSpinnerModule, MatSortModule, MatDatepickerModule
   ],
@@ -93,6 +93,7 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   errorMessage: string = '';
   computerStatusTitle: string = '';
   computerStatusData: Computer[] = [];
+  isLoading: boolean = false;
   
   @ViewChild('updateDialog') updateDialog!: TemplateRef<any>;
   @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
@@ -128,22 +129,6 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
     matIconRegistry.registerFontClassAlias('material-symbols-outlined');
     matIconRegistry.setDefaultFontSetClass('material-icons');
     this.snackBar = snackBar;
-    this.computerForm = this.fb.group({
-      ipAddress: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-           /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/
-          ),
-        ],
-      ],
-      hostName: ['', [Validators.required]],
-      osName: ['', [Validators.required]],
-      osVersion: ['', [Validators.required]],
-      location: ['', [Validators.required]],
-    });
-
   }
 
   ngOnInit(): void {
@@ -162,7 +147,8 @@ export class ComputerComponent implements OnInit, OnDestroy, AfterViewInit {
   machineName: ['', Validators.required],
   ipAddress: ['', [Validators.required, Validators.pattern(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)]],
   osVersion: ['', Validators.required],
-  antivirusStatus: ['', Validators.required],
+  antivirusStatus: [''],
+  customAntivirusStatus:[''],
   firewallStatus: ['', Validators.required],
   loggedInUser: ['', Validators.required],
   installedSoftwares: this.fb.array([
@@ -233,6 +219,10 @@ get installedSoftwares(): FormArray {
       this.installedSoftwares.removeAt(index);
     }
   }
+
+  get getAntivirusStatus(){
+      return this.deviceForm.get('antivirusStatus')?.value;
+  }
   
   fetchComputerData() {
     this.isTableLoading = true;
@@ -284,8 +274,9 @@ get installedSoftwares(): FormArray {
       return;
     }
     const nowUtc = new Date().toISOString();
-    const timestampDate = nowUtc.split('.')[0].concat('Z');
+    const timestampDate = this.vulnSyncService.toFullIsoStringWithOffset(nowUtc);
     this.deviceForm.get('timestamp')?.setValue(timestampDate);
+    this.deviceForm.get('antivirusStatus')?.setValue(this.deviceForm.get('antivirusStatus')?.value === "" ? 'Unknown' : this.deviceForm.get('antivirusStatus')?.value);
     console.log(this.deviceForm.value);
     this.vulnSyncService.setLoading(true);
     this.http
@@ -504,6 +495,7 @@ get installedSoftwares(): FormArray {
      .subscribe({
        next:(response) =>{
           console.log(response)
+          this.computerStatusData = this.computerStatusData.filter((comp: any)=> { return comp.uuid !== computerId});
           this.fetchComputerData();
           this.vulnSyncDash.showToast('Computer revert to list', 'success');
        },
@@ -513,12 +505,7 @@ get installedSoftwares(): FormArray {
        }
      });
   }
-  addApplication(computer: any): void {
-    this.vulnSyncService.setComputerData(computer);
-    this.router.navigate(['/vulnerabilitySync/computer', computer.uuid], {
-      state: { computer: computer },
-    });
-  }
+
   viewUnresolvedCpe() {
     console.log("cl")
     this.http.get<any>(vulnSyncEnvironments.viewUnresolvedPageUrl).subscribe({

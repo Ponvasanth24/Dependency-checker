@@ -116,10 +116,13 @@ export class UpdateComputerDialogComponent {
   const formatted =timestamp?.concat('Z');
   this.updateComputerForm.get('timestamp')?.setValue(formatted);
   console.log(this.updateComputerForm.valid)
-  const lucDateRaw = this.updateComputerForm.get('lastUpdateCheck')?.value;
-  console.log(lucDateRaw.indexOf('Z'))
-  if(lucDateRaw.indexOf('Z') === -1){
-    const formattedLuc = lucDateRaw.concat('Z');
+  const rawDate = this.updateComputerForm.get('lastUpdateCheck')?.value;
+  console.log(rawDate)
+  const normalizedDate = String(this.normalizeDate(new Date(rawDate)));
+  // const lucDateRaw = this.updateComputerForm.get('lastUpdateCheck')?.value;
+  console.log(normalizedDate)
+  if(normalizedDate && normalizedDate.indexOf('Z') === -1){
+    const formattedLuc = normalizedDate.concat('Z');
     this.updateComputerForm.get('lastUpdateCheck')?.setValue(formattedLuc);
   }
 
@@ -159,6 +162,12 @@ export class UpdateComputerDialogComponent {
     console.error('Submit error:', error);
   }
 }
+// Adjusts the date to remove timezone offset
+normalizeDate(date: Date): Date {
+  const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - userTimezoneOffset);
+}
+
 
   closeDialog(): void {
     setTimeout(() => this.dialogRef.close(), 200);

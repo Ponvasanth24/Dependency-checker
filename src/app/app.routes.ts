@@ -38,7 +38,7 @@ export const routes: Routes = [
       ]
       },
       {
-        path: 'vulnerabilitySync',
+        path: 'cvssDataStore',
         loadComponent: () => import('./vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component').then(m => m.VulnerabilitysyncdashboardComponent),
         children:[{
           path:'computer',

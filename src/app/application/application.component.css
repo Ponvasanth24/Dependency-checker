@@ -284,12 +284,6 @@
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), 0 2px 10px rgba(0, 0, 0, 0.1), 0 2px 20px rgba(0, 0, 0, 0.1);
 }
 
-.text-secondary {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); 
-}
-.h5.text-secondary {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
 ::ng-deep .mat-sort-header-arrow {
   font-weight: 500 !important;
   opacity: 1 !important;   
