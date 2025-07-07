@@ -376,7 +376,7 @@ get installedSoftwares(): FormArray {
         : totalItems <= 50 && totalItems >= 25
         ? [10, 25]
         : totalItems <= 25 && totalItems >= 10
-        ? [10]
+        ? [5,10]
         : [5];
     this.pagedComputerData = this.storedComputerData.slice(
       this.start,
