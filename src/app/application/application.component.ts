@@ -166,16 +166,20 @@ fetchApplicationData(): void {
       return;
     }
     this.vulnSyncService.setLoading(true);
-    if(!this.isExistComputrtId()) return;
     const AddedApplication = this.applicationForm.getRawValue();
-    AddedApplication.installedDate = String(AddedApplication.installedDate.toISOString()).replace(/Z$/,'');
+    console.log(AddedApplication.installedDate)
+    const date = AddedApplication.installedDate;
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    AddedApplication.installedDate = `${yyyy}-${mm}-${dd}T00:00:00`;
     const { computerUuid ,...refinigAddedApplication} = AddedApplication;
-    if(String(this.computer.timestamp)?.indexOf('Z') === -1 || String(this.computer.installedDate)?.indexOf('Z') === -1) {
+    if(String(this.computer.lastUpdateCheck)?.indexOf('Z') === -1) {
        const lastUpdateCheck = `${this.computer.lastUpdateCheck}Z`;
-       const timestamp = this.toFullIsoStringWithOffset(this.computer.timestamp);
-       this.computer.timestamp = timestamp;
        this.computer.lastUpdateCheck = lastUpdateCheck;
     }
+    const timestamp = this.toFullIsoStringWithOffset(this.computer.timestamp);
+    this.computer.timestamp = timestamp;
     const { deleted ,uuid, id, createdAt, updatedAt, active, ...computerData } = this.computer;
     const refiningInstalledSoftwares = (this.storedApplicationData as ApplicationData[]).map(({id, uuid, createdAt, deleted, active, updatedAt, vulnerabilities, ...rest}) => rest);
     const installedSoftwares = [...refiningInstalledSoftwares, refinigAddedApplication];
@@ -196,6 +200,33 @@ fetchApplicationData(): void {
       }
     });
   }
+  onSoftwareDateChange(selectedDate: Date): void {
+  if (!selectedDate) {
+    return;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const selectedDateTime = new Date(selectedDate);
+  console.log(selectedDateTime)
+  selectedDateTime.setHours(0, 0, 0, 0); 
+  const formattedDate = this.formatDateTime(selectedDate); 
+  this.applicationForm.get('installedDate')?.setValue(formattedDate); 
+  if (selectedDateTime.getTime() > today.getTime()) {
+    this.applicationForm.get('installedDate')?.setValue(''); 
+    this.vulnSyncDash.showToast('Installed date cannot be in the future', 'error');
+    return;
+  }
+}
+formatDateTime(date: Date): string {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
   addDependency(application: Application) {
     this.vulnSyncService.setApplicationData(application);
     this.router.navigate(['/vulnerabilitySync/application', application.uuid]);

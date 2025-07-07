@@ -101,7 +101,7 @@
 
           <td>
             <mat-form-field appearance="fill" class="full-width">
-              <input matInput [matDatepicker]="picker" formControlName="installedDate" placeholder="Choose a date">
+              <input matInput [matDatepicker]="picker" formControlName="installedDate" (dateChange)="onSoftwareDateChange($event.value)" placeholder="Choose a date">
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
               <mat-error *ngIf="applicationForm.get('installedDate')?.touched && applicationForm.get('installedDate')?.hasError('required')">

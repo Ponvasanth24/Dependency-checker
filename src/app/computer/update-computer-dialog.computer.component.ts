@@ -117,12 +117,10 @@ export class UpdateComputerDialogComponent {
   this.updateComputerForm.get('timestamp')?.setValue(formatted);
   console.log(this.updateComputerForm.valid)
   const rawDate = this.updateComputerForm.get('lastUpdateCheck')?.value;
+
   console.log(rawDate)
-  const normalizedDate = String(this.normalizeDate(new Date(rawDate)));
-  // const lucDateRaw = this.updateComputerForm.get('lastUpdateCheck')?.value;
-  console.log(normalizedDate)
-  if(normalizedDate && normalizedDate.indexOf('Z') === -1){
-    const formattedLuc = normalizedDate.concat('Z');
+  if(rawDate && rawDate.indexOf('Z') === -1){
+    const formattedLuc = rawDate?.concat('Z');
     this.updateComputerForm.get('lastUpdateCheck')?.setValue(formattedLuc);
   }
 

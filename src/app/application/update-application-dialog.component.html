@@ -35,7 +35,7 @@
 
    <mat-form-field appearance="fill" class="full-width">
    <mat-label class="fw-bold">Installed Date</mat-label>
-   <input matInput [matDatepicker]="picker" formControlName="installedDate" placeholder="Choose a date" readonly>
+   <input matInput [matDatepicker]="picker" (dateChange)="onSoftwareDateChange($event.value)" formControlName="installedDate" placeholder="Choose a date" readonly>
    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
    <mat-datepicker #picker></mat-datepicker>
    <!-- <mat-error class="error-field" *ngIf="updateApplicationForm.get('installedDate')?.hasError('required')">

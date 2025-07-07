@@ -14,6 +14,7 @@ import { MatNativeDateModule, provideNativeDateAdapter} from '@angular/material/
 import { MatIcon } from '@angular/material/icon';
 import { ComputerData } from '../../vulnSyncModels/ComputerData';
 import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
+import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 
 interface ApplicationData {
   id: number;
@@ -47,11 +48,13 @@ export class UpdateApplicationDialogComponent {
   updateApplicationForm!: FormGroup;
   computer!: any;
   applications!: any;
+  private vulnSyncDash!: VulnerabilitysyncdashboardComponent
 
   constructor(
     public dialogRef: MatDialogRef<UpdateApplicationDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private fb: FormBuilder, private http: HttpClient, private vulnSyncService: VulnerabilitySyncService
+    private fb: FormBuilder, private http: HttpClient, private vulnSyncService: VulnerabilitySyncService,
+    
   ) {
     this.updateApplicationForm = this.fb.group({
       softwareName: [data?.application.softwareName, Validators.required],
@@ -127,6 +130,36 @@ export class UpdateApplicationDialogComponent {
         }
       });
   }
+}
+
+onSoftwareDateChange(selectedDate: Date): void {
+  if (!selectedDate) {
+    return;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const selectedDateTime = new Date(selectedDate);
+  console.log(selectedDateTime)
+  selectedDateTime.setHours(0, 0, 0, 0); 
+  const formattedDate = this.formatDateTime(selectedDate); 
+  this.updateApplicationForm.get('installedDate')?.setValue(formattedDate); 
+  console.log(selectedDateTime.getTime() > today.getTime())
+  if (selectedDateTime.getTime() > today.getTime()) {
+    this.updateApplicationForm.get('installedDate')?.setValue(''); 
+    this.vulnSyncService.setToastMessage({message: 'Installed date cannot be in the future', status: 'error'});
+    return;
+  }
+}
+
+formatDateTime(date: Date): string {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
 }
