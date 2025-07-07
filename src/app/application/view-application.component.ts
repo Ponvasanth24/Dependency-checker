@@ -50,7 +50,8 @@ export class ViewApplicationDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient, private vulnSyncService: VulnerabilitySyncService) {};
 
   ngOnInit(): void {
-     const computerUuid = this.data.computerUuid;
+     this.computer = this.data.computer;
+     const computerUuid = this.data.computer.uuid;
      const params = {status: this.data.status};
      this.applicationStatus = this.data.status;
      this.title = this.applicationStatus ? 'Uninstalled Softwares' : 'Installed Software';
@@ -165,6 +166,7 @@ export class ViewApplicationDialogComponent {
       });
   }
   installApplications() {
+    console.log(this.computer);
     if(this.computer.lastUpdateCheck && this.computer.lastUpdateCheck?.indexOf('Z') === -1) {
        const lastUpdateCheck = `${this.computer.lastUpdateCheck}Z`;
        this.computer.lastUpdateCheck = lastUpdateCheck;

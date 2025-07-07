@@ -298,7 +298,7 @@ fetchApplicationData(): void {
       width: '90vw',
       minHeight: '50vh',
       maxHeight: '90vh',
-      data:{ computerUuid: this.computer.uuid, applications: this.storedApplicationData, status: statusObj.status}
+      data:{ computer: this.computer, applications: this.storedApplicationData, status: statusObj.status}
     });
 
     dialogRef.afterOpened().subscribe(() => {
