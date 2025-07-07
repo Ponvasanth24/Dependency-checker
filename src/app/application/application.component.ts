@@ -107,7 +107,6 @@ export class ApplicationComponent implements OnInit, AfterViewInit, OnDestroy {
     private vulnSyncDash: VulnerabilitysyncdashboardComponent
   ) {
     this.applicationForm = this.fb.group({
-      computerUuid: ['', Validators.required],
       softwareName: ['', Validators.required],
       softwareVersion: [''],
       vendorName: [''],
