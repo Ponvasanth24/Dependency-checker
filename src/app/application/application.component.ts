@@ -232,7 +232,7 @@ fetchApplicationData(): void {
   }
 
   this.pagedApplicationData = new MatTableDataSource(sortedData.slice(this.start, this.end));
-  console.log(this.pagedApplicationData)
+  console.log(this.pagedApplicationData);
 }
 
 
@@ -298,7 +298,7 @@ fetchApplicationData(): void {
       width: '90vw',
       minHeight: '50vh',
       maxHeight: '90vh',
-      data:{ computer: this.computer, applications: this.storedApplicationData, status: statusObj.status}
+      data:{ computerUuid: this.computer.uuid, applications: this.storedApplicationData, status: statusObj.status}
     });
 
     dialogRef.afterOpened().subscribe(() => {
@@ -330,6 +330,9 @@ fetchApplicationData(): void {
       break;
       case 5008:
       this.vulnSyncDash.showToast('Invalid input provided', 'error');
+      break;
+      case 5017:
+      this.vulnSyncDash.showToast('Computer is inactive, cannot perform this operation, Kindly activate it first.', 'error');
       break;
       default:
          break;

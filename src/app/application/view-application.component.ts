@@ -50,9 +50,7 @@ export class ViewApplicationDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any, private http: HttpClient, private vulnSyncService: VulnerabilitySyncService) {};
 
   ngOnInit(): void {
-     this.computer = this.data.computer;
-     console.log(this.computer)
-     const computerUuid = this.computer.uuid;
+     const computerUuid = this.data.computerUuid;
      const params = {status: this.data.status};
      this.applicationStatus = this.data.status;
      this.title = this.applicationStatus ? 'Uninstalled Softwares' : 'Installed Software';
@@ -152,11 +150,13 @@ export class ViewApplicationDialogComponent {
           this.vulnSyncService.setLoading(false);
         },
         error: (error) => {
-           console.error('save error:', error);
-          this.vulnSyncService.setLoading(false); 
-          if(error.error.errorCode === 2109) {
-          this.dialogRef.close(4001);
           console.error('save error:', error);
+            this.vulnSyncService.setLoading(false); 
+          if(error.error.errorCode === 2109) {
+            this.dialogRef.close(4001);
+          console.error('save error:', error);
+          } else if(error.error.errorCode === 5017){
+            this.dialogRef.close(5017);
           }
           else {
              this.dialogRef.close(5008);
@@ -211,6 +211,8 @@ export class ViewApplicationDialogComponent {
           if(error.error.errorCode === 2109) {
           this.dialogRef.close(4001);
           console.error('save error:', error);
+          } else if(error.error.errorCode === 5017){
+            this.dialogRef.close(5017);
           }
           else {
              this.dialogRef.close(5008);

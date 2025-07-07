@@ -81,7 +81,8 @@ export interface Vulnerabilities {
   createdAt: string;
   updatedAt: string | null;
   deleted: boolean;
-  expanded: boolean
+  expanded: boolean;
+  isOverflowing?: boolean;
 }
 
 export interface InstalledSoftware {

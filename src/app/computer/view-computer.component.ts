@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { vulnSyncEnvironments } from '../../environments/vulnSyncEnvironments';
@@ -18,11 +18,12 @@ MatDialogContent
     CommonModule, MatProgressSpinnerModule, MatTooltipModule, MatIcon, MatDialogContent
   ]
 })
-export class ViewComputerDialogComponent implements OnInit {
+export class ViewComputerDialogComponent implements OnInit,AfterViewInit {
   computerData: any= [];
   isLoading: boolean = false;
   vulnerabilityData: Vulnerabilities[] = []; 
   cpeName: string = "";
+  @ViewChildren('descElem') descElements!: QueryList<ElementRef>;
   @ViewChild('vulnerabilityTable', { read: TemplateRef }) vulnerabilityTable!: TemplateRef<any>;
   constructor(
     public dialogRef: MatDialogRef<ViewComputerDialogComponent>,
@@ -48,14 +49,26 @@ export class ViewComputerDialogComponent implements OnInit {
       });
   } 
 
-  openViewApplicationDialog(applicationUuid: string) {
+  ngAfterViewInit() {
+  if(this.vulnerabilityData.length > 0) {
+  setTimeout(() => {
+    this.descElements.forEach((elemRef, index) => {
+      const el = elemRef.nativeElement;
+      const isOverflowing = el.scrollHeight > el.clientHeight;
+      this.vulnerabilityData[index].isOverflowing = isOverflowing;
+    });
+  });
+}
+}
+
+  openViewVulnerabilityDialog(applicationUuid: string) {
       this.http.get(`${vulnSyncEnvironments.getApplicationVulnerabilities}${applicationUuid}/vulnerabilities`)
       .subscribe({
         next: (response) => {
           console.log(response)
         this.vulnerabilityData = response as Vulnerabilities[] || [];
         this.cpeName = this.vulnerabilityData[0].cpeName || "";
-        this.vulnerabilityData = this.vulnerabilityData.map(v => ({...v, expanded: false})) || [];
+        this.vulnerabilityData = this.vulnerabilityData.map(v => ({...v, isOverflowing: false, expanded: false})) || [];
         console.log(this.vulnerabilityData)
         this.isLoading = false;
       },
@@ -65,7 +78,10 @@ export class ViewComputerDialogComponent implements OnInit {
           this.dialogRef.close(err.error.errorCode);
         }
       });
-      this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'95vw', maxHeight: '90vh'});
+      const dialogRef = this.dialog.open(this.vulnerabilityTable, {data: this.vulnerabilityData, width:'95vw', maxHeight: '90vh'});
+      dialogRef.afterClosed().subscribe(()=>{
+        this.cpeName = "";
+      });
   }
   toggleDescription(index: number): void {
   this.vulnerabilityData[index].expanded = !this.vulnerabilityData[index].expanded;

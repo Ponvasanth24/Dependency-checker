@@ -12,5 +12,9 @@
    padding: 10px;
 }
 .resolve-cpe-table tbody tr:nth-child(odd){
-       background-color: #ddd;
-   }
+  background-color: #ddd;
+}
+.btn-gray-shade {
+    color: white;
+    background-color: gray;
+}

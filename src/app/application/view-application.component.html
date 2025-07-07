@@ -12,7 +12,7 @@
 <table class="styled-table">
   <thead>
     <tr class="text-theme-color sticky-top bg-white">
-      <th *ngIf="data.status"></th>
+      <th></th>
       <th>Name</th>
       <th>Vendor</th>
       <th>Version</th>
@@ -48,7 +48,7 @@
         </ng-container>
     </ng-container> 
   </tbody>
-  <tfoot>
+  <tfoot class="sticky-bottom bg-white">
     <tr *ngIf="installedApplicationsData?.length">
       <td colspan="5"><button [disabled]="!isAnyAppSelected" (click)="uninstallApplications()" class="btn btn-secondary">Add to Uninstalled List</button></td>
     </tr>

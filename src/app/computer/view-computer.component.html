@@ -53,7 +53,7 @@
       <td>{{ app.softwareVersion }}</td>
       <td>{{ app.installedDate }}</td>
       <td>{{app.createdAt}}</td>
-      <td class="text-center"><span (click)="openViewApplicationDialog(app.uuid)" matTooltip="View Vulnerabilities"
+      <td class="text-center"><span (click)="openViewVulnerabilityDialog(app.uuid)" matTooltip="View Vulnerabilities"
         class="material-symbols-outlined cursor-pointer bg-white rounded icon-shadow p-1 text-center">visibility</span>
       </td>
     </tr>
@@ -96,9 +96,10 @@
         <ng-container *ngIf="vulnerabilityData.length > 0">
         <tr *ngFor="let vulnerability of vulnerabilityData; let i = index">
           <td class="text-nowrap"><span class="bg-secondary text-white rounded p-2">{{vulnerability.cveId}}</span></td>
-          <td><div class="description-text" [class.collapsed]="vulnerability.expanded" (click)="toggleDescription(i)">
+          <td class="py-2">
+            <div class="description-text py-2" [class.collapsed]="vulnerability.expanded" (click)="toggleDescription(i)">
             {{ vulnerability.description }}</div>
-          <div class="text-primary cursor-pointer small" (click)="toggleDescription(i)">
+          <div *ngIf="vulnerability.isOverflowing" class="text-primary cursor-pointer small py-1" (click)="toggleDescription(i)">
             {{ vulnerability.expanded ? 'Show less' : 'Show more' }}
           </div></td>
           <td>{{vulnerability.cvssVersion}}</td>

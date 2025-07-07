@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { storedApplications } from '../../vulnSyncModels/ComputerData';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -13,12 +13,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { VulnerabilitysyncdashboardComponent } from '../vulnerabilitysyncdashboard/vulnerabilitysyncdashboard.component';
 import { ActivatedRoute } from '@angular/router';
 import { VulnerabilitySyncService } from '../../shared/VulnerabilitySyncService';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-unresolvedcpe',
   standalone: true,
   imports: [CommonModule, MatTableModule, MatIconModule, MatLabel, MatSelect, FormsModule, MatOptionModule,
-    MatProgressSpinnerModule, MatTooltipModule
+    MatProgressSpinnerModule, MatTooltipModule, MatDialogModule
   ],
   templateUrl: './unresolvedcpe.component.html',
   styleUrl: './unresolvedcpe.component.css'
@@ -43,10 +45,12 @@ export class UnresolvedcpeComponent implements OnInit{
      expandedColumns: string[] = [...this.displayedColumns, 'expandedDetail'];
      sortActive = '';
      sortDirection: 'asc' | 'desc' = 'asc';
+     @ViewChild('confirmDialog') confirmDialog!: TemplateRef<any>;
+     dialogRef!: MatDialogRef<any> 
     
      likelyCpeRegex = /^cpe:\d+\.\d+:[aho\*]:[^:]+:[^:]+:[^:]+(?::[^:]*){0,7}$/
      constructor(private cd: ChangeDetectorRef, private http: HttpClient, private vulnSyncDash: VulnerabilitysyncdashboardComponent,
-         private router: ActivatedRoute, private vulnSyncService: VulnerabilitySyncService
+         private router: ActivatedRoute, private vulnSyncService: VulnerabilitySyncService, private dialog: MatDialog
      ){}
 
      ngOnInit(): void {
@@ -154,7 +158,11 @@ showLikelyCpeNames(vendor: string, product: string, version: string, application
     });
 }
 
-addDependencyHint(cpeName: string, application: any){
+async addDependencyHint(cpeName: string, application: any){
+     this.cpeName = cpeName;
+     this.dialogRef = this.dialog.open(this.confirmDialog);
+     const confirm = await firstValueFrom(this.dialogRef.afterClosed());
+     if(!confirm) return;
      if(!this.likelyCpeRegex.test(cpeName)){
         this.vulnSyncDash.showToast("CPE Name Not Valid",'error');
         return;
