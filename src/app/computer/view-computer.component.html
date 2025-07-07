@@ -99,7 +99,7 @@
           <td class="py-2">
             <div class="description-text py-2" [class.collapsed]="vulnerability.expanded" (click)="toggleDescription(i)">
             {{ vulnerability.description }}</div>
-          <div *ngIf="vulnerability.isOverflowing" class="text-primary cursor-pointer small py-1" (click)="toggleDescription(i)">
+          <div class="text-primary cursor-pointer small py-1" (click)="toggleDescription(i)">
             {{ vulnerability.expanded ? 'Show less' : 'Show more' }}
           </div></td>
           <td>{{vulnerability.cvssVersion}}</td>
